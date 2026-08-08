@@ -52,64 +52,8 @@
   body{
     font-family:var(--font-body);
     background:var(--clr-bg);
-    color:var(--clr-ink);
-    -webkit-font-smoothing:antialiased;
-  }
-
-  #app{
-    max-width:480px;
-    margin:0 auto;
-    height:100vh;
-    background:var(--clr-bg);
-    position:relative;
-    overflow:hidden;
-  }
-  @media (min-width:481px){
-    #app{ box-shadow:0 0 40px rgba(0,0,0,.08); }
-  }
-
-  /* ================= CATEGORY: Auth Screen (adapted from reference design) ================= */
-  .auth-screen{
-    position:fixed; left:50%; top:0; bottom:0; transform:translateX(-50%);
-    width:100%; max-width:480px;
-    background:#FBF3E2;
-    z-index:1000;
-    overflow-y:auto;
-    display:flex; flex-direction:column;
-    padding:calc(38px + var(--safe-top)) 26px calc(30px + var(--safe-bottom));
-    box-shadow:0 0 40px rgba(0,0,0,.08);
-  }
-  .auth-screen.hide{ display:none; }
-
-  .auth-brand{ text-align:center; margin-bottom:26px; }
-  .auth-brand-name{ font-family:var(--font-display); font-weight:700; font-size:25px; color:var(--clr-ink); }
-  .auth-brand-tagline{ font-size:12.5px; color:var(--clr-ink-soft); margin-top:4px; font-weight:500; }
-
-  .auth-badge{ align-self:center; color:var(--clr-ink-soft); font-weight:700; font-size:14.5px; margin-bottom:28px; text-align:center; letter-spacing:.2px; }
-
-  .auth-panel{ flex:1; display:flex; flex-direction:column; }
-  .auth-step{ display:none; flex-direction:column; }
-  .auth-step.active{ display:flex; }
-
-  .auth-account-row{ display:flex; align-items:center; justify-content:center; gap:8px; font-size:14px; color:var(--clr-ink-soft); font-weight:500; margin-bottom:26px; }
-  .auth-account-row b{ color:var(--clr-ink); font-weight:700; }
-  .auth-edit-pencil{ width:26px;height:26px; border-radius:50%; border:none; background:var(--clr-card); box-shadow:0 1px 5px rgba(0,0,0,.08); display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--clr-ink-soft); flex-shrink:0; }
-  .auth-edit-pencil svg{width:13px;height:13px;}
-
-  .auth-field-label{ font-size:12.5px; font-weight:700; color:var(--clr-ink-soft); margin-bottom:9px; text-align:center; }
-  .auth-phone-input-wrap{ display:flex; align-items:center; gap:10px; border:1.6px solid var(--clr-line); border-radius:var(--radius-md); padding:14px 16px; background:var(--clr-card); margin-bottom:8px; }
-  .auth-phone-input-wrap.error{ border-color:var(--clr-owe-to-me); }
-  .auth-phone-prefix{ font-size:15px; font-weight:700; color:var(--clr-ink-soft); }
-  .auth-phone-input-wrap input{ flex:1; border:none; outline:none; background:none; font-family:var(--font-body); font-size:16px; letter-spacing:.5px; color:var(--clr-ink); }
-  .auth-hint{ min-height:16px; font-size:12px; color:var(--clr-owe-to-me); font-weight:600; text-align:center; margin-bottom:14px; }
-
-  .auth-primary-btn{ width:100%; padding:16px; border:none; border-radius:var(--radius-full); background:linear-gradient(160deg, var(--clr-primary), var(--clr-primary-dark)); color:#fff; font-size:15.5px; font-weight:700; cursor:pointer; box-shadow:0 8px 18px rgba(198,16,46,.28); margin-top:6px; }
-  .auth-primary-btn:active{ transform:scale(.98); }
-
-  .auth-pin-title{ text-align:center; font-size:15.5px; font-weight:700; color:var(--clr-ink); margin-bottom:20px; }
-  .auth-pin-boxes{ display:flex; justify-content:center; gap:12px; margin-bottom:8px; }
-  .auth-pin-boxes .pin-box{ width:52px;height:58px; border:1.8px solid var(--clr-line); border-radius:var(--radius-md); background:var(--clr-card); display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:700; color:var(--clr-ink); }
-  .auth-pin-boxes .pin-box.filled{ border-color:var(--clr-primary); }
+ gn-items:center; justify-content:center; gap:8px; font-size:14px; color:var(--clr-ink-soft); font-weight:500; margin-bottom:26px; }
+olor:var(--clr-primary); }
   .auth-pin-boxes.shake{ animation:authShake .38s ease; }
   @keyframes authShake{ 10%,90%{transform:translateX(-2px);} 20%,80%{transform:translateX(4px);} 30%,50%,70%{transform:translateX(-8px);} 40%,60%{transform:translateX(8px);} }
 
