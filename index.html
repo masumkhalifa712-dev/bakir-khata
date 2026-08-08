@@ -423,10 +423,13 @@
   .cd-profile-side-label{font-size:11px; color:var(--clr-ink-soft); font-weight:600;}
   .cd-profile-side-amount{font-size:14.5px; font-weight:700; color:var(--clr-ink); margin-top:2px;}
 
+  .cd-profile-card.no-avatar .cd-profile-name{ font-size:19px; }
+  .cd-profile-card.no-avatar .cd-profile-phone-row span{ font-size:14.5px; }
+
   .cd-action-row{ margin:14px 16px 0; display:flex; gap:8px; }
   .cd-period-select{ flex:1; min-width:0; border:1px solid var(--clr-line); background:var(--clr-card); border-radius:var(--radius-full); padding:9px 10px; font-size:12.5px; font-weight:700; color:var(--clr-ink-soft); }
-  .cd-action-btn{ flex:1; min-width:0; display:flex; align-items:center; justify-content:center; gap:6px; background:var(--clr-card); border:1px solid var(--clr-line); border-radius:var(--radius-full); padding:9px 10px; font-size:12.5px; font-weight:700; color:var(--clr-ink); cursor:pointer; }
-  .cd-action-btn svg.trailing{width:14px;height:14px; color:var(--clr-ink-soft); flex-shrink:0;}
+  .cd-quick-action-btn{ flex:1; min-width:0; display:flex; align-items:center; justify-content:center; gap:6px; background:var(--clr-card); border:1px solid var(--clr-line); border-radius:var(--radius-full); padding:9px 10px; font-size:12.5px; font-weight:700; color:var(--clr-ink); cursor:pointer; }
+  .cd-quick-action-btn svg.trailing{width:14px;height:14px; color:var(--clr-ink-soft); flex-shrink:0;}
 
   .cd-custom-range{ margin:8px 16px 0; display:flex; align-items:center; gap:8px; }
   .cd-custom-range span{ font-size:12px; font-weight:600; color:var(--clr-ink-soft); }
@@ -538,6 +541,23 @@
   .ce-option-row.delete{color:var(--clr-owe-to-me);}
   .ce-option-row.edit{color:#2563A8;}
   .ce-option-label{font-size:14.5px; font-weight:700; flex:1;}
+
+  /* ================= CATEGORY: Delete-Blocked Modal ================= */
+  .del-modal-overlay{ position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:600; display:none; align-items:flex-end; justify-content:center; }
+  .del-modal-overlay.show{ display:flex; }
+  .del-modal{ width:100%; max-width:480px; background:var(--clr-bg); border-radius:20px 20px 0 0; max-height:80vh; display:flex; flex-direction:column; }
+  .del-modal-icon{ width:52px; height:52px; border-radius:50%; background:#FDE8E8; color:var(--clr-owe-to-me); display:flex; align-items:center; justify-content:center; margin:22px auto 10px; }
+  .del-modal-icon svg{ width:26px; height:26px; }
+  .del-modal-title{ text-align:center; font-size:15.5px; font-weight:700; color:var(--clr-ink); padding:0 24px; }
+  .del-modal-notice{ margin:12px 16px 4px; background:#FDE8E8; border:1px solid #F5B5B5; border-radius:12px; padding:12px 14px; font-size:13px; font-weight:600; color:#8A1F2E; text-align:center; }
+  .del-modal-tx-list{ overflow-y:auto; margin:14px 16px; padding-right:2px; }
+  .del-modal-tx-row{ display:flex; justify-content:space-between; align-items:center; padding:10px 4px; border-bottom:1px solid var(--clr-line); font-size:12.5px; }
+  .del-modal-tx-row:last-child{ border-bottom:none; }
+  .del-modal-tx-date{ color:var(--clr-ink-soft); }
+  .del-modal-tx-amt{ font-weight:700; }
+  .del-modal-tx-amt.take{ color:var(--clr-i-owe); }
+  .del-modal-tx-amt.give{ color:var(--clr-owe-to-me); }
+  .del-modal-close-btn{ margin:6px 16px calc(18px + var(--safe-bottom)); padding:14px; border:none; border-radius:12px; background:var(--clr-card); border:1px solid var(--clr-line); font-size:14px; font-weight:700; color:var(--clr-ink); cursor:pointer; }
 
   /* ================= CATEGORY: Transaction Detail Screen ================= */
   .txd-section-label{ margin:18px 16px 10px; font-size:13.5px; font-weight:700; color:var(--clr-ink); }
@@ -932,9 +952,8 @@
       </div>
     </div>
 
-    <!-- ===== CATEGORY: Profile Card ===== -->
-    <div class="cd-profile-card">
-      <div class="cd-avatar" id="cdAvatar"></div>
+    <!-- ===== CATEGORY: Profile Card (no avatar — photos disabled for now) ===== -->
+    <div class="cd-profile-card no-avatar">
       <div class="cd-profile-main">
         <div class="cd-profile-name" id="cdName">নাম <span id="cdId"></span></div>
         <div class="cd-profile-phone-row">
@@ -970,11 +989,11 @@
         <option value="day">দিন</option>
         <option value="custom">কাস্টম</option>
       </select>
-      <button class="cd-action-btn" id="cdSmsBtn">
+      <button class="cd-quick-action-btn" id="cdSmsBtn">
         <span>তাগাদা</span>
         <svg class="trailing" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       </button>
-      <button class="cd-action-btn" id="cdDateBtn">
+      <button class="cd-quick-action-btn" id="cdDateBtn">
         <span>পরিশোধ</span>
         <svg class="trailing" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
       </button>
@@ -1020,6 +1039,21 @@
       </button>
     </div>
   </section>
+
+  <!-- ================================================================ -->
+  <!-- ================= MODAL: Delete Blocked (has transactions) ===== -->
+  <!-- ================================================================ -->
+  <div class="del-modal-overlay" id="delBlockedOverlay">
+    <div class="del-modal">
+      <div class="del-modal-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </div>
+      <div class="del-modal-title" id="delModalCustomerName">কাস্টমারের নাম</div>
+      <div class="del-modal-notice">লেনদেন শেষ না হওয়া পর্যন্ত এই কাস্টমার ডিলেট করা যাবে না</div>
+      <div class="del-modal-tx-list" id="delModalTxList"></div>
+      <button class="del-modal-close-btn" id="delModalCloseBtn">বন্ধ করুন</button>
+    </div>
+  </div>
 
   <!-- ===== CATEGORY: Bottom Action Buttons (fixed, outside scroll) ===== -->
   <div class="cd-bottom-actions">
@@ -1628,6 +1662,14 @@
   /* ================= CATEGORY: Home Screen — List Render =========== */
   /* ================================================================ */
   const bn = n => Number(n||0).toLocaleString('bn-BD');
+  // Numeric date + 24-hour time for every transaction timestamp, e.g. "7/8/2026 | 16:40"
+  function nowDateTimeStrings(){
+    const now = new Date();
+    return {
+      date: `${now.getDate()}/${now.getMonth()+1}/${now.getFullYear()}`,
+      time: `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`
+    };
+  }
   const formatDMY = (isoDate) => { const [y,m,d] = isoDate.split('-'); return `${d}-${m}-${y}`; };
 
   function renderList(filter=""){
@@ -2140,12 +2182,6 @@
     if(!customer.transactions) customer.transactions = [];
     recomputeCustomerTotals(customer);
 
-    document.getElementById('cdAvatar').innerHTML = customer.photo
-      ? `<img src="${customer.photo}" />`
-      : (customer.initial || '');
-    if(!customer.photo){
-      document.getElementById('cdAvatar').style.background = customer.color || '#D9D2BC';
-    }
     document.getElementById('cdName').innerHTML = `${customer.name} ${customer.id ? `<span>· ${customer.id}</span>` : ''}`;
     document.getElementById('cdTotalAmount').textContent = bn(customer.amount) + " টাকা";
     document.getElementById('cdInstallmentDue').textContent = bn(customer.installmentDue) + " টাকা";
@@ -2296,6 +2332,17 @@
   document.getElementById('ceEditBtn').addEventListener('click', ()=>showToast("কাস্টমারের তথ্য এডিট (শীঘ্রই আসছে)"));
   document.getElementById('ceDeleteBtn').addEventListener('click', async ()=>{
     if(!currentCustomer) return;
+    const txs = currentCustomer.transactions || [];
+    if(txs.length > 0){
+      document.getElementById('delModalCustomerName').textContent = `${currentCustomer.name}-এর ${bn(txs.length)}টি লেনদেন আছে`;
+      document.getElementById('delModalTxList').innerHTML = txs.map(tx => `
+        <div class="del-modal-tx-row">
+          <span class="del-modal-tx-date">${tx.date} | ${tx.time}</span>
+          <span class="del-modal-tx-amt ${tx.take ? 'take' : 'give'}">${tx.take ? 'নিয়েছি' : 'দিয়েছি'}: ${bn(tx.take || tx.give)} টাকা</span>
+        </div>`).join('');
+      document.getElementById('delBlockedOverlay').classList.add('show');
+      return; // deletion is fully blocked while any transaction exists — no way around this
+    }
     const ok = window.confirm(`${currentCustomer.name}-কে মুছে ফেলতে চান? এই কাজটি ফেরানো যাবে না।`);
     if(!ok) return;
     const idx = customers.indexOf(currentCustomer);
@@ -2305,6 +2352,12 @@
     appEl.classList.remove('show-customeredit');
     goHome();
     showToast("কাস্টমার মুছে ফেলা হয়েছে");
+  });
+  document.getElementById('delModalCloseBtn').addEventListener('click', ()=>{
+    document.getElementById('delBlockedOverlay').classList.remove('show');
+  });
+  document.getElementById('delBlockedOverlay').addEventListener('click', (e)=>{
+    if(e.target.id === 'delBlockedOverlay') document.getElementById('delBlockedOverlay').classList.remove('show');
   });
   document.getElementById('cdDateBtn').addEventListener('click', ()=>showToast("পরিশোধের তারিখ (শীঘ্রই আসছে)"));
   document.getElementById('cdSmsBtn').addEventListener('click', ()=>{
@@ -2522,14 +2575,10 @@
       Object.assign(tx, planFields);
       showToast("এন্ট্রি আপডেট হয়েছে");
     }else{
-      const now = new Date();
-      const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-      const hours24 = now.getHours();
-      const hours12 = ((hours24 % 12) || 12);
-      const ampm = hours24 < 12 ? 'AM' : 'PM';
+      const { date: __d, time: __t } = nowDateTimeStrings();
       const newTx = {
-        date: `${now.getDate()} ${monthNames[now.getMonth()]} ${now.getFullYear()}`,
-        time: `${String(hours12).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')} ${ampm}`,
+        date: __d,
+        time: __t,
         note,
         category: 'installment',
         take: 0,
@@ -2675,14 +2724,10 @@
     if(discount > 0) noteParts.push(`ছাড়: ${bn(discount)} টাকা`);
 
     if(!currentCustomer.transactions) currentCustomer.transactions = [];
-    const now = new Date();
-    const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-    const hours24 = now.getHours();
-    const hours12 = ((hours24 % 12) || 12);
-    const ampm = hours24 < 12 ? 'AM' : 'PM';
+    const { date: __d, time: __t } = nowDateTimeStrings();
     const newTx = {
-      date: `${now.getDate()} ${monthNames[now.getMonth()]} ${now.getFullYear()}`,
-      time: `${String(hours12).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')} ${ampm}`,
+      date: __d,
+      time: __t,
       note: noteParts.join(' — '),
       category: 'installment',
       take: received + discount,
@@ -2757,14 +2802,10 @@
       if(dueDate) tx.dueDate = dueDate;
       showToast("এন্ট্রি আপডেট হয়েছে");
     }else{
-      const now = new Date();
-      const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-      const hours24 = now.getHours();
-      const hours12 = ((hours24 % 12) || 12);
-      const ampm = hours24 < 12 ? 'AM' : 'PM';
+      const { date: __d, time: __t } = nowDateTimeStrings();
       const newTx = {
-        date: `${now.getDate()} ${monthNames[now.getMonth()]} ${now.getFullYear()}`,
-        time: `${String(hours12).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')} ${ampm}`,
+        date: __d,
+        time: __t,
         note,
         category: currentEntryCategory,
         take: sheetMode === 'take' ? amt : 0,
