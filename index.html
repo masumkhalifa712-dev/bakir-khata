@@ -224,6 +224,33 @@
 
   /* ================= CATEGORY: Summary Stats Bar ================= */
   .summary-bar{ margin:20px 18px 0; background:var(--clr-card); border-radius:var(--radius-lg); display:flex; box-shadow:0 2px 14px rgba(0,0,0,.04); overflow:hidden; }
+
+  .collapsible-header-section{ max-height:220px; opacity:1; overflow:hidden; transition:max-height .32s ease, opacity .22s ease; }
+  #screen-home.collapsed-header .collapsible-header-section{ max-height:0; opacity:0; }
+
+  /* ================= CATEGORY: List Filter Modal ================= */
+  .lf-overlay{ position:fixed; inset:0; background:rgba(15,15,20,.6); z-index:610; display:none; align-items:center; justify-content:center; padding:24px; }
+  .lf-overlay.show{ display:flex; }
+  .lf-panel{ width:100%; max-width:400px; max-height:88vh; overflow-y:auto; background:#fff; border-radius:22px; padding:24px 20px calc(20px + var(--safe-bottom)); }
+  .lf-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+  .lf-title{ font-size:21px; font-weight:800; color:var(--clr-ink); }
+  .lf-close-btn{ width:36px; height:36px; border-radius:50%; border:none; background:#F1F1F3; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--clr-ink-soft); }
+  .lf-close-btn svg{ width:17px; height:17px; }
+  .lf-check-row{ display:flex; align-items:center; justify-content:space-between; background:#F1F1F3; border-radius:14px; padding:15px 16px; margin-bottom:12px; cursor:pointer; font-size:15px; font-weight:700; color:var(--clr-ink); }
+  .lf-checkbox{ width:22px; height:22px; border-radius:6px; border:2px solid #B9B9BE; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .lf-checkbox svg{ width:14px; height:14px; opacity:0; color:#fff; }
+  .lf-check-row.checked .lf-checkbox{ background:var(--clr-primary); border-color:var(--clr-primary); }
+  .lf-check-row.checked .lf-checkbox svg{ opacity:1; }
+  .lf-divider{ border:none; border-top:1.5px dashed #E2E2E6; margin:18px 0; }
+  .lf-section-title{ font-size:15px; font-weight:800; color:var(--clr-ink); margin-bottom:12px; }
+  .lf-radio-row{ display:flex; gap:10px; margin-bottom:10px; }
+  .lf-radio-opt{ flex:1; display:flex; align-items:center; gap:9px; background:#F1F1F3; border-radius:14px; padding:15px 14px; cursor:pointer; font-size:14.5px; font-weight:700; color:var(--clr-ink-soft); }
+  .lf-radio-circle{ width:18px; height:18px; border-radius:50%; border:2px solid #B9B9BE; flex-shrink:0; position:relative; }
+  .lf-radio-opt.selected{ color:var(--clr-ink); }
+  .lf-radio-opt.selected .lf-radio-circle{ border-color:var(--clr-primary); }
+  .lf-radio-opt.selected .lf-radio-circle::after{ content:''; position:absolute; inset:3px; border-radius:50%; background:var(--clr-primary); }
+  .lf-confirm-btn{ width:100%; margin-top:8px; padding:16px; border:none; border-radius:14px; background:linear-gradient(160deg, var(--clr-primary), var(--clr-primary-dark)); color:#fff; font-weight:800; font-size:16px; cursor:pointer; }
+
   .summary-item{flex:1; text-align:center; padding:16px 8px;}
   .summary-item + .summary-item{border-left:1px solid var(--clr-line);}
   .summary-amount{font-family:var(--font-display); font-size:22px; font-weight:700;}
@@ -749,33 +776,35 @@
       <small>এখানে আপনার নিজের বিজ্ঞাপন/অফার বসবে</small>
     </div>
 
-    <div class="quick-actions">
-      <button class="quick-action" data-action="backup">
-        <span class="qa-icon" style="color:#2E9E5B;"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg></span>
-        <span>ডাটা ব্যাকআপ</span>
-      </button>
-      <button class="quick-action" data-action="bulk-sms">
-        <span class="qa-icon" style="color:#D6304A;"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM8 15H6v-2h2v2zm0-3H6V9.99h2V12zm0-3.01H6V7h2v1.99zM18 15h-8v-2h8v2zm0-3h-8V9.99h8V12zm0-3.01h-8V7h8v1.99z"/></svg></span>
-        <span>টালি-মেসেজ</span>
-      </button>
-      <button class="quick-action" data-action="cashbox">
-        <span class="qa-icon" style="color:#D18B1D;"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 6h-2.18c.11-.31.18-.65.18-1a2.996 2.996 0 0 0-5.5-1.65l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zM15 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z"/></svg></span>
-        <span>ক্যাশবক্স</span>
-      </button>
-      <button class="quick-action" data-action="reminder">
-        <span class="qa-icon" style="color:#2E9E5B;"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg></span>
-        <span>গ্রুপ তাগাদা</span>
-      </button>
-    </div>
-
-    <div class="summary-bar">
-      <div class="summary-item receivable">
-        <div class="summary-amount" id="totalReceivable">০ টাকা</div>
-        <div class="summary-label">মোট পাবো</div>
+    <div class="collapsible-header-section" id="collapsibleHeaderSection">
+      <div class="quick-actions">
+        <button class="quick-action" data-action="backup">
+          <span class="qa-icon" style="color:#2E9E5B;"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg></span>
+          <span>ডাটা ব্যাকআপ</span>
+        </button>
+        <button class="quick-action" data-action="bulk-sms">
+          <span class="qa-icon" style="color:#D6304A;"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM8 15H6v-2h2v2zm0-3H6V9.99h2V12zm0-3.01H6V7h2v1.99zM18 15h-8v-2h8v2zm0-3h-8V9.99h8V12zm0-3.01h-8V7h8v1.99z"/></svg></span>
+          <span>টালি-মেসেজ</span>
+        </button>
+        <button class="quick-action" data-action="cashbox">
+          <span class="qa-icon" style="color:#D18B1D;"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 6h-2.18c.11-.31.18-.65.18-1a2.996 2.996 0 0 0-5.5-1.65l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zM15 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z"/></svg></span>
+          <span>ক্যাশবক্স</span>
+        </button>
+        <button class="quick-action" data-action="reminder">
+          <span class="qa-icon" style="color:#2E9E5B;"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg></span>
+          <span>গ্রুপ তাগাদা</span>
+        </button>
       </div>
-      <div class="summary-item payable">
-        <div class="summary-amount" id="totalPayable">০ টাকা</div>
-        <div class="summary-label">মোট দেবো</div>
+
+      <div class="summary-bar">
+        <div class="summary-item receivable">
+          <div class="summary-amount" id="totalReceivable">০ টাকা</div>
+          <div class="summary-label">মোট পাবো</div>
+        </div>
+        <div class="summary-item payable">
+          <div class="summary-amount" id="totalPayable">০ টাকা</div>
+          <div class="summary-label">মোট দেবো</div>
+        </div>
       </div>
     </div>
 
@@ -1117,10 +1146,18 @@
     </div>
 
     <!-- ===== CATEGORY: Profile Card (reused) ===== -->
-    <div class="cd-profile-card">
-      <div class="cd-avatar" id="ndAvatar"></div>
+    <div class="cd-profile-card no-avatar">
       <div class="cd-profile-main">
         <div class="cd-profile-name" id="ndName">নাম <span id="ndId"></span></div>
+        <div class="cd-profile-phone-row">
+          <span id="ndPhoneNumber">মোবাইল নম্বর</span>
+          <button class="cd-phone-icon-btn call" id="ndCallBtn" aria-label="কল করুন">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.98.36 1.94.68 2.87a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.21-1.21a2 2 0 0 1 2.11-.45c.93.32 1.89.55 2.87.68A2 2 0 0 1 22 16.92z"/></svg>
+          </button>
+          <button class="cd-phone-icon-btn whatsapp" id="ndWhatsappBtn" aria-label="WhatsApp">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.36 5.07L2 22l5.06-1.33A9.94 9.94 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.6 0-3.1-.44-4.38-1.2l-.31-.18-3 .79.8-2.92-.2-.3A7.94 7.94 0 0 1 4 12c0-4.41 3.59-8 8-8s8 3.59 8 8-3.59 8-8 8zm4.4-5.6c-.24-.12-1.44-.71-1.66-.79-.22-.08-.38-.12-.55.12-.16.24-.63.79-.77.95-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.18-.71-.63-1.19-1.42-1.33-1.66-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.55-1.32-.75-1.81-.2-.48-.4-.41-.55-.42-.14-.01-.3-.01-.46-.01-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.7 2.6 4.12 3.64.58.25 1.03.4 1.38.51.58.18 1.11.16 1.53.1.47-.07 1.44-.59 1.64-1.16.2-.57.2-1.06.14-1.16-.06-.1-.22-.16-.46-.28z"/></svg>
+          </button>
+        </div>
         <div class="cd-profile-total-label">সর্বমোট বাকি</div>
         <div class="cd-profile-total-amount" id="ndTotalAmount">০ টাকা</div>
       </div>
@@ -1130,7 +1167,7 @@
           <div class="cd-profile-side-amount" id="ndInstallmentDue">০ টাকা</div>
         </div>
         <div class="cd-profile-side-row">
-          <div class="cd-profile-side-label">সাধারণ বাকি</div>
+          <div class="cd-profile-side-label" id="ndGeneralDueLabel">সাধারণ বাকি</div>
           <div class="cd-profile-side-amount" id="ndGeneralDue">০ টাকা</div>
         </div>
       </div>
@@ -1188,10 +1225,18 @@
     </div>
 
     <!-- ===== CATEGORY: Profile Card (reused) ===== -->
-    <div class="cd-profile-card">
-      <div class="cd-avatar" id="txdAvatar"></div>
+    <div class="cd-profile-card no-avatar">
       <div class="cd-profile-main">
         <div class="cd-profile-name" id="txdName">নাম <span id="txdId"></span></div>
+        <div class="cd-profile-phone-row">
+          <span id="txdPhoneNumber">মোবাইল নম্বর</span>
+          <button class="cd-phone-icon-btn call" id="txdCallBtn" aria-label="কল করুন">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.98.36 1.94.68 2.87a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.21-1.21a2 2 0 0 1 2.11-.45c.93.32 1.89.55 2.87.68A2 2 0 0 1 22 16.92z"/></svg>
+          </button>
+          <button class="cd-phone-icon-btn whatsapp" id="txdWhatsappBtn" aria-label="WhatsApp">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.36 5.07L2 22l5.06-1.33A9.94 9.94 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.6 0-3.1-.44-4.38-1.2l-.31-.18-3 .79.8-2.92-.2-.3A7.94 7.94 0 0 1 4 12c0-4.41 3.59-8 8-8s8 3.59 8 8-3.59 8-8 8zm4.4-5.6c-.24-.12-1.44-.71-1.66-.79-.22-.08-.38-.12-.55.12-.16.24-.63.79-.77.95-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.18-.71-.63-1.19-1.42-1.33-1.66-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.55-1.32-.75-1.81-.2-.48-.4-.41-.55-.42-.14-.01-.3-.01-.46-.01-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.7 2.6 4.12 3.64.58.25 1.03.4 1.38.51.58.18 1.11.16 1.53.1.47-.07 1.44-.59 1.64-1.16.2-.57.2-1.06.14-1.16-.06-.1-.22-.16-.46-.28z"/></svg>
+          </button>
+        </div>
         <div class="cd-profile-total-label">সর্বমোট বাকি</div>
         <div class="cd-profile-total-amount" id="txdTotalAmount">০ টাকা</div>
       </div>
@@ -1201,7 +1246,7 @@
           <div class="cd-profile-side-amount" id="txdInstallmentDue">০ টাকা</div>
         </div>
         <div class="cd-profile-side-row">
-          <div class="cd-profile-side-label">সাধারণ বাকি</div>
+          <div class="cd-profile-side-label" id="txdGeneralDueLabel">সাধারণ বাকি</div>
           <div class="cd-profile-side-amount" id="txdGeneralDue">০ টাকা</div>
         </div>
       </div>
@@ -1271,10 +1316,18 @@
     </div>
 
     <!-- ===== CATEGORY: Profile Card (reused) ===== -->
-    <div class="cd-profile-card">
-      <div class="cd-avatar" id="niAvatar"></div>
+    <div class="cd-profile-card no-avatar">
       <div class="cd-profile-main">
         <div class="cd-profile-name" id="niName">নাম <span id="niId"></span></div>
+        <div class="cd-profile-phone-row">
+          <span id="niPhoneNumber">মোবাইল নম্বর</span>
+          <button class="cd-phone-icon-btn call" id="niCallBtn" aria-label="কল করুন">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.98.36 1.94.68 2.87a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.21-1.21a2 2 0 0 1 2.11-.45c.93.32 1.89.55 2.87.68A2 2 0 0 1 22 16.92z"/></svg>
+          </button>
+          <button class="cd-phone-icon-btn whatsapp" id="niWhatsappBtn" aria-label="WhatsApp">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.36 5.07L2 22l5.06-1.33A9.94 9.94 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.6 0-3.1-.44-4.38-1.2l-.31-.18-3 .79.8-2.92-.2-.3A7.94 7.94 0 0 1 4 12c0-4.41 3.59-8 8-8s8 3.59 8 8-3.59 8-8 8zm4.4-5.6c-.24-.12-1.44-.71-1.66-.79-.22-.08-.38-.12-.55.12-.16.24-.63.79-.77.95-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.18-.71-.63-1.19-1.42-1.33-1.66-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.55-1.32-.75-1.81-.2-.48-.4-.41-.55-.42-.14-.01-.3-.01-.46-.01-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.7 2.6 4.12 3.64.58.25 1.03.4 1.38.51.58.18 1.11.16 1.53.1.47-.07 1.44-.59 1.64-1.16.2-.57.2-1.06.14-1.16-.06-.1-.22-.16-.46-.28z"/></svg>
+          </button>
+        </div>
         <div class="cd-profile-total-label">সর্বমোট বাকি</div>
         <div class="cd-profile-total-amount" id="niTotalAmount">০ টাকা</div>
       </div>
@@ -1284,7 +1337,7 @@
           <div class="cd-profile-side-amount" id="niInstallmentDue">০ টাকা</div>
         </div>
         <div class="cd-profile-side-row">
-          <div class="cd-profile-side-label">সাধারণ বাকি</div>
+          <div class="cd-profile-side-label" id="niGeneralDueLabel">সাধারণ বাকি</div>
           <div class="cd-profile-side-amount" id="niGeneralDue">০ টাকা</div>
         </div>
       </div>
@@ -1381,10 +1434,18 @@
     </div>
 
     <!-- ===== CATEGORY: Profile Card (reused) ===== -->
-    <div class="cd-profile-card">
-      <div class="cd-avatar" id="ciAvatar"></div>
+    <div class="cd-profile-card no-avatar">
       <div class="cd-profile-main">
         <div class="cd-profile-name" id="ciName">নাম <span id="ciId"></span></div>
+        <div class="cd-profile-phone-row">
+          <span id="ciPhoneNumber">মোবাইল নম্বর</span>
+          <button class="cd-phone-icon-btn call" id="ciCallBtn" aria-label="কল করুন">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.98.36 1.94.68 2.87a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.21-1.21a2 2 0 0 1 2.11-.45c.93.32 1.89.55 2.87.68A2 2 0 0 1 22 16.92z"/></svg>
+          </button>
+          <button class="cd-phone-icon-btn whatsapp" id="ciWhatsappBtn" aria-label="WhatsApp">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.36 5.07L2 22l5.06-1.33A9.94 9.94 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.6 0-3.1-.44-4.38-1.2l-.31-.18-3 .79.8-2.92-.2-.3A7.94 7.94 0 0 1 4 12c0-4.41 3.59-8 8-8s8 3.59 8 8-3.59 8-8 8zm4.4-5.6c-.24-.12-1.44-.71-1.66-.79-.22-.08-.38-.12-.55.12-.16.24-.63.79-.77.95-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.18-.71-.63-1.19-1.42-1.33-1.66-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.55-1.32-.75-1.81-.2-.48-.4-.41-.55-.42-.14-.01-.3-.01-.46-.01-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.7 2.6 4.12 3.64.58.25 1.03.4 1.38.51.58.18 1.11.16 1.53.1.47-.07 1.44-.59 1.64-1.16.2-.57.2-1.06.14-1.16-.06-.1-.22-.16-.46-.28z"/></svg>
+          </button>
+        </div>
         <div class="cd-profile-total-label">সর্বমোট বাকি</div>
         <div class="cd-profile-total-amount" id="ciTotalAmount">০ টাকা</div>
       </div>
@@ -1394,7 +1455,7 @@
           <div class="cd-profile-side-amount" id="ciInstallmentDue">০ টাকা</div>
         </div>
         <div class="cd-profile-side-row">
-          <div class="cd-profile-side-label">সাধারণ বাকি</div>
+          <div class="cd-profile-side-label" id="ciGeneralDueLabel">সাধারণ বাকি</div>
           <div class="cd-profile-side-amount" id="ciGeneralDue">০ টাকা</div>
         </div>
       </div>
@@ -1518,6 +1579,47 @@
         শেষের এন্ট্রি পাঠান
       </button>
       <button class="sheet-cancel" id="tagadaChoiceCancelBtn">বাতিল</button>
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- ================= MODAL: List Filter / Sort ===================== -->
+  <!-- ================================================================ -->
+  <div class="lf-overlay" id="lfOverlay">
+    <div class="lf-panel">
+      <div class="lf-header">
+        <div class="lf-title">ফিল্টার</div>
+        <button class="lf-close-btn" id="lfCloseBtn" aria-label="বন্ধ করুন">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="lf-check-row checked" id="lfCustomerRow">
+        <span>কাস্টমার</span>
+        <div class="lf-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+      </div>
+      <div class="lf-check-row checked" id="lfSupplierRow">
+        <span>সাপ্লায়ার</span>
+        <div class="lf-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+      </div>
+
+      <hr class="lf-divider" />
+
+      <div class="lf-section-title">দেবো/পাবার পরিমাণ</div>
+      <div class="lf-radio-row">
+        <div class="lf-radio-opt" id="lfAmountAsc" data-value="asc"><span class="lf-radio-circle"></span><span>কম → বেশি</span></div>
+        <div class="lf-radio-opt" id="lfAmountDesc" data-value="desc"><span class="lf-radio-circle"></span><span>বেশি → কম</span></div>
+      </div>
+
+      <hr class="lf-divider" />
+
+      <div class="lf-section-title">সর্বশেষ লেনদেন</div>
+      <div class="lf-radio-row">
+        <div class="lf-radio-opt" id="lfDateNewest" data-value="newest"><span class="lf-radio-circle"></span><span>নতুন → পুরাতন</span></div>
+        <div class="lf-radio-opt" id="lfDateOldest" data-value="oldest"><span class="lf-radio-circle"></span><span>পুরাতন → নতুন</span></div>
+      </div>
+
+      <button class="lf-confirm-btn" id="lfConfirmBtn">নিশ্চিত</button>
     </div>
   </div>
 
@@ -1708,14 +1810,25 @@
   }
   const formatDMY = (isoDate) => { const [y,m,d] = isoDate.split('-'); return `${d}-${m}-${y}`; };
 
+  function getLastTxDate(c){
+    const txs = c.transactions || [];
+    if(txs.length === 0) return new Date(0);
+    const d = new Date(txs[txs.length-1].date);
+    return isNaN(d) ? new Date(0) : d;
+  }
   function renderList(filter=""){
     const list = document.getElementById('customerList');
     const q = filter.trim().toLowerCase();
-    const filtered = customers.filter(c =>
+    let filtered = customers.filter(c =>
       c.name.toLowerCase().includes(q) ||
       (c.mobile && c.mobile.includes(q)) ||
       (c.id && c.id.toLowerCase().includes(q))
     );
+    filtered = filtered.filter(c => c.type==='customer' ? listFilterState.showCustomer : listFilterState.showSupplier);
+    if(listFilterState.amountSort === 'asc') filtered.sort((a,b)=>a.amount-b.amount);
+    else if(listFilterState.amountSort === 'desc') filtered.sort((a,b)=>b.amount-a.amount);
+    if(listFilterState.dateSort === 'newest') filtered.sort((a,b)=>getLastTxDate(b)-getLastTxDate(a));
+    else if(listFilterState.dateSort === 'oldest') filtered.sort((a,b)=>getLastTxDate(a)-getLastTxDate(b));
     list.innerHTML = "";
     document.getElementById('emptyState').classList.toggle('show', filtered.length===0);
     document.getElementById('emptyStateText').textContent = customersLoading ? 'লোড হচ্ছে...' : 'কোনো কাস্টমার পাওয়া যায়নি';
@@ -1752,6 +1865,13 @@
   }
 
   document.getElementById('searchInput').addEventListener('input', e => renderList(e.target.value));
+
+  // Scrolling the list down (finger pushes up) tucks away the quick-actions
+  // and summary bar so the search bar and list get more room; scrolling back
+  // to the top brings them back.
+  document.querySelector('.home-scroll').addEventListener('scroll', function(){
+    document.getElementById('screen-home').classList.toggle('collapsed-header', this.scrollTop > 8);
+  });
 
   /* ================= CATEGORY: Toast Notification System ================= */
   const TOAST_ICONS = {
@@ -1830,7 +1950,49 @@
   document.querySelectorAll('.quick-action').forEach(btn=>{
     btn.addEventListener('click', ()=>showToast(btn.querySelector('span:last-child').textContent + " (শীঘ্রই আসছে)"));
   });
-  document.getElementById('filterBtn').addEventListener('click', ()=>showToast("ফিল্টার (শীঘ্রই আসছে)"));
+  let listFilterState = { showCustomer: true, showSupplier: true, amountSort: null, dateSort: null };
+  document.getElementById('filterBtn').addEventListener('click', ()=>{
+    document.getElementById('lfOverlay').classList.add('show');
+  });
+  document.getElementById('lfCloseBtn').addEventListener('click', ()=>{
+    document.getElementById('lfOverlay').classList.remove('show');
+  });
+  document.getElementById('lfOverlay').addEventListener('click', (e)=>{
+    if(e.target.id === 'lfOverlay') document.getElementById('lfOverlay').classList.remove('show');
+  });
+  document.getElementById('lfCustomerRow').addEventListener('click', function(){
+    // কাস্টমার/সাপ্লায়ার both stay on by default — at least one must always
+    // remain checked, so the list is never accidentally filtered to nothing.
+    if(this.classList.contains('checked') && !document.getElementById('lfSupplierRow').classList.contains('checked')) return;
+    this.classList.toggle('checked');
+  });
+  document.getElementById('lfSupplierRow').addEventListener('click', function(){
+    if(this.classList.contains('checked') && !document.getElementById('lfCustomerRow').classList.contains('checked')) return;
+    this.classList.toggle('checked');
+  });
+  function wireRadioPair(id1, id2){
+    const el1 = document.getElementById(id1), el2 = document.getElementById(id2);
+    [el1, el2].forEach(el=>{
+      el.addEventListener('click', ()=>{
+        const wasSelected = el.classList.contains('selected');
+        el1.classList.remove('selected');
+        el2.classList.remove('selected');
+        if(!wasSelected) el.classList.add('selected');
+      });
+    });
+  }
+  wireRadioPair('lfAmountAsc', 'lfAmountDesc');
+  wireRadioPair('lfDateNewest', 'lfDateOldest');
+  document.getElementById('lfConfirmBtn').addEventListener('click', ()=>{
+    listFilterState.showCustomer = document.getElementById('lfCustomerRow').classList.contains('checked');
+    listFilterState.showSupplier = document.getElementById('lfSupplierRow').classList.contains('checked');
+    listFilterState.amountSort = document.getElementById('lfAmountAsc').classList.contains('selected') ? 'asc'
+      : document.getElementById('lfAmountDesc').classList.contains('selected') ? 'desc' : null;
+    listFilterState.dateSort = document.getElementById('lfDateNewest').classList.contains('selected') ? 'newest'
+      : document.getElementById('lfDateOldest').classList.contains('selected') ? 'oldest' : null;
+    document.getElementById('lfOverlay').classList.remove('show');
+    renderList(document.getElementById('searchInput').value);
+  });
   document.getElementById('exportBtn').addEventListener('click', goToReportFilter);
   document.querySelectorAll('.nav-item').forEach(btn=>{
     btn.addEventListener('click', ()=>{
@@ -2239,24 +2401,55 @@
     customer.amount = installmentDue + generalDue;
   }
 
+  // Shared by all 5 screens that show the profile summary card (বাকির বিবরণ,
+  // নতুন বাকি, transaction detail, নতুন সহজ কিস্তি, কিস্তি আদায়) so they always
+  // look and behave identically — name, phone, total due, and the কিস্তি/সাধারণ
+  // বাকি breakdown (including the দেব swap when there's an overpayment credit).
+  function renderProfileCardHeader(prefix, customer){
+    const nameEl = document.getElementById(prefix+'Name');
+    if(nameEl) nameEl.innerHTML = `${customer.name} ${customer.id ? `<span>· ${customer.id}</span>` : ''}`;
+    const phoneEl = document.getElementById(prefix+'PhoneNumber');
+    if(phoneEl) phoneEl.textContent = customer.mobile || 'মোবাইল নম্বর নেই';
+    const totalEl = document.getElementById(prefix+'TotalAmount');
+    if(totalEl) totalEl.textContent = bn(customer.amount) + " টাকা";
+    const instEl = document.getElementById(prefix+'InstallmentDue');
+    if(instEl) instEl.textContent = bn(customer.installmentDue) + " টাকা";
+    const genEl = document.getElementById(prefix+'GeneralDue');
+    const genLabelEl = document.getElementById(prefix+'GeneralDueLabel');
+    if(genEl && genLabelEl){
+      if(customer.generalIOwe > 0){
+        genLabelEl.textContent = 'দেব';
+        genEl.textContent = bn(customer.generalIOwe) + " টাকা";
+        genEl.style.color = 'var(--clr-i-owe)';
+      }else{
+        genLabelEl.textContent = 'সাধারণ বাকি';
+        genEl.textContent = bn(customer.generalDue) + " টাকা";
+        genEl.style.color = '';
+      }
+    }
+  }
+  function wireProfileCallWhatsapp(prefix){
+    const callBtn = document.getElementById(prefix+'CallBtn');
+    const waBtn = document.getElementById(prefix+'WhatsappBtn');
+    if(callBtn) callBtn.addEventListener('click', ()=>{
+      if(!currentCustomer || !currentCustomer.mobile){ showToast('মোবাইল নম্বর সেভ করা নেই', 'danger'); return; }
+      window.location.href = `tel:${currentCustomer.mobile}`;
+    });
+    if(waBtn) waBtn.addEventListener('click', ()=>{
+      if(!currentCustomer || !currentCustomer.mobile){ showToast('মোবাইল নম্বর সেভ করা নেই', 'danger'); return; }
+      let num = currentCustomer.mobile.replace(/\D/g,'');
+      if(num.startsWith('0')) num = '88' + num; // Bangladesh country code
+      window.open(`https://wa.me/${num}`, '_blank');
+    });
+  }
+  ['nd','txd','ni','ci'].forEach(wireProfileCallWhatsapp);
+
   function renderCustomerDetail(customer){
     currentCustomer = customer;
     if(!customer.transactions) customer.transactions = [];
     recomputeCustomerTotals(customer);
 
-    document.getElementById('cdName').innerHTML = `${customer.name} ${customer.id ? `<span>· ${customer.id}</span>` : ''}`;
-    document.getElementById('cdTotalAmount').textContent = bn(customer.amount) + " টাকা";
-    document.getElementById('cdInstallmentDue').textContent = bn(customer.installmentDue) + " টাকা";
-    if(customer.generalIOwe > 0){
-      document.getElementById('cdGeneralDueLabel').textContent = 'দেব';
-      document.getElementById('cdGeneralDue').textContent = bn(customer.generalIOwe) + " টাকা";
-      document.getElementById('cdGeneralDue').style.color = 'var(--clr-i-owe)';
-    }else{
-      document.getElementById('cdGeneralDueLabel').textContent = 'সাধারণ বাকি';
-      document.getElementById('cdGeneralDue').textContent = bn(customer.generalDue) + " টাকা";
-      document.getElementById('cdGeneralDue').style.color = '';
-    }
-    document.getElementById('cdPhoneNumber').textContent = customer.mobile || 'মোবাইল নম্বর নেই';
+    renderProfileCardHeader('cd', customer);
 
     const txList = document.getElementById('cdTxList');
     txList.innerHTML = "";
@@ -2304,13 +2497,7 @@
     const tx = currentCustomer.transactions[idx];
 
     document.getElementById('txdTitle').textContent = (tx.category === 'installment') ? 'সহজ কিস্তি বিবরণ' : 'সিঙ্গেল বাকি বিবরণ';
-    document.getElementById('txdAvatar').innerHTML = currentCustomer.photo
-      ? `<img src="${currentCustomer.photo}" />` : (currentCustomer.initial || '');
-    document.getElementById('txdAvatar').style.background = currentCustomer.photo ? 'transparent' : (currentCustomer.color || '#D9D2BC');
-    document.getElementById('txdName').innerHTML = `${currentCustomer.name} ${currentCustomer.id ? `<span>· ${currentCustomer.id}</span>` : ''}`;
-    document.getElementById('txdTotalAmount').textContent = bn(currentCustomer.amount) + " টাকা";
-    document.getElementById('txdInstallmentDue').textContent = bn(currentCustomer.installmentDue) + " টাকা";
-    document.getElementById('txdGeneralDue').textContent = bn(currentCustomer.generalDue) + " টাকা";
+    renderProfileCardHeader('txd', currentCustomer);
 
     document.getElementById('txdDate').textContent = `${tx.date} | ${tx.time}`;
     const typeAmtEl = document.getElementById('txdTypeAmt');
@@ -2541,13 +2728,7 @@
   /* ================================================================ */
   function goToNewDue(clickedLabel){
     if(!currentCustomer) return;
-    document.getElementById('ndAvatar').innerHTML = currentCustomer.photo
-      ? `<img src="${currentCustomer.photo}" />` : (currentCustomer.initial || '');
-    document.getElementById('ndAvatar').style.background = currentCustomer.photo ? 'transparent' : (currentCustomer.color || '#D9D2BC');
-    document.getElementById('ndName').innerHTML = `${currentCustomer.name} ${currentCustomer.id ? `<span>· ${currentCustomer.id}</span>` : ''}`;
-    document.getElementById('ndTotalAmount').textContent = bn(currentCustomer.amount) + " টাকা";
-    document.getElementById('ndInstallmentDue').textContent = bn(currentCustomer.installmentDue || 0) + " টাকা";
-    document.getElementById('ndGeneralDue').textContent = bn(currentCustomer.generalDue || 0) + " টাকা";
+    renderProfileCardHeader('nd', currentCustomer);
 
     const purchaseRow = document.getElementById('ndPurchaseRow');
     const purchaseField = document.getElementById('ndPurchasePriceField');
@@ -2600,13 +2781,7 @@
   /* ================================================================ */
   function goToNewInstallment(){
     if(!currentCustomer) return;
-    document.getElementById('niAvatar').innerHTML = currentCustomer.photo
-      ? `<img src="${currentCustomer.photo}" />` : (currentCustomer.initial || '');
-    document.getElementById('niAvatar').style.background = currentCustomer.photo ? 'transparent' : (currentCustomer.color || '#D9D2BC');
-    document.getElementById('niName').innerHTML = `${currentCustomer.name} ${currentCustomer.id ? `<span>· ${currentCustomer.id}</span>` : ''}`;
-    document.getElementById('niTotalAmount').textContent = bn(currentCustomer.amount) + " টাকা";
-    document.getElementById('niInstallmentDue').textContent = bn(currentCustomer.installmentDue || 0) + " টাকা";
-    document.getElementById('niGeneralDue').textContent = bn(currentCustomer.generalDue || 0) + " টাকা";
+    renderProfileCardHeader('ni', currentCustomer);
 
     niSubmitBar.classList.remove('show');
     niSubmitBar.style.transform = 'translate(-50%, 0px)';
@@ -2796,13 +2971,7 @@
 
   function goToCollectInstallment(){
     if(!currentCustomer) return;
-    document.getElementById('ciAvatar').innerHTML = currentCustomer.photo
-      ? `<img src="${currentCustomer.photo}" />` : (currentCustomer.initial || '');
-    document.getElementById('ciAvatar').style.background = currentCustomer.photo ? 'transparent' : (currentCustomer.color || '#D9D2BC');
-    document.getElementById('ciName').innerHTML = `${currentCustomer.name} ${currentCustomer.id ? `<span>· ${currentCustomer.id}</span>` : ''}`;
-    document.getElementById('ciTotalAmount').textContent = bn(currentCustomer.amount) + " টাকা";
-    document.getElementById('ciInstallmentDue').textContent = bn(currentCustomer.installmentDue || 0) + " টাকা";
-    document.getElementById('ciGeneralDue').textContent = bn(currentCustomer.generalDue || 0) + " টাকা";
+    renderProfileCardHeader('ci', currentCustomer);
 
     const today = new Date();
     document.getElementById('ciDateInput').value = today.toISOString().slice(0,10);
