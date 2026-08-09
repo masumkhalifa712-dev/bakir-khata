@@ -974,7 +974,7 @@
           <div class="cd-profile-side-amount" id="cdInstallmentDue">০ টাকা</div>
         </div>
         <div class="cd-profile-side-row">
-          <div class="cd-profile-side-label">সাধারণ বাকি</div>
+          <div class="cd-profile-side-label" id="cdGeneralDueLabel">সাধারণ বাকি</div>
           <div class="cd-profile-side-amount" id="cdGeneralDue">০ টাকা</div>
         </div>
       </div>
@@ -1745,7 +1745,8 @@
 
     const totalReceivable = customers.filter(c=>c.type==='customer' && c.amount>0).reduce((s,c)=>s+c.amount,0);
     document.getElementById('totalReceivable').textContent = bn(totalReceivable) + " টাকা";
-    document.getElementById('totalPayable').textContent = bn(0) + " টাকা";
+    const totalPayable = customers.reduce((s,c)=>s+(c.generalIOwe||0),0);
+    document.getElementById('totalPayable').textContent = bn(totalPayable) + " টাকা";
     document.getElementById('customerCount').textContent = bn(customers.filter(c=>c.type==='customer').length);
     document.getElementById('supplierCount').textContent = bn(customers.filter(c=>c.type==='supplier').length);
   }
@@ -2203,13 +2204,38 @@
   let currentCustomer = null;
   function recomputeCustomerTotals(customer){
     const txs = customer.transactions || [];
-    let installmentDue = 0, generalDue = 0;
+    let installmentDue = 0, generalDue = 0, generalIOwe = 0;
     txs.forEach(tx => {
-      const delta = (tx.give || 0) - (tx.take || 0);
-      if(tx.category === 'installment') installmentDue += delta; else generalDue += delta;
+      if(tx.category === 'installment'){
+        installmentDue += (tx.give || 0) - (tx.take || 0);
+      }else if(tx.give){
+        // A দেব balance (shop owes customer) gets settled by a normal সাধারণ
+        // বাকি entry first — only the leftover, if any, becomes new due.
+        if(generalIOwe > 0){
+          if(tx.give <= generalIOwe){
+            generalIOwe -= tx.give;
+          }else{
+            generalDue += (tx.give - generalIOwe);
+            generalIOwe = 0;
+          }
+        }else{
+          generalDue += tx.give;
+        }
+      }else if(tx.take){
+        // Paying more than the current general due doesn't push সাধারণ বাকি
+        // negative — the excess becomes a separate "দেব" (shop owes customer)
+        // balance that a fresh বাকি entry never silently cancels out.
+        if(tx.take <= generalDue){
+          generalDue -= tx.take;
+        }else{
+          generalIOwe += (tx.take - generalDue);
+          generalDue = 0;
+        }
+      }
     });
     customer.installmentDue = installmentDue;
     customer.generalDue = generalDue;
+    customer.generalIOwe = generalIOwe;
     customer.amount = installmentDue + generalDue;
   }
 
@@ -2221,7 +2247,15 @@
     document.getElementById('cdName').innerHTML = `${customer.name} ${customer.id ? `<span>· ${customer.id}</span>` : ''}`;
     document.getElementById('cdTotalAmount').textContent = bn(customer.amount) + " টাকা";
     document.getElementById('cdInstallmentDue').textContent = bn(customer.installmentDue) + " টাকা";
-    document.getElementById('cdGeneralDue').textContent = bn(customer.generalDue) + " টাকা";
+    if(customer.generalIOwe > 0){
+      document.getElementById('cdGeneralDueLabel').textContent = 'দেব';
+      document.getElementById('cdGeneralDue').textContent = bn(customer.generalIOwe) + " টাকা";
+      document.getElementById('cdGeneralDue').style.color = 'var(--clr-i-owe)';
+    }else{
+      document.getElementById('cdGeneralDueLabel').textContent = 'সাধারণ বাকি';
+      document.getElementById('cdGeneralDue').textContent = bn(customer.generalDue) + " টাকা";
+      document.getElementById('cdGeneralDue').style.color = '';
+    }
     document.getElementById('cdPhoneNumber').textContent = customer.mobile || 'মোবাইল নম্বর নেই';
 
     const txList = document.getElementById('cdTxList');
@@ -2435,25 +2469,21 @@
     if(e.target.id === 'tagadaChoiceOverlay') document.getElementById('tagadaChoiceOverlay').classList.remove('show');
   });
   document.getElementById('tagadaTotalDueBtn').addEventListener('click', ()=>{
-    const shopName = document.getElementById('shopName').textContent.trim() || 'দোকানের নাম';
-    const message = `প্রিয় ${currentCustomer.name},\nআপনার নামে বর্তমানে ${bn(currentCustomer.amount)} টাকা বাকি রয়েছে।\nদ্রুত পরিশোধ করার জন্য অনুরোধ করা হলো।\n\nধন্যবাদান্তে\n${shopName}`;
-    window.location.href = `sms:${currentCustomer.mobile}?body=${encodeURIComponent(message)}`;
     document.getElementById('tagadaChoiceOverlay').classList.remove('show');
+    offerTxSms('reminder', currentCustomer, currentCustomer.amount, currentCustomer.amount, null, ()=>{});
   });
   document.getElementById('tagadaLastEntryBtn').addEventListener('click', ()=>{
+    document.getElementById('tagadaChoiceOverlay').classList.remove('show');
     const txs = currentCustomer.transactions || [];
     if(txs.length === 0){
       showToast('কোনো লেনদেন পাওয়া যায়নি', 'danger');
-      document.getElementById('tagadaChoiceOverlay').classList.remove('show');
       return;
     }
     const lastTx = txs[txs.length - 1];
     const amount = lastTx.take || lastTx.give;
     const kind = lastTx.take ? 'take' : (lastTx.category === 'installment' ? 'installment' : 'general');
     const extra = lastTx.category === 'installment' ? { perInstallment: lastTx.perInstallment, count: lastTx.installmentCount } : null;
-    const message = buildTxSmsMessage(kind, currentCustomer, amount, currentCustomer.amount, extra);
-    window.location.href = `sms:${currentCustomer.mobile}?body=${encodeURIComponent(message)}`;
-    document.getElementById('tagadaChoiceOverlay').classList.remove('show');
+    offerTxSms(kind, currentCustomer, amount, currentCustomer.amount, extra, ()=>{});
   });
   document.getElementById('cdCallBtn').addEventListener('click', ()=>{
     if(!currentCustomer || !currentCustomer.mobile){ showToast('মোবাইল নম্বর সেভ করা নেই', 'danger'); return; }
@@ -2699,6 +2729,9 @@
 
   function buildTxSmsMessage(kind, customer, amount, due, extra){
     const shopName = document.getElementById('shopName').textContent.trim() || 'দোকানের নাম';
+    if(kind === 'reminder'){
+      return `প্রিয় ${customer.name},\nআপনার নামে বর্তমানে ${bn(amount)} টাকা বাকি রয়েছে।\nদ্রুত পরিশোধ করার জন্য অনুরোধ করা হলো।\n\nধন্যবাদান্তে\n${shopName}`;
+    }
     if(kind === 'take'){
       return `প্রিয় ${customer.name},\nআপনার থেকে ${bn(amount)} টাকা গ্রহণ করা হলো।\nবর্তমান বাকি: ${bn(due)} টাকা\n\nসঠিক সময়ে পরিশোধের জন্য ধন্যবাদ।\n${shopName}`;
     }
