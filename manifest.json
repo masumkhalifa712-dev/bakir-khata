@@ -1,7 +1,7 @@
 {
-  "name": "দোকান খাতা",
-  "short_name": "দোকান খাতা",
-  "description": "দোকানের বাকি ও কিস্তি হিসাব রাখার অ্যাপ",
+  "name": "আমার বাকির খাতা",
+  "short_name": "বাকির খাতা",
+  "description": "দোকানের বাকি ও কিস্তির হিসাব রাখার অ্যাপ",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
