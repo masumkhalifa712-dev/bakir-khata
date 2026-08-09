@@ -411,9 +411,9 @@
   .cd-profile-name span{font-weight:600; color:var(--clr-ink-soft); font-size:13px;}
   .cd-profile-phone-row{ display:flex; align-items:center; gap:8px; margin-top:4px; }
   .cd-profile-phone-row span{ font-size:12.5px; font-weight:600; color:var(--clr-ink-soft); }
-  .cd-phone-icon-btn{ width:22px; height:22px; border-radius:50%; border:none; display:flex; align-items:center; justify-content:center; flex-shrink:0; cursor:pointer; }
-  .cd-phone-icon-btn svg{ width:12px; height:12px; }
-  .cd-phone-icon-btn.call{ background:var(--clr-primary); color:#fff; }
+  .cd-phone-icon-btn{ width:29px; height:29px; border-radius:50%; border:none; display:flex; align-items:center; justify-content:center; flex-shrink:0; cursor:pointer; }
+  .cd-phone-icon-btn svg{ width:16px; height:16px; }
+  .cd-phone-icon-btn.call{ background:#fff; color:#1E8A4C; border:1.5px solid #CDEBDA; }
   .cd-phone-icon-btn.whatsapp{ background:#25D366; color:#fff; }
   .cd-profile-total-label{font-size:12.5px; color:var(--clr-ink-soft); margin-top:6px; font-weight:600;}
   .cd-profile-total-amount{font-family:var(--font-display); font-size:23px; font-weight:700; color:var(--clr-owe-to-me); margin-top:1px;}
@@ -424,7 +424,7 @@
   .cd-profile-side-amount{font-size:14.5px; font-weight:700; color:var(--clr-ink); margin-top:2px;}
 
   .cd-profile-card.no-avatar .cd-profile-name{ font-size:19px; }
-  .cd-profile-card.no-avatar .cd-profile-phone-row span{ font-size:14.5px; }
+  .cd-profile-card.no-avatar .cd-profile-phone-row span{ font-size:16px; }
 
   .cd-action-row{ margin:14px 16px 0; display:flex; gap:8px; }
   .cd-period-select{ flex:1; min-width:0; border:1px solid var(--clr-line); background:var(--clr-card); border-radius:var(--radius-full); padding:9px 10px; font-size:12.5px; font-weight:700; color:var(--clr-ink-soft); }
@@ -1055,6 +1055,24 @@
     </div>
   </div>
 
+  <!-- ================================================================ -->
+  <!-- ================= MODAL: Edit Customer Name / Mobile ============ -->
+  <!-- ================================================================ -->
+  <div class="del-modal-overlay" id="editCustomerOverlay">
+    <div class="del-modal">
+      <div class="del-modal-title" style="margin-top:20px;">কাস্টমারের তথ্য এডিট করুন</div>
+      <div style="padding:16px;">
+        <label class="field-label">নাম</label>
+        <div class="field-input-wrap"><input type="text" id="ceEditNameInput" style="border:none; outline:none; width:100%; font-size:14px; font-family:var(--font-body); color:var(--clr-ink);" /></div>
+        <div style="height:14px;"></div>
+        <label class="field-label">মোবাইল নাম্বার</label>
+        <div class="field-input-wrap"><input type="tel" inputmode="numeric" maxlength="11" id="ceEditMobileInput" style="border:none; outline:none; width:100%; font-size:14px; font-family:var(--font-body); color:var(--clr-ink);" /></div>
+      </div>
+      <button class="rf-submit-btn" id="ceEditSaveBtn" style="margin:6px 16px;">সংরক্ষণ করুন</button>
+      <button class="del-modal-close-btn" id="ceEditCancelBtn">বাতিল</button>
+    </div>
+  </div>
+
   <!-- ===== CATEGORY: Bottom Action Buttons (fixed, outside scroll) ===== -->
   <div class="cd-bottom-actions">
     <button class="cd-action-btn give" id="cdGiveBtn">দিচ্ছি</button>
@@ -1146,8 +1164,8 @@
         </button>
         <input type="file" id="ndImageInput" accept="image/*" style="display:none;" />
         <div class="nd-sms-pill">
-          <span>এসএমএস: ০ টাকা</span>
-          <button class="toggle-switch" id="ndSmsToggle" aria-label="এসএমএস টগল"><span class="knob"></span></button>
+          <span>এসএমএস পাঠাতে চাইলে চালু রাখুন</span>
+          <button class="toggle-switch on" id="ndSmsToggle" aria-label="এসএমএস টগল"><span class="knob"></span></button>
         </div>
         <button class="nd-date-btn" id="ndDateBtn">
           <span id="ndDateLabel">বাকি পরিশোধের তারিখ</span>
@@ -1340,8 +1358,8 @@
         </button>
         <input type="file" id="niImageInput" accept="image/*" style="display:none;" />
         <div class="nd-sms-pill">
-          <span>এসএমএস: ০ টাকা</span>
-          <button class="toggle-switch" id="niSmsToggle" aria-label="এসএমএস টগল"><span class="knob"></span></button>
+          <span>এসএমএস পাঠাতে চাইলে চালু রাখুন</span>
+          <button class="toggle-switch on" id="niSmsToggle" aria-label="এসএমএস টগল"><span class="knob"></span></button>
         </div>
       </div>
     </div>
@@ -1431,11 +1449,10 @@
         </div>
 
         <div class="ci-footer">
-          <label class="ci-sms-check">
-            <input type="checkbox" id="ciSmsCheckbox" />
-            SMS পাঠাতে চান?
-          </label>
-          <div class="ci-balance">ব্যালেন্সঃ <span id="ciBalanceValue">0</span></div>
+          <div class="nd-sms-pill" style="width:100%;">
+            <span>এসএমএস পাঠাতে চাইলে চালু রাখুন</span>
+            <button class="toggle-switch on" id="ciSmsToggle" aria-label="এসএমএস টগল"><span class="knob"></span></button>
+          </div>
         </div>
       </div>
     </div>
@@ -1482,6 +1499,25 @@
         অন্য মাধ্যমে শেয়ার করুন
       </button>
       <button class="sheet-cancel" id="txSmsSkipBtn">থাক, দরকার নেই</button>
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- ================= SHEET: তাগাদা — Choice ======================== -->
+  <!-- ================================================================ -->
+  <div class="sheet-overlay" id="tagadaChoiceOverlay">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title">কী নিয়ে তাগাদা পাঠাতে চান?</div>
+      <button class="sheet-option" id="tagadaTotalDueBtn">
+        <span class="so-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
+        সর্বমোট বাকির তাগাদা
+      </button>
+      <button class="sheet-option" id="tagadaLastEntryBtn">
+        <span class="so-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></span>
+        শেষের এন্ট্রি পাঠান
+      </button>
+      <button class="sheet-cancel" id="tagadaChoiceCancelBtn">বাতিল</button>
     </div>
   </div>
 
@@ -2329,7 +2365,34 @@
   function closeCustomerEdit(){ appEl.classList.remove('show-customeredit'); }
   document.getElementById('cdMenuBtn').addEventListener('click', goToCustomerEdit);
   document.getElementById('ceBackBtn').addEventListener('click', ()=> history.back());
-  document.getElementById('ceEditBtn').addEventListener('click', ()=>showToast("কাস্টমারের তথ্য এডিট (শীঘ্রই আসছে)"));
+  document.getElementById('ceEditBtn').addEventListener('click', ()=>{
+    if(!currentCustomer) return;
+    document.getElementById('ceEditNameInput').value = currentCustomer.name || '';
+    document.getElementById('ceEditMobileInput').value = currentCustomer.mobile || '';
+    document.getElementById('editCustomerOverlay').classList.add('show');
+  });
+  document.getElementById('ceEditCancelBtn').addEventListener('click', ()=>{
+    document.getElementById('editCustomerOverlay').classList.remove('show');
+  });
+  document.getElementById('editCustomerOverlay').addEventListener('click', (e)=>{
+    if(e.target.id === 'editCustomerOverlay') document.getElementById('editCustomerOverlay').classList.remove('show');
+  });
+  document.getElementById('ceEditMobileInput').addEventListener('input', function(){ this.value = this.value.replace(/\D/g,'').slice(0,11); });
+  document.getElementById('ceEditSaveBtn').addEventListener('click', async ()=>{
+    if(!currentCustomer) return;
+    const name = document.getElementById('ceEditNameInput').value.trim();
+    const mobile = document.getElementById('ceEditMobileInput').value.trim();
+    if(!name){ showToast('নাম দিন', 'danger'); return; }
+    if(mobile && !/^\d{11}$/.test(mobile)){ showToast('সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন', 'danger'); return; }
+    currentCustomer.name = name;
+    currentCustomer.mobile = mobile;
+    currentCustomer.initial = initialsFromName(name);
+    await persistCustomers();
+    renderCustomerDetail(currentCustomer);
+    renderList(document.getElementById('searchInput').value);
+    document.getElementById('editCustomerOverlay').classList.remove('show');
+    showToast('কাস্টমারের তথ্য আপডেট হয়েছে');
+  });
   document.getElementById('ceDeleteBtn').addEventListener('click', async ()=>{
     if(!currentCustomer) return;
     const txs = currentCustomer.transactions || [];
@@ -2363,9 +2426,34 @@
   document.getElementById('cdSmsBtn').addEventListener('click', ()=>{
     if(!currentCustomer) return;
     if(!currentCustomer.mobile){ showToast('কাস্টমারের মোবাইল নম্বর সেভ করা নেই', 'danger'); return; }
+    document.getElementById('tagadaChoiceOverlay').classList.add('show');
+  });
+  document.getElementById('tagadaChoiceCancelBtn').addEventListener('click', ()=>{
+    document.getElementById('tagadaChoiceOverlay').classList.remove('show');
+  });
+  document.getElementById('tagadaChoiceOverlay').addEventListener('click', (e)=>{
+    if(e.target.id === 'tagadaChoiceOverlay') document.getElementById('tagadaChoiceOverlay').classList.remove('show');
+  });
+  document.getElementById('tagadaTotalDueBtn').addEventListener('click', ()=>{
     const shopName = document.getElementById('shopName').textContent.trim() || 'দোকানের নাম';
     const message = `প্রিয় ${currentCustomer.name},\nআপনার নামে বর্তমানে ${bn(currentCustomer.amount)} টাকা বাকি রয়েছে।\nদ্রুত পরিশোধ করার জন্য অনুরোধ করা হলো।\n\nধন্যবাদান্তে\n${shopName}`;
     window.location.href = `sms:${currentCustomer.mobile}?body=${encodeURIComponent(message)}`;
+    document.getElementById('tagadaChoiceOverlay').classList.remove('show');
+  });
+  document.getElementById('tagadaLastEntryBtn').addEventListener('click', ()=>{
+    const txs = currentCustomer.transactions || [];
+    if(txs.length === 0){
+      showToast('কোনো লেনদেন পাওয়া যায়নি', 'danger');
+      document.getElementById('tagadaChoiceOverlay').classList.remove('show');
+      return;
+    }
+    const lastTx = txs[txs.length - 1];
+    const amount = lastTx.take || lastTx.give;
+    const kind = lastTx.take ? 'take' : (lastTx.category === 'installment' ? 'installment' : 'general');
+    const extra = lastTx.category === 'installment' ? { perInstallment: lastTx.perInstallment, count: lastTx.installmentCount } : null;
+    const message = buildTxSmsMessage(kind, currentCustomer, amount, currentCustomer.amount, extra);
+    window.location.href = `sms:${currentCustomer.mobile}?body=${encodeURIComponent(message)}`;
+    document.getElementById('tagadaChoiceOverlay').classList.remove('show');
   });
   document.getElementById('cdCallBtn').addEventListener('click', ()=>{
     if(!currentCustomer || !currentCustomer.mobile){ showToast('মোবাইল নম্বর সেভ করা নেই', 'danger'); return; }
@@ -2597,7 +2685,7 @@
     renderCustomerDetail(currentCustomer);
     renderList(document.getElementById('searchInput').value);
     if(isNewEntry){
-      offerTxSms('installment', currentCustomer, remaining, currentCustomer.amount, { perInstallment, count }, closeNewInstallment);
+      offerTxSms('installment', currentCustomer, remaining, currentCustomer.amount, { perInstallment, count }, closeNewInstallment, 'niSmsToggle');
     }else{
       closeNewInstallment();
     }
@@ -2621,10 +2709,12 @@
   }
 
   // Called right after a transaction is saved. Shows the SMS/share sheet if the
-  // customer has a saved mobile number; onDone always runs afterward (whichever
-  // option they pick, or if they skip) so the screen still closes normally.
-  function offerTxSms(kind, customer, amount, due, extra, onDone){
-    if(!customer || !customer.mobile){ onDone(); return; }
+  // customer has a saved mobile number AND that screen's SMS toggle is on;
+  // onDone always runs afterward (whichever option they pick, or if they skip
+  // or the toggle was off) so the screen still closes normally either way.
+  function offerTxSms(kind, customer, amount, due, extra, onDone, toggleId){
+    const toggleOn = !toggleId || document.getElementById(toggleId).classList.contains('on');
+    if(!toggleOn || !customer || !customer.mobile){ onDone(); return; }
     pendingSmsContext = { customer, message: buildTxSmsMessage(kind, customer, amount, due, extra), onDone };
     txSmsSheetOverlay.classList.add('show');
   }
@@ -2689,8 +2779,7 @@
     document.getElementById('ciAmountReceived').value = '';
     document.getElementById('ciDiscount').value = 0;
     document.getElementById('ciDescription').value = '';
-    document.getElementById('ciSmsCheckbox').checked = false;
-    document.getElementById('ciBalanceValue').textContent = '0'; // this is the SMS credit balance, not the customer's due
+    document.getElementById('ciSmsToggle').classList.add('on');
 
     ciSubmitBar.classList.remove('show');
     ciSubmitBar.style.transform = 'translate(-50%, 0px)';
@@ -2740,7 +2829,7 @@
     renderCustomerDetail(currentCustomer);
     renderList(document.getElementById('searchInput').value);
     showToast("কিস্তি গ্রহণ সংরক্ষণ হয়েছে ✅");
-    offerTxSms('take', currentCustomer, received, currentCustomer.amount, null, closeCollectInstallment);
+    offerTxSms('take', currentCustomer, received, currentCustomer.amount, null, closeCollectInstallment, 'ciSmsToggle');
   });
 
   document.getElementById('ndPurchaseToggle').addEventListener('click', function(){
@@ -2771,6 +2860,9 @@
   });
 
   document.getElementById('niSmsToggle').addEventListener('click', function(){
+    this.classList.toggle('on');
+  });
+  document.getElementById('ciSmsToggle').addEventListener('click', function(){
     this.classList.toggle('on');
   });
   document.getElementById('niImageBtn').addEventListener('click', ()=> document.getElementById('niImageInput').click());
@@ -2821,7 +2913,7 @@
     renderCustomerDetail(currentCustomer);
     renderList(document.getElementById('searchInput').value);
     if(isNewEntry){
-      offerTxSms(sheetMode === 'take' ? 'take' : 'general', currentCustomer, amt, currentCustomer.amount, null, closeNewDue);
+      offerTxSms(sheetMode === 'take' ? 'take' : 'general', currentCustomer, amt, currentCustomer.amount, null, closeNewDue, 'ndSmsToggle');
     }else{
       closeNewDue();
     }
