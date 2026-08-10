@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>অ্যাডমিন প্যানেল — আমার বাকির খাতা</title>
+<style>
+  :root{
+    --clr-primary:#C8102E; --clr-primary-dark:#9c0c24;
+    --clr-bg:#F3F2F0; --clr-card:#ffffff; --clr-ink:#1B1B1F; --clr-ink-soft:#6B6B72;
+    --clr-line:#E7E5E1;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; font-family:'Hind Siliguri','Noto Sans Bengali',sans-serif; background:var(--clr-bg); color:var(--clr-ink); min-height:100vh;}
+
+  /* ---- Login screen ---- */
+  .login-wrap{ min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; }
+  .login-card{ width:100%; max-width:360px; background:var(--clr-card); border-radius:20px; padding:32px 26px; box-shadow:0 10px 30px rgba(0,0,0,.08); text-align:center; }
+  .login-badge{ width:60px; height:60px; border-radius:16px; background:var(--clr-primary); color:#fff; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:26px; font-weight:800; }
+  .login-title{ font-size:19px; font-weight:800; margin-bottom:4px; }
+  .login-sub{ font-size:13px; color:var(--clr-ink-soft); margin-bottom:24px; }
+  .login-input{ width:100%; border:1.6px solid var(--clr-line); border-radius:12px; padding:13px 15px; font-size:15px; font-family:inherit; margin-bottom:14px; outline:none; }
+  .login-input:focus{ border-color:var(--clr-primary); }
+  .login-btn{ width:100%; padding:14px; border:none; border-radius:12px; background:linear-gradient(160deg, var(--clr-primary), var(--clr-primary-dark)); color:#fff; font-weight:700; font-size:15px; cursor:pointer; }
+  .login-error{ color:var(--clr-primary); font-size:13px; margin-top:10px; display:none; }
+  .login-error.show{ display:block; }
+
+  /* ---- Dashboard ---- */
+  .dash{ display:none; max-width:1100px; margin:0 auto; padding:20px 16px 60px; }
+  .dash.show{ display:block; }
+  .dash-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:22px; flex-wrap:wrap; gap:10px; }
+  .dash-title{ font-size:20px; font-weight:800; }
+  .dash-title span{ color:var(--clr-ink-soft); font-weight:600; font-size:13px; display:block; margin-top:2px; }
+  .logout-btn{ padding:9px 16px; border:1.4px solid var(--clr-line); background:var(--clr-card); border-radius:999px; font-size:13px; font-weight:700; color:var(--clr-ink-soft); cursor:pointer; }
+
+  .stats-row{ display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:12px; margin-bottom:24px; }
+  .stat-card{ background:var(--clr-card); border-radius:16px; padding:18px; box-shadow:0 2px 10px rgba(0,0,0,.04); }
+  .stat-label{ font-size:12.5px; color:var(--clr-ink-soft); font-weight:600; margin-bottom:6px; }
+  .stat-value{ font-size:23px; font-weight:800; }
+
+  .table-wrap{ background:var(--clr-card); border-radius:16px; overflow-x:auto; box-shadow:0 2px 10px rgba(0,0,0,.04); }
+  table{ width:100%; border-collapse:collapse; font-size:13.5px; min-width:640px; }
+  th{ text-align:left; padding:14px 16px; background:#FAFAF9; color:var(--clr-ink-soft); font-weight:700; font-size:12.5px; border-bottom:1.5px solid var(--clr-line); white-space:nowrap; }
+  td{ padding:13px 16px; border-bottom:1px solid var(--clr-line); white-space:nowrap; }
+  tr:last-child td{ border-bottom:none; }
+  .loading-row, .empty-row{ text-align:center; padding:30px; color:var(--clr-ink-soft); }
+  .search-box{ margin-bottom:14px; }
+  .search-box input{ width:100%; max-width:300px; border:1.6px solid var(--clr-line); border-radius:11px; padding:10px 14px; font-size:13.5px; font-family:inherit; outline:none; }
+  .badge{ display:inline-block; padding:4px 10px; border-radius:999px; font-size:11px; font-weight:700; }
+  .badge.active{ background:#E3F5EA; color:#1E8A4C; }
+  .badge.blocked{ background:#FCE7E9; color:var(--clr-primary); }
+  .row-actions{ display:flex; gap:6px; }
+  .row-actions button{ border:none; border-radius:8px; padding:7px 11px; font-size:11.5px; font-weight:700; cursor:pointer; font-family:inherit; }
+  .btn-block{ background:#FEF3E0; color:#9A6B00; }
+  .btn-unblock{ background:#E3F5EA; color:#1E8A4C; }
+  .btn-delete{ background:#FCE7E9; color:var(--clr-primary); }
+</style>
+</head>
+<body>
+
+  <div class="login-wrap" id="loginWrap">
+    <div class="login-card">
+      <div class="login-badge">৳</div>
+      <div class="login-title">অ্যাডমিন প্যানেল</div>
+      <div class="login-sub">আমার বাকির খাতা</div>
+      <input type="password" class="login-input" id="adminPasswordInput" placeholder="অ্যাডমিন পাসওয়ার্ড" />
+      <button class="login-btn" id="adminLoginBtn">লগইন</button>
+      <div class="login-error" id="adminLoginError">পাসওয়ার্ড সঠিক নয়</div>
+    </div>
+  </div>
+
+  <div class="dash" id="dash">
+    <div class="dash-header">
+      <div class="dash-title">অ্যাডমিন প্যানেল <span>আমার বাকির খাতা — সব ইউজার</span></div>
+      <button class="logout-btn" id="adminLogoutBtn">লগ আউট</button>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">মোট ইউজার (দোকান)</div>
+        <div class="stat-value" id="statTotalUsers">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">মোট কাস্টমার/সাপ্লায়ার</div>
+        <div class="stat-value" id="statTotalCustomers">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">মোট বকেয়া (সব ইউজার মিলিয়ে)</div>
+        <div class="stat-value" id="statTotalDue">—</div>
+      </div>
+    </div>
+
+    <div class="search-box"><input type="text" id="userSearchInput" placeholder="মোবাইল নাম্বার দিয়ে খুঁজুন" /></div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>মোবাইল নাম্বার</th>
+            <th>যোগ দিয়েছে</th>
+            <th>কাস্টমার সংখ্যা</th>
+            <th>মোট বকেয়া</th>
+            <th>অবস্থা</th>
+            <th>কার্যক্রম</th>
+          </tr>
+        </thead>
+        <tbody id="usersTableBody">
+          <tr><td colspan="6" class="loading-row">লোড হচ্ছে...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+<script type="module">
+  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+  const SUPABASE_URL = "https://tamzreokpnvqpxvkbpiw.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRhbXpyZW9rcG52cXB4dmticGl3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYwMjU4MTAsImV4cCI6MjEwMTYwMTgxMH0.-ddoBc5pVVLUcrBfxb5RUeSU_wCuQQsLzhfpwDsBsHQ";
+  const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // Step 1: a fixed admin password. Change this any time — just ask, or edit
+  // this one line yourself. This gates access to the panel; the panel itself
+  // then reads the same Supabase tables the app already uses.
+  const ADMIN_PASSWORD = "Khata@Admin2026";
+
+  const bn = n => Number(n||0).toLocaleString('bn-BD');
+
+  document.getElementById('adminLoginBtn').addEventListener('click', tryLogin);
+  document.getElementById('adminPasswordInput').addEventListener('keydown', (e)=>{ if(e.key==='Enter') tryLogin(); });
+  function tryLogin(){
+    const val = document.getElementById('adminPasswordInput').value;
+    if(val === ADMIN_PASSWORD){
+      sessionStorage.setItem('adminAuthed', '1');
+      showDashboard();
+    }else{
+      document.getElementById('adminLoginError').classList.add('show');
+    }
+  }
+  document.getElementById('adminLogoutBtn').addEventListener('click', ()=>{
+    sessionStorage.removeItem('adminAuthed');
+    document.getElementById('dash').classList.remove('show');
+    document.getElementById('loginWrap').style.display = 'flex';
+    document.getElementById('adminPasswordInput').value = '';
+  });
+
+  function showDashboard(){
+    document.getElementById('loginWrap').style.display = 'none';
+    document.getElementById('dash').classList.add('show');
+    loadUsers();
+  }
+  // Stay logged in across a refresh within the same browser tab session
+  if(sessionStorage.getItem('adminAuthed') === '1') showDashboard();
+
+  async function loadUsers(){
+    const tbody = document.getElementById('usersTableBody');
+    try{
+      const { data: accounts, error: accErr } = await sb.from('accounts').select('mobile, created_at, blocked').order('created_at', { ascending: false });
+      if(accErr) throw accErr;
+      const { data: userDataRows, error: udErr } = await sb.from('user_data').select('mobile, customers');
+      if(udErr) throw udErr;
+
+      const dataByMobile = {};
+      (userDataRows || []).forEach(row => { dataByMobile[row.mobile] = row.customers || []; });
+
+      allUsers = (accounts || []).map(acc => {
+        const customers = dataByMobile[acc.mobile] || [];
+        return {
+          mobile: acc.mobile,
+          created_at: acc.created_at,
+          blocked: !!acc.blocked,
+          customerCount: customers.length,
+          dueSum: customers.reduce((s,c)=> s + (c.amount || 0), 0),
+        };
+      });
+
+      renderStats();
+      renderUsers(allUsers);
+    }catch(e){
+      tbody.innerHTML = '<tr><td colspan="6" class="empty-row">তথ্য লোড করা যায়নি — ইন্টারনেট কানেকশন চেক করুন</td></tr>';
+    }
+  }
+
+  function renderStats(){
+    const totalCustomers = allUsers.reduce((s,u)=>s+u.customerCount,0);
+    const totalDue = allUsers.reduce((s,u)=>s+u.dueSum,0);
+    document.getElementById('statTotalUsers').textContent = bn(allUsers.length);
+    document.getElementById('statTotalCustomers').textContent = bn(totalCustomers);
+    document.getElementById('statTotalDue').textContent = bn(totalDue) + " টাকা";
+  }
+
+  function renderUsers(list){
+    const tbody = document.getElementById('usersTableBody');
+    if(list.length === 0){
+      tbody.innerHTML = '<tr><td colspan="6" class="empty-row">কোনো ইউজার পাওয়া যায়নি</td></tr>';
+      return;
+    }
+    tbody.innerHTML = list.map(u => {
+      const joined = u.created_at ? new Date(u.created_at).toLocaleDateString('bn-BD', { year:'numeric', month:'short', day:'numeric' }) : '—';
+      return `
+        <tr>
+          <td>${u.mobile}</td>
+          <td>${joined}</td>
+          <td>${bn(u.customerCount)}</td>
+          <td>${bn(u.dueSum)} টাকা</td>
+          <td><span class="badge ${u.blocked ? 'blocked' : 'active'}">${u.blocked ? 'বন্ধ' : 'সচল'}</span></td>
+          <td>
+            <div class="row-actions">
+              <button class="${u.blocked ? 'btn-unblock' : 'btn-block'}" data-action="toggle-block" data-mobile="${u.mobile}">${u.blocked ? 'চালু করুন' : 'বন্ধ করুন'}</button>
+              <button class="btn-delete" data-action="delete" data-mobile="${u.mobile}">ডিলিট</button>
+            </div>
+          </td>
+        </tr>`;
+    }).join('');
+  }
+
+  let allUsers = [];
+  document.getElementById('userSearchInput').addEventListener('input', (e)=>{
+    const q = e.target.value.trim();
+    renderUsers(q ? allUsers.filter(u=>u.mobile.includes(q)) : allUsers);
+  });
+
+  document.getElementById('usersTableBody').addEventListener('click', async (e)=>{
+    const btn = e.target.closest('button');
+    if(!btn) return;
+    const mobile = btn.dataset.mobile;
+    const action = btn.dataset.action;
+    const user = allUsers.find(u=>u.mobile===mobile);
+
+    if(action === 'toggle-block'){
+      const newBlocked = !user.blocked;
+      const msg = newBlocked
+        ? `${mobile} নাম্বারের একাউন্টটি বন্ধ করতে চান? এই ইউজার আর লগইন করতে পারবে না।`
+        : `${mobile} নাম্বারের একাউন্টটি আবার চালু করতে চান?`;
+      if(!confirm(msg)) return;
+      btn.disabled = true;
+      const { error } = await sb.from('accounts').update({ blocked: newBlocked }).eq('mobile', mobile);
+      if(error){ alert('আপডেট করা যায়নি: ' + error.message); btn.disabled = false; return; }
+      user.blocked = newBlocked;
+      renderStats();
+      renderUsers(allUsers);
+    }
+
+    if(action === 'delete'){
+      const msg = `${mobile} নাম্বারের একাউন্ট এবং তার সব কাস্টমার/লেনদেনের তথ্য পুরোপুরি মুছে ফেলতে চান? এই কাজটি ফেরানো যাবে না।`;
+      if(!confirm(msg)) return;
+      btn.disabled = true;
+      const { error: e1 } = await sb.from('user_data').delete().eq('mobile', mobile);
+      const { error: e2 } = await sb.from('accounts').delete().eq('mobile', mobile);
+      if(e1 || e2){ alert('ডিলিট করা যায়নি: ' + ((e1&&e1.message)||(e2&&e2.message))); btn.disabled = false; return; }
+      allUsers = allUsers.filter(u=>u.mobile!==mobile);
+      renderStats();
+      renderUsers(allUsers);
+    }
+  });
+</script>
+</body>
+</html>
