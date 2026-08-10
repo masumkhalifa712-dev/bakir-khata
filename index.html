@@ -3256,6 +3256,17 @@
   // Called once a mobile number is authenticated — points the app at that
   // user's own isolated customer data and reveals the home screen.
   async function completeAuth(mobile){
+    // Checked here (the one place every login path funnels through) so an
+    // admin-blocked account is refused whether they're logging in fresh,
+    // auto-logging in on reload, or recovering via a cloud PIN match.
+    try{
+      const { data } = await sb.from('accounts').select('blocked').eq('mobile', mobile).maybeSingle();
+      if(data && data.blocked){
+        showToast('এই একাউন্টটি সাময়িকভাবে বন্ধ রাখা হয়েছে। বিস্তারিত জানতে দোকানের সাথে যোগাযোগ করুন।', 'danger');
+        showAuthStep('phone');
+        return;
+      }
+    }catch(e){ /* if this check can't be reached, don't lock a legitimate user out */ }
     currentUserMobile = mobile;
     authScreenEl.classList.add('hide');
     await loadCustomers();
