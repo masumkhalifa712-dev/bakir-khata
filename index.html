@@ -152,6 +152,8 @@
   #app.show-report #screen-reportFilter{ transform:translateX(0); }
   #screen-shopSettings{ transform:translateX(100%); z-index:2; }
   #app.show-shopsettings #screen-shopSettings{ transform:translateX(0); }
+  #screen-appSettings{ transform:translateX(100%); z-index:2; }
+  #app.show-appsettings #screen-appSettings{ transform:translateX(0); }
   #app.show-report #screen-home{ transform:translateX(-18%); filter:brightness(.92); }
   #screen-customerDetail{ transform:translateX(100%); z-index:3; }
   #screen-newDue{ transform:translateX(100%); z-index:4; }
@@ -257,6 +259,21 @@
   .ss-select{ width:100%; border:1.6px solid var(--clr-line); border-radius:12px; padding:13px 15px; font-size:14.5px; font-family:var(--font-body); color:var(--clr-ink); background:var(--clr-card); outline:none; }
   .ss-textarea{ width:100%; border:1.6px solid var(--clr-line); border-radius:12px; padding:13px 15px; font-size:14.5px; font-family:var(--font-body); color:var(--clr-ink); outline:none; resize:vertical; min-height:70px; }
   .ss-save-btn{ width:100%; padding:15px; border:none; border-radius:12px; background:linear-gradient(160deg, var(--clr-primary), var(--clr-primary-dark)); color:#fff; font-weight:700; font-size:15px; cursor:pointer; margin-top:6px; }
+
+  /* ================= CATEGORY: Business Mode Settings ================= */
+  .mode-card{ display:flex; align-items:center; gap:14px; background:var(--clr-card); border:2px solid var(--clr-line); border-radius:16px; padding:18px 16px; margin-bottom:14px; cursor:pointer; }
+  .mode-card.selected{ border-color:var(--clr-primary); background:linear-gradient(160deg, #FFF6F2, #FFEFEA); }
+  .mode-card-icon{ width:42px; height:42px; border-radius:12px; background:#F1F1F3; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .mode-card.selected .mode-card-icon{ background:var(--clr-primary); color:#fff; }
+  .mode-card-icon svg{ width:21px; height:21px; color:var(--clr-ink-soft); }
+  .mode-card.selected .mode-card-icon svg{ color:#fff; }
+  .mode-card-text{ flex:1; }
+  .mode-card-title{ font-size:15px; font-weight:700; color:var(--clr-ink); }
+  .mode-card-desc{ font-size:12px; color:var(--clr-ink-soft); margin-top:2px; }
+  .mode-card-check{ width:22px; height:22px; border-radius:50%; border:2px solid var(--clr-line); flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+  .mode-card.selected .mode-card-check{ background:var(--clr-primary); border-color:var(--clr-primary); }
+  .mode-card-check svg{ width:12px; height:12px; color:#fff; opacity:0; }
+  .mode-card.selected .mode-card-check svg{ opacity:1; }
 
   .lf-overlay{ position:fixed; inset:0; background:rgba(15,15,20,.6); z-index:610; display:none; align-items:center; justify-content:center; padding:24px; }
 
@@ -947,6 +964,49 @@
   </section>
 
   <!-- ================================================================ -->
+  <!-- ================= SCREEN: App Settings (Business Mode) ========== -->
+  <!-- ================================================================ -->
+  <section class="screen" id="screen-appSettings">
+    <div class="cd-topbar">
+      <button class="cd-back" id="asBackBtn" aria-label="ফিরে যান">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      </button>
+      <div class="cd-title">সেটিংস</div>
+    </div>
+
+    <div class="ss-body">
+      <label class="field-label" style="margin-bottom:12px; display:block;">আপনার দোকান কী ধরনের হিসাব রাখবে?</label>
+
+      <div class="mode-card" id="modeCardGeneral" data-mode="general">
+        <div class="mode-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
+        <div class="mode-card-text">
+          <div class="mode-card-title">সাধারণ বাকি</div>
+          <div class="mode-card-desc">শুধু বাকি বিক্রয় ও আদায়ের হিসাব</div>
+        </div>
+        <div class="mode-card-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+      </div>
+
+      <div class="mode-card" id="modeCardInstallment" data-mode="installment">
+        <div class="mode-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+        <div class="mode-card-text">
+          <div class="mode-card-title">সহজ কিস্তি</div>
+          <div class="mode-card-desc">শুধু কিস্তিতে বিক্রয় ও আদায়ের হিসাব</div>
+        </div>
+        <div class="mode-card-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+      </div>
+
+      <div class="mode-card" id="modeCardBoth" data-mode="both">
+        <div class="mode-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 0 20 15.3 15.3 0 0 1 0-20"/><line x1="2" y1="12" x2="22" y2="12"/></svg></div>
+        <div class="mode-card-text">
+          <div class="mode-card-title">উভয়</div>
+          <div class="mode-card-desc">বাকি ও কিস্তি — দুই ধরনের হিসাবই রাখুন</div>
+        </div>
+        <div class="mode-card-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
   <!-- ================= SCREEN: Report Filter / PDF ================== -->
   <!-- ================================================================ -->
   <section class="screen" id="screen-reportFilter">
@@ -970,12 +1030,14 @@
         </div>
       </div>
 
-      <label class="field-label">ব্যবস্থাপনার ধরন</label>
-      <select class="rf-select" id="rfManagementType">
-        <option value="both">কিস্তি/বাকি ব্যবস্থাপনা</option>
-        <option value="general">বাকি ব্যবস্থাপনা</option>
-        <option value="installment">কিস্তি ব্যবস্থাপনা</option>
-      </select>
+      <div id="rfManagementTypeWrap">
+        <label class="field-label">ব্যবস্থাপনার ধরন</label>
+        <select class="rf-select" id="rfManagementType">
+          <option value="both">কিস্তি/বাকি ব্যবস্থাপনা</option>
+          <option value="general">বাকি ব্যবস্থাপনা</option>
+          <option value="installment">কিস্তি ব্যবস্থাপনা</option>
+        </select>
+      </div>
 
       <button class="rf-submit-btn" id="rfGenerateBtn">পিডিএফ সেভ করুন</button>
     </div>
@@ -1833,7 +1895,7 @@
   // saved through the app itself (and persisted to Supabase) will appear.
   const DEFAULT_CUSTOMERS = [];
 
-  let shopInfo = { name: '', ownerName: '', shopType: '', address: '' };
+  let shopInfo = { name: '', ownerName: '', shopType: '', address: '', businessMode: 'both' };
   function applyShopInfoToUI(){
     document.getElementById('shopName').textContent = shopInfo.name || 'দোকানের নাম';
     document.getElementById('menuDrawerShopName').textContent = shopInfo.name || 'দোকানের নাম';
@@ -1851,7 +1913,8 @@
       if(data){
         customers = data.customers || [];
         meta = data.meta || { nextSerial: 1 };
-        shopInfo = data.shop_info || { name: '', ownerName: '', shopType: '', address: '' };
+        shopInfo = data.shop_info || { name: '', ownerName: '', shopType: '', address: '', businessMode: 'both' };
+        if(!shopInfo.businessMode) shopInfo.businessMode = 'both';
       }else{
         customers = DEFAULT_CUSTOMERS;
         meta = { nextSerial: 1 };
@@ -1871,7 +1934,7 @@
     customersRealtimeChannel = sb.channel('user_data_' + currentUserMobile)
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'user_data', filter: `mobile=eq.${currentUserMobile}` }, (payload) => {
         customers = payload.new.customers || [];
-        if(payload.new.shop_info){ shopInfo = payload.new.shop_info; applyShopInfoToUI(); }
+        if(payload.new.shop_info){ shopInfo = payload.new.shop_info; if(!shopInfo.businessMode) shopInfo.businessMode = 'both'; applyShopInfoToUI(); }
         // Keep currentCustomer pointing at the live object so further edits
         // (adding another entry, etc.) always mutate data that will actually be saved.
         if(currentCustomer){
@@ -2075,7 +2138,37 @@
   /* ================= CATEGORY: Header Icon Actions ================= */
   document.getElementById('whatsappBtn').addEventListener('click', ()=>showToast("হোয়াটসঅ্যাপ সেটআপ (শীঘ্রই আসছে)"));
   document.getElementById('notifBtn').addEventListener('click', ()=>{ document.getElementById('notifDot').style.display='none'; showToast("নোটিফিকেশন"); });
-  document.getElementById('settingsBtn').addEventListener('click', ()=>showToast("সেটিংস (শীঘ্রই আসছে)"));
+  document.getElementById('settingsBtn').addEventListener('click', goToAppSettings);
+
+  /* ================================================================ */
+  /* ================= CATEGORY: App Settings (Business Mode) ========= */
+  /* ================================================================ */
+  function goToAppSettings(){
+    closeMenuDrawer();
+    updateModeCardsUI();
+    appEl.classList.add('show-appsettings');
+    pushAppState('appsettings');
+  }
+  function closeAppSettings(){ appEl.classList.remove('show-appsettings'); }
+  document.getElementById('asBackBtn').addEventListener('click', ()=> history.back());
+  function updateModeCardsUI(){
+    document.querySelectorAll('.mode-card').forEach(card=>{
+      card.classList.toggle('selected', card.dataset.mode === shopInfo.businessMode);
+    });
+  }
+  document.querySelectorAll('.mode-card').forEach(card=>{
+    card.addEventListener('click', async ()=>{
+      if(shopInfo.businessMode === card.dataset.mode) return;
+      shopInfo.businessMode = card.dataset.mode;
+      updateModeCardsUI();
+      await persistShopInfo();
+      // Re-render whatever profile card is currently visible so the change
+      // (hiding কিস্তি বাকি or সাধারণ বাকি) is reflected immediately.
+      if(currentCustomer) renderProfileCardHeader('cd', currentCustomer);
+      updateReportFilterModeUI();
+      showToast('সেটিংস সংরক্ষণ হয়েছে');
+    });
+  });
   document.getElementById('bannerAd').addEventListener('click', ()=>showToast("ব্যানার এড ম্যানেজ (শীঘ্রই আসছে)"));
   document.querySelectorAll('.quick-action').forEach(btn=>{
     btn.addEventListener('click', ()=>showToast(btn.querySelector('span:last-child').textContent + " (শীঘ্রই আসছে)"));
@@ -2139,7 +2232,7 @@
   const appEl = document.getElementById('app');
   function pushAppState(name){ try{ history.pushState({ appScreen:name }, '', ''); }catch(e){} }
   function goToAddCustomer(){ appEl.classList.add('show-add'); pushAppState('add'); }
-  function goHome(){ appEl.classList.remove('show-add'); appEl.classList.remove('show-detail'); appEl.classList.remove('show-newdue'); appEl.classList.remove('show-txdetail'); appEl.classList.remove('show-customeredit'); appEl.classList.remove('show-newinstallment'); appEl.classList.remove('show-collectinstallment'); appEl.classList.remove('show-report'); appEl.classList.remove('show-shopsettings'); resetAddForm(); }
+  function goHome(){ appEl.classList.remove('show-add'); appEl.classList.remove('show-detail'); appEl.classList.remove('show-newdue'); appEl.classList.remove('show-txdetail'); appEl.classList.remove('show-customeredit'); appEl.classList.remove('show-newinstallment'); appEl.classList.remove('show-collectinstallment'); appEl.classList.remove('show-report'); appEl.classList.remove('show-shopsettings'); appEl.classList.remove('show-appsettings'); resetAddForm(); }
 
   /* ================================================================ */
   /* ================= CATEGORY: Side Menu Drawer ===================== */
@@ -2209,11 +2302,22 @@
   });
   function goToCustomerDetail(customer){ renderCustomerDetail(customer); appEl.classList.add('show-detail'); pushAppState('detail'); }
   function closeCustomerDetail(){ appEl.classList.remove('show-detail'); }
+  function updateReportFilterModeUI(){
+    const wrap = document.getElementById('rfManagementTypeWrap');
+    const select = document.getElementById('rfManagementType');
+    if(shopInfo.businessMode === 'both'){
+      wrap.style.display = '';
+    }else{
+      wrap.style.display = 'none';
+      select.value = shopInfo.businessMode; // 'general' or 'installment'
+    }
+  }
   function goToReportFilter(){
     const today = new Date().toISOString().slice(0,10);
     document.getElementById('rfDateFrom').value = today;
     document.getElementById('rfDateTo').value = today;
     document.getElementById('rfManagementType').value = 'both';
+    updateReportFilterModeUI();
     appEl.classList.add('show-report');
     pushAppState('report');
   }
@@ -2625,6 +2729,16 @@
         genEl.style.color = '';
       }
     }
+    // Single-mode shops (শুধু বাকি বা শুধু কিস্তি) don't need to see the other
+    // category's always-zero row — hide it so the card isn't cluttered.
+    if(instEl){
+      const instRow = instEl.closest('.cd-profile-side-row');
+      if(instRow) instRow.style.display = (shopInfo.businessMode === 'general') ? 'none' : '';
+    }
+    if(genEl){
+      const genRow = genEl.closest('.cd-profile-side-row');
+      if(genRow) genRow.style.display = (shopInfo.businessMode === 'installment') ? 'none' : '';
+    }
   }
   function wireProfileCallWhatsapp(prefix){
     const callBtn = document.getElementById(prefix+'CallBtn');
@@ -2885,8 +2999,22 @@
   let currentEntryCategory = 'general';
   const giveTypeSheetOverlay = document.getElementById('giveTypeSheetOverlay');
 
+  function chooseEntryType(kind){ // kind: 'installment' | 'general'
+    giveTypeSheetOverlay.classList.remove('show');
+    editingTxIndex = null;
+    if(kind === 'installment'){
+      currentEntryCategory = 'installment';
+      if(sheetMode === 'give') goToNewInstallment(); else goToCollectInstallment();
+    }else{
+      currentEntryCategory = 'general';
+      const label = sheetMode === 'give' ? 'সাধারণ বাকি' : 'সাধারণ বাকি আদায়';
+      goToNewDue(label);
+    }
+  }
   document.getElementById('cdGiveBtn').addEventListener('click', ()=>{
     sheetMode = 'give';
+    if(shopInfo.businessMode === 'installment'){ chooseEntryType('installment'); return; }
+    if(shopInfo.businessMode === 'general'){ chooseEntryType('general'); return; }
     document.getElementById('giveTypeSheetTitle').textContent = "আপনি কি ধরনের বাকি দিচ্ছেন নির্বাচন করুন";
     document.getElementById('giveTypeInstallmentLabel').textContent = "সহজ কিস্তি";
     document.getElementById('giveTypeGeneralLabel').textContent = "সাধারণ বাকি";
@@ -2894,6 +3022,8 @@
   });
   document.getElementById('cdTakeBtn').addEventListener('click', ()=>{
     sheetMode = 'take';
+    if(shopInfo.businessMode === 'installment'){ chooseEntryType('installment'); return; }
+    if(shopInfo.businessMode === 'general'){ chooseEntryType('general'); return; }
     document.getElementById('giveTypeSheetTitle').textContent = "আপনি কি ধরনের বাকি নিচ্ছেন নির্বাচন করুন";
     document.getElementById('giveTypeInstallmentLabel').textContent = "কিস্তি আদায়";
     document.getElementById('giveTypeGeneralLabel').textContent = "সাধারণ বাকি আদায়";
@@ -3640,6 +3770,7 @@
     if(appEl.classList.contains('show-add')){ goHome(); return; }
     if(appEl.classList.contains('show-report')){ closeReportFilter(); return; }
     if(appEl.classList.contains('show-shopsettings')){ closeShopSettings(); return; }
+    if(appEl.classList.contains('show-appsettings')){ closeAppSettings(); return; }
     // No app-level screen open — we're at home. Require a second back press
     // within a few seconds before actually letting the app exit, so a single
     // accidental back-press never logs the user out.
