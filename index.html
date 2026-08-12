@@ -538,8 +538,8 @@
   .nd-body{ padding:18px 20px 110px; }
   .nd-row-two{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:18px; }
   .nd-toggle-row{ display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; padding:2px 2px 0; }
-  .nd-field-label{ font-size:12.5px; font-weight:700; color:var(--clr-ink-soft); margin-bottom:7px; display:flex; align-items:center; justify-content:space-between; gap:8px; }
-  .nd-amount-input{ border:1.6px solid var(--clr-line); border-radius:var(--radius-md); padding:13px 15px; font-size:15px; font-family:var(--font-body); color:var(--clr-ink); width:100%; outline:none; background:var(--clr-card); }
+  .nd-field-label{ font-size:12.5px; font-weight:700; color:var(--clr-ink-soft); margin-bottom:6px; display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .nd-amount-input{ border:1.4px solid var(--clr-line); border-radius:10px; padding:9px 12px; font-size:13.5px; font-family:var(--font-body); color:var(--clr-ink); width:100%; outline:none; background:var(--clr-card); }
   .nd-amount-input:focus{border-color:var(--clr-primary);}
   .nd-toggle-wrap{ display:flex; align-items:center; justify-content:center; height:47px; }
 
@@ -548,22 +548,28 @@
   .toggle-switch.on{ background:linear-gradient(160deg, #3E86C9, #2563A8); }
   .toggle-switch.on .knob{ transform:translateX(19px); background:#F5D061; }
 
-  .nd-purchase-price-field{ margin-top:-8px; margin-bottom:18px; display:none; }
+  .nd-purchase-price-field{ margin-top:-8px; margin-bottom:14px; display:none; }
   .nd-purchase-price-field.show{ display:block; }
 
-  .nd-note-textarea{ width:100%; min-height:100px; border:1.6px solid var(--clr-line); border-radius:var(--radius-md); padding:13px 15px; font-size:14.5px; font-family:var(--font-body); color:var(--clr-ink); resize:vertical; outline:none; background:var(--clr-card); }
+  .nd-note-textarea{ width:100%; min-height:72px; border:1.4px solid var(--clr-line); border-radius:10px; padding:9px 12px; font-size:13px; font-family:var(--font-body); color:var(--clr-ink); resize:vertical; outline:none; background:var(--clr-card); }
   .nd-note-textarea:focus{border-color:var(--clr-primary);}
 
-  .nd-utility-row{ display:flex; align-items:center; gap:14px; margin-top:20px; flex-wrap:wrap; }
-  .nd-image-btn{ width:52px;height:52px; border-radius:14px; border:1.8px dashed #C9C8C4; background:var(--clr-card); display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--clr-ink-soft); flex-shrink:0; position:relative; }
-  .nd-image-btn svg{width:22px;height:22px;}
-  .nd-image-btn .plus-badge{ position:absolute; top:-4px; right:-4px; width:16px;height:16px; border-radius:50%; background:var(--clr-primary); color:#fff; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; }
-  .nd-image-preview{width:100%;height:100%;object-fit:cover;border-radius:12px;}
+  /* Bottom utility card (ছবি / এসএমএস / তারিখ) — styled to match the ci-row
+     card look used on কিস্তি আদায়, so every entry screen's footer feels the same. */
+  .nd-utility-card{ border:1px solid var(--clr-line); border-radius:14px; overflow:hidden; margin-top:18px; }
+  .nd-utility-row{ display:flex; align-items:center; gap:10px; padding:11px 14px; border-bottom:1px solid var(--clr-line); }
+  .nd-utility-row:last-child{ border-bottom:none; }
+  .nd-utility-row-label{ font-size:12.5px; font-weight:600; color:var(--clr-ink); flex-shrink:0; }
+  .nd-utility-row-right{ flex:1; display:flex; align-items:center; justify-content:flex-end; gap:8px; }
+  .nd-image-btn{ width:36px;height:36px; border-radius:10px; border:1.6px dashed #C9C8C4; background:var(--clr-card); display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--clr-ink-soft); flex-shrink:0; position:relative; }
+  .nd-image-btn svg{width:17px;height:17px;}
+  .nd-image-btn .plus-badge{ position:absolute; top:-4px; right:-4px; width:14px;height:14px; border-radius:50%; background:var(--clr-primary); color:#fff; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; }
+  .nd-image-preview{width:100%;height:100%;object-fit:cover;border-radius:8px;}
 
-  .nd-sms-pill{ display:flex; align-items:center; gap:10px; background:var(--clr-bg); border-radius:var(--radius-full); padding:9px 14px; font-size:13px; font-weight:600; color:var(--clr-ink-soft); }
+  .nd-sms-pill{ display:flex; align-items:center; gap:10px; }
 
-  .nd-date-btn{ display:flex; align-items:center; gap:8px; background:none; border:none; font-size:13.5px; font-weight:600; color:var(--clr-ink); cursor:pointer; margin-left:auto; }
-  .nd-date-btn svg{width:19px;height:19px; color:var(--clr-ink-soft);}
+  .nd-date-btn{ display:flex; align-items:center; gap:8px; background:none; border:none; font-size:13px; font-weight:600; color:var(--clr-ink); cursor:pointer; }
+  .nd-date-btn svg{width:16px;height:16px; color:var(--clr-ink-soft);}
 
   .nd-submit-bar{ display:none; position:fixed; left:50%; transform:translate(-50%, 0px); bottom:0; width:100%; max-width:480px; padding:14px 20px calc(16px + var(--safe-bottom)); background:var(--clr-bg); border-top:1px solid var(--clr-line); z-index:26; box-sizing:border-box; }
   #app.show-newdue .nd-submit-bar.show{ display:block; }
@@ -1347,23 +1353,37 @@
       <div class="nd-field-label">নোট</div>
       <textarea class="nd-note-textarea" id="ndNoteInput" placeholder="যেমনঃ আজকের কিস্তি দেওয়া"></textarea>
 
-      <!-- ===== CATEGORY: Image / SMS / Due Date Row ===== -->
-      <div class="nd-utility-row">
-        <button class="nd-image-btn" id="ndImageBtn" aria-label="ছবি যোগ করুন">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-          <span class="plus-badge">+</span>
-        </button>
-        <input type="file" id="ndImageInput" accept="image/*" style="display:none;" />
-        <div class="nd-sms-pill">
-          <span>এসএমএস পাঠাতে চাইলে চালু রাখুন</span>
-          <button class="toggle-switch on" id="ndSmsToggle" aria-label="এসএমএস টগল"><span class="knob"></span></button>
+      <!-- ===== CATEGORY: Image / SMS / Due Date (compact card, matches কিস্তি আদায়) ===== -->
+      <div class="nd-utility-card">
+        <div class="nd-utility-row">
+          <div class="nd-utility-row-label">ছবি</div>
+          <div class="nd-utility-row-right">
+            <button class="nd-image-btn" id="ndImageBtn" aria-label="ছবি যোগ করুন">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+              <span class="plus-badge">+</span>
+            </button>
+          </div>
         </div>
-        <button class="nd-date-btn" id="ndDateBtn">
-          <span id="ndDateLabel">বাকি পরিশোধের তারিখ</span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        </button>
-        <input type="date" id="ndDateInput" style="position:absolute; opacity:0; pointer-events:none; width:1px; height:1px;" />
+        <div class="nd-utility-row">
+          <div class="nd-utility-row-label">এসএমএস</div>
+          <div class="nd-utility-row-right">
+            <div class="nd-sms-pill">
+              <button class="toggle-switch on" id="ndSmsToggle" aria-label="এসএমএস টগল"><span class="knob"></span></button>
+            </div>
+          </div>
+        </div>
+        <div class="nd-utility-row">
+          <div class="nd-utility-row-label">তারিখ</div>
+          <div class="nd-utility-row-right">
+            <button class="nd-date-btn" id="ndDateBtn">
+              <span id="ndDateLabel">বাকি পরিশোধের তারিখ</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </button>
+          </div>
+        </div>
       </div>
+      <input type="file" id="ndImageInput" accept="image/*" style="display:none;" />
+      <input type="date" id="ndDateInput" style="position:absolute; opacity:0; pointer-events:none; width:1px; height:1px;" />
     </div>
   </section>
 
@@ -1557,18 +1577,27 @@
       <div class="nd-field-label" style="margin-top:20px;">নোট</div>
       <textarea class="nd-note-textarea" id="niNoteInput" placeholder="যেমনঃ নতুন মোবাইল কিস্তিতে বিক্রি"></textarea>
 
-      <!-- ===== CATEGORY: Image / SMS Row ===== -->
-      <div class="nd-utility-row">
-        <button class="nd-image-btn" id="niImageBtn" aria-label="ছবি যোগ করুন">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-          <span class="plus-badge">+</span>
-        </button>
-        <input type="file" id="niImageInput" accept="image/*" style="display:none;" />
-        <div class="nd-sms-pill">
-          <span>এসএমএস পাঠাতে চাইলে চালু রাখুন</span>
-          <button class="toggle-switch on" id="niSmsToggle" aria-label="এসএমএস টগল"><span class="knob"></span></button>
+      <!-- ===== CATEGORY: Image / SMS (compact card, matches কিস্তি আদায়) ===== -->
+      <div class="nd-utility-card">
+        <div class="nd-utility-row">
+          <div class="nd-utility-row-label">ছবি</div>
+          <div class="nd-utility-row-right">
+            <button class="nd-image-btn" id="niImageBtn" aria-label="ছবি যোগ করুন">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+              <span class="plus-badge">+</span>
+            </button>
+          </div>
+        </div>
+        <div class="nd-utility-row">
+          <div class="nd-utility-row-label">এসএমএস</div>
+          <div class="nd-utility-row-right">
+            <div class="nd-sms-pill">
+              <button class="toggle-switch on" id="niSmsToggle" aria-label="এসএমএস টগল"><span class="knob"></span></button>
+            </div>
+          </div>
         </div>
       </div>
+      <input type="file" id="niImageInput" accept="image/*" style="display:none;" />
     </div>
   </section>
 
@@ -1663,9 +1692,9 @@
           </div>
         </div>
 
-        <div class="ci-footer">
-          <div class="nd-sms-pill" style="width:100%;">
-            <span>এসএমএস পাঠাতে চাইলে চালু রাখুন</span>
+        <div class="ci-row" style="border-bottom:none;">
+          <div class="ci-row-label">এসএমএস</div>
+          <div class="ci-row-input-wrap" style="justify-content:flex-end;">
             <button class="toggle-switch on" id="ciSmsToggle" aria-label="এসএমএস টগল"><span class="knob"></span></button>
           </div>
         </div>
