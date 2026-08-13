@@ -8,7 +8,7 @@
   :root{
     --clr-primary:#C8102E; --clr-primary-dark:#9c0c24;
     --clr-bg:#F3F2F0; --clr-card:#ffffff; --clr-ink:#1B1B1F; --clr-ink-soft:#6B6B72;
-    --clr-line:#E7E5E1;
+    --clr-line:#E7E5E1; --clr-green:#1E8A4C;
   }
   *{box-sizing:border-box;}
   body{margin:0; font-family:'Hind Siliguri','Noto Sans Bengali',sans-serif; background:var(--clr-bg); color:var(--clr-ink); min-height:100vh;}
@@ -26,34 +26,69 @@
   .login-error.show{ display:block; }
 
   /* ---- Dashboard ---- */
-  .dash{ display:none; max-width:1100px; margin:0 auto; padding:20px 16px 60px; }
+  .dash{ display:none; max-width:1150px; margin:0 auto; padding:20px 16px 60px; }
   .dash.show{ display:block; }
   .dash-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:22px; flex-wrap:wrap; gap:10px; }
   .dash-title{ font-size:20px; font-weight:800; }
   .dash-title span{ color:var(--clr-ink-soft); font-weight:600; font-size:13px; display:block; margin-top:2px; }
   .logout-btn{ padding:9px 16px; border:1.4px solid var(--clr-line); background:var(--clr-card); border-radius:999px; font-size:13px; font-weight:700; color:var(--clr-ink-soft); cursor:pointer; }
 
-  .stats-row{ display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:12px; margin-bottom:24px; }
-  .stat-card{ background:var(--clr-card); border-radius:16px; padding:18px; box-shadow:0 2px 10px rgba(0,0,0,.04); }
-  .stat-label{ font-size:12.5px; color:var(--clr-ink-soft); font-weight:600; margin-bottom:6px; }
-  .stat-value{ font-size:23px; font-weight:800; }
+  .stats-row{ display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); gap:12px; margin-bottom:24px; }
+  .stat-card{ background:var(--clr-card); border-radius:16px; padding:16px; box-shadow:0 2px 10px rgba(0,0,0,.04); }
+  .stat-label{ font-size:12px; color:var(--clr-ink-soft); font-weight:600; margin-bottom:6px; }
+  .stat-value{ font-size:21px; font-weight:800; }
+
+  .panel-card{ background:var(--clr-card); border-radius:16px; padding:18px; box-shadow:0 2px 10px rgba(0,0,0,.04); margin-bottom:22px; }
+  .panel-title{ font-size:15px; font-weight:800; margin-bottom:12px; display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+  .panel-title small{ font-weight:600; font-size:11.5px; color:var(--clr-ink-soft); }
+  .panel-textarea{ width:100%; min-height:70px; border:1.6px solid var(--clr-line); border-radius:11px; padding:11px 13px; font-size:13.5px; font-family:inherit; outline:none; resize:vertical; }
+  .panel-row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:10px; }
+  .toggle-mini{ display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600; }
+  .btn-primary{ padding:10px 18px; border:none; border-radius:10px; background:linear-gradient(160deg,var(--clr-primary),var(--clr-primary-dark)); color:#fff; font-weight:700; font-size:13px; cursor:pointer; font-family:inherit; }
+  .btn-secondary{ padding:10px 18px; border:1.4px solid var(--clr-line); border-radius:10px; background:var(--clr-card); color:var(--clr-ink); font-weight:700; font-size:13px; cursor:pointer; font-family:inherit; }
+  .changelog-list{ margin-top:10px; font-size:13px; }
+  .changelog-item{ padding:8px 0; border-bottom:1px solid var(--clr-line); display:flex; justify-content:space-between; gap:10px; }
+  .changelog-item:last-child{ border-bottom:none; }
+  .changelog-date{ color:var(--clr-ink-soft); font-size:11.5px; white-space:nowrap; }
+
+  .toolbar{ display:flex; gap:10px; margin-bottom:14px; flex-wrap:wrap; align-items:center; }
+  .toolbar input, .toolbar select{ border:1.6px solid var(--clr-line); border-radius:11px; padding:10px 14px; font-size:13.5px; font-family:inherit; outline:none; background:var(--clr-card); }
+  .toolbar input{ flex:1; min-width:180px; max-width:280px; }
 
   .table-wrap{ background:var(--clr-card); border-radius:16px; overflow-x:auto; box-shadow:0 2px 10px rgba(0,0,0,.04); }
-  table{ width:100%; border-collapse:collapse; font-size:13.5px; min-width:640px; }
-  th{ text-align:left; padding:14px 16px; background:#FAFAF9; color:var(--clr-ink-soft); font-weight:700; font-size:12.5px; border-bottom:1.5px solid var(--clr-line); white-space:nowrap; }
-  td{ padding:13px 16px; border-bottom:1px solid var(--clr-line); white-space:nowrap; }
+  table{ width:100%; border-collapse:collapse; font-size:13px; min-width:880px; }
+  th{ text-align:left; padding:13px 14px; background:#FAFAF9; color:var(--clr-ink-soft); font-weight:700; font-size:11.5px; border-bottom:1.5px solid var(--clr-line); white-space:nowrap; }
+  td{ padding:12px 14px; border-bottom:1px solid var(--clr-line); white-space:nowrap; }
   tr:last-child td{ border-bottom:none; }
+  tr.user-row{ cursor:pointer; }
+  tr.user-row:hover{ background:#FAFAF9; }
   .loading-row, .empty-row{ text-align:center; padding:30px; color:var(--clr-ink-soft); }
-  .search-box{ margin-bottom:14px; }
-  .search-box input{ width:100%; max-width:300px; border:1.6px solid var(--clr-line); border-radius:11px; padding:10px 14px; font-size:13.5px; font-family:inherit; outline:none; }
-  .badge{ display:inline-block; padding:4px 10px; border-radius:999px; font-size:11px; font-weight:700; }
-  .badge.active{ background:#E3F5EA; color:#1E8A4C; }
+  .badge{ display:inline-block; padding:4px 9px; border-radius:999px; font-size:10.5px; font-weight:700; }
+  .badge.active{ background:#E3F5EA; color:var(--clr-green); }
   .badge.blocked{ background:#FCE7E9; color:var(--clr-primary); }
-  .row-actions{ display:flex; gap:6px; }
-  .row-actions button{ border:none; border-radius:8px; padding:7px 11px; font-size:11.5px; font-weight:700; cursor:pointer; font-family:inherit; }
+  .badge.paid{ background:#FFF3D6; color:#8A6100; }
+  .badge.free{ background:#EDEDEF; color:var(--clr-ink-soft); }
+  .row-actions{ display:flex; gap:6px; flex-wrap:wrap; }
+  .row-actions button{ border:none; border-radius:8px; padding:6px 10px; font-size:11px; font-weight:700; cursor:pointer; font-family:inherit; }
   .btn-block{ background:#FEF3E0; color:#9A6B00; }
-  .btn-unblock{ background:#E3F5EA; color:#1E8A4C; }
+  .btn-unblock{ background:#E3F5EA; color:var(--clr-green); }
   .btn-delete{ background:#FCE7E9; color:var(--clr-primary); }
+  .btn-paid{ background:#FFF3D6; color:#8A6100; }
+  .btn-export{ background:#E7F0FE; color:#1D5DBF; }
+
+  /* ---- User detail modal ---- */
+  .modal-overlay{ position:fixed; inset:0; background:rgba(15,15,20,.55); z-index:50; display:none; align-items:center; justify-content:center; padding:20px; }
+  .modal-overlay.show{ display:flex; }
+  .modal-box{ width:100%; max-width:480px; max-height:85vh; overflow-y:auto; background:var(--clr-card); border-radius:18px; padding:22px 20px; }
+  .modal-close{ float:right; border:none; background:#F1F1F3; width:30px; height:30px; border-radius:50%; font-size:15px; cursor:pointer; color:var(--clr-ink-soft); }
+  .modal-title{ font-size:16px; font-weight:800; margin-bottom:14px; }
+  .detail-row{ display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--clr-line); font-size:13px; }
+  .detail-row:last-child{ border-bottom:none; }
+  .detail-label{ color:var(--clr-ink-soft); font-weight:600; }
+  .detail-value{ font-weight:700; text-align:right; }
+  .cust-mini-list{ margin-top:14px; }
+  .cust-mini-row{ display:flex; justify-content:space-between; padding:7px 0; font-size:12.5px; border-bottom:1px solid var(--clr-line); }
+  .cust-mini-row:last-child{ border-bottom:none; }
 </style>
 </head>
 <body>
@@ -76,37 +111,78 @@
     </div>
 
     <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-label">মোট ইউজার (দোকান)</div>
-        <div class="stat-value" id="statTotalUsers">—</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">মোট কাস্টমার/সাপ্লায়ার</div>
-        <div class="stat-value" id="statTotalCustomers">—</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">মোট বকেয়া (সব ইউজার মিলিয়ে)</div>
-        <div class="stat-value" id="statTotalDue">—</div>
+      <div class="stat-card"><div class="stat-label">মোট ইউজার (দোকান)</div><div class="stat-value" id="statTotalUsers">—</div></div>
+      <div class="stat-card"><div class="stat-label">মোট কাস্টমার/সাপ্লায়ার</div><div class="stat-value" id="statTotalCustomers">—</div></div>
+      <div class="stat-card"><div class="stat-label">মোট বকেয়া (সব মিলিয়ে)</div><div class="stat-value" id="statTotalDue">—</div></div>
+      <div class="stat-card"><div class="stat-label">পেইড ইউজার</div><div class="stat-value" id="statPaidUsers">—</div></div>
+      <div class="stat-card"><div class="stat-label">শুধু সাধারণ বাকি</div><div class="stat-value" id="statModeGeneral">—</div></div>
+      <div class="stat-card"><div class="stat-label">শুধু সহজ কিস্তি</div><div class="stat-value" id="statModeInstallment">—</div></div>
+      <div class="stat-card"><div class="stat-label">উভয় ব্যবহার করে</div><div class="stat-value" id="statModeBoth">—</div></div>
+    </div>
+
+    <div class="panel-card">
+      <div class="panel-title">📢 ঘোষণা/নোটিশ <small>সব ইউজারের হোমপেজে দেখাবে</small></div>
+      <textarea class="panel-textarea" id="broadcastText" placeholder="যেমনঃ নতুন ফিচার এসেছে — এসএমএস দিয়ে জানান কাস্টমারকে!"></textarea>
+      <div class="panel-row">
+        <label class="toggle-mini"><input type="checkbox" id="broadcastActive" /> সক্রিয় (ইউজাররা দেখতে পাবে)</label>
+        <button class="btn-primary" id="saveBroadcastBtn">সংরক্ষণ করুন</button>
       </div>
     </div>
 
-    <div class="search-box"><input type="text" id="userSearchInput" placeholder="মোবাইল নাম্বার দিয়ে খুঁজুন" /></div>
+    <div class="panel-card">
+      <div class="panel-title">🗒️ পরিবর্তনের নোট <small>নিজের রেকর্ডের জন্য, শুধু তুমি দেখবে</small></div>
+      <div class="panel-row">
+        <input type="text" id="changelogInput" placeholder="যেমনঃ SMS ফিচার যোগ হয়েছে" style="flex:1; min-width:200px; border:1.6px solid var(--clr-line); border-radius:10px; padding:10px 13px; font-size:13px; font-family:inherit; outline:none;" />
+        <button class="btn-secondary" id="addChangelogBtn">যোগ করুন</button>
+      </div>
+      <div class="changelog-list" id="changelogList"></div>
+    </div>
+
+    <div class="toolbar">
+      <input type="text" id="userSearchInput" placeholder="মোবাইল নাম্বার দিয়ে খুঁজুন" />
+      <select id="statusFilter">
+        <option value="all">সব ইউজার</option>
+        <option value="active">শুধু সচল</option>
+        <option value="blocked">শুধু বন্ধ</option>
+        <option value="paid">শুধু পেইড</option>
+        <option value="free">শুধু ফ্রি</option>
+      </select>
+      <select id="sortBy">
+        <option value="date_desc">নতুন → পুরাতন</option>
+        <option value="date_asc">পুরাতন → নতুন</option>
+        <option value="due_desc">বকেয়া বেশি → কম</option>
+        <option value="due_asc">বকেয়া কম → বেশি</option>
+      </select>
+      <button class="btn-export" id="exportCsvBtn" style="border:none;border-radius:10px;padding:10px 16px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;">⬇ CSV এক্সপোর্ট</button>
+    </div>
+
     <div class="table-wrap">
       <table>
         <thead>
           <tr>
             <th>মোবাইল নাম্বার</th>
             <th>যোগ দিয়েছে</th>
-            <th>কাস্টমার সংখ্যা</th>
+            <th>সর্বশেষ লগইন</th>
+            <th>কাস্টমার</th>
             <th>মোট বকেয়া</th>
+            <th>প্ল্যান</th>
             <th>অবস্থা</th>
             <th>কার্যক্রম</th>
           </tr>
         </thead>
         <tbody id="usersTableBody">
-          <tr><td colspan="6" class="loading-row">লোড হচ্ছে...</td></tr>
+          <tr><td colspan="8" class="loading-row">লোড হচ্ছে...</td></tr>
         </tbody>
       </table>
+    </div>
+  </div>
+
+  <!-- ================= User Detail Modal ================= -->
+  <div class="modal-overlay" id="detailModalOverlay">
+    <div class="modal-box">
+      <button class="modal-close" id="detailModalCloseBtn">✕</button>
+      <div class="modal-title" id="detailModalMobile">—</div>
+      <div id="detailModalBody"></div>
     </div>
   </div>
 
@@ -117,12 +193,12 @@
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRhbXpyZW9rcG52cXB4dmticGl3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYwMjU4MTAsImV4cCI6MjEwMTYwMTgxMH0.-ddoBc5pVVLUcrBfxb5RUeSU_wCuQQsLzhfpwDsBsHQ";
   const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  // Step 1: a fixed admin password. Change this any time — just ask, or edit
-  // this one line yourself. This gates access to the panel; the panel itself
-  // then reads the same Supabase tables the app already uses.
+  // Step 1 password gate. Change any time — just edit this one line.
   const ADMIN_PASSWORD = "Khata@Admin2026";
 
   const bn = n => Number(n||0).toLocaleString('bn-BD');
+  const fmtDate = (iso) => iso ? new Date(iso).toLocaleDateString('bn-BD', { year:'numeric', month:'short', day:'numeric' }) : '—';
+  const fmtDateTime = (iso) => iso ? new Date(iso).toLocaleDateString('bn-BD', { year:'numeric', month:'short', day:'numeric' }) + ' ' + new Date(iso).toLocaleTimeString('bn-BD', { hour:'2-digit', minute:'2-digit' }) : '—';
 
   document.getElementById('adminLoginBtn').addEventListener('click', tryLogin);
   document.getElementById('adminPasswordInput').addEventListener('keydown', (e)=>{ if(e.key==='Enter') tryLogin(); });
@@ -146,110 +222,267 @@
     document.getElementById('loginWrap').style.display = 'none';
     document.getElementById('dash').classList.add('show');
     loadUsers();
+    loadAppConfig();
   }
-  // Stay logged in across a refresh within the same browser tab session
   if(sessionStorage.getItem('adminAuthed') === '1') showDashboard();
+
+  /* ================= Users ================= */
+  let allUsers = [];
 
   async function loadUsers(){
     const tbody = document.getElementById('usersTableBody');
     try{
-      const { data: accounts, error: accErr } = await sb.from('accounts').select('mobile, created_at, blocked').order('created_at', { ascending: false });
+      const { data: accounts, error: accErr } = await sb.from('accounts')
+        .select('mobile, created_at, blocked, plan, plan_expiry, last_login')
+        .order('created_at', { ascending: false });
       if(accErr) throw accErr;
-      const { data: userDataRows, error: udErr } = await sb.from('user_data').select('mobile, customers');
+      const { data: userDataRows, error: udErr } = await sb.from('user_data').select('mobile, customers, shop_info');
       if(udErr) throw udErr;
 
       const dataByMobile = {};
-      (userDataRows || []).forEach(row => { dataByMobile[row.mobile] = row.customers || []; });
+      (userDataRows || []).forEach(row => { dataByMobile[row.mobile] = row; });
 
       allUsers = (accounts || []).map(acc => {
-        const customers = dataByMobile[acc.mobile] || [];
+        const row = dataByMobile[acc.mobile] || {};
+        const customers = row.customers || [];
+        const shopInfo = row.shop_info || {};
         return {
           mobile: acc.mobile,
           created_at: acc.created_at,
+          last_login: acc.last_login,
           blocked: !!acc.blocked,
+          plan: acc.plan || 'free',
+          plan_expiry: acc.plan_expiry,
           customerCount: customers.length,
           dueSum: customers.reduce((s,c)=> s + (c.amount || 0), 0),
+          businessMode: shopInfo.businessMode || 'both',
+          shopInfo,
+          customers,
         };
       });
 
       renderStats();
-      renderUsers(allUsers);
+      applyFiltersAndRender();
     }catch(e){
-      tbody.innerHTML = '<tr><td colspan="6" class="empty-row">তথ্য লোড করা যায়নি — ইন্টারনেট কানেকশন চেক করুন</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="8" class="empty-row">তথ্য লোড করা যায়নি — ইন্টারনেট কানেকশন চেক করুন</td></tr>';
     }
   }
 
   function renderStats(){
     const totalCustomers = allUsers.reduce((s,u)=>s+u.customerCount,0);
     const totalDue = allUsers.reduce((s,u)=>s+u.dueSum,0);
+    const paidCount = allUsers.filter(u=>u.plan==='paid').length;
     document.getElementById('statTotalUsers').textContent = bn(allUsers.length);
     document.getElementById('statTotalCustomers').textContent = bn(totalCustomers);
     document.getElementById('statTotalDue').textContent = bn(totalDue) + " টাকা";
+    document.getElementById('statPaidUsers').textContent = bn(paidCount);
+    document.getElementById('statModeGeneral').textContent = bn(allUsers.filter(u=>u.businessMode==='general').length);
+    document.getElementById('statModeInstallment').textContent = bn(allUsers.filter(u=>u.businessMode==='installment').length);
+    document.getElementById('statModeBoth').textContent = bn(allUsers.filter(u=>u.businessMode==='both').length);
+  }
+
+  function applyFiltersAndRender(){
+    const q = document.getElementById('userSearchInput').value.trim();
+    const status = document.getElementById('statusFilter').value;
+    const sortBy = document.getElementById('sortBy').value;
+
+    let list = allUsers.slice();
+    if(q) list = list.filter(u=>u.mobile.includes(q));
+    if(status === 'active') list = list.filter(u=>!u.blocked);
+    if(status === 'blocked') list = list.filter(u=>u.blocked);
+    if(status === 'paid') list = list.filter(u=>u.plan==='paid');
+    if(status === 'free') list = list.filter(u=>u.plan!=='paid');
+
+    if(sortBy === 'date_desc') list.sort((a,b)=> new Date(b.created_at||0) - new Date(a.created_at||0));
+    if(sortBy === 'date_asc') list.sort((a,b)=> new Date(a.created_at||0) - new Date(b.created_at||0));
+    if(sortBy === 'due_desc') list.sort((a,b)=> b.dueSum - a.dueSum);
+    if(sortBy === 'due_asc') list.sort((a,b)=> a.dueSum - b.dueSum);
+
+    renderUsers(list);
+  }
+  ['userSearchInput'].forEach(id=> document.getElementById(id).addEventListener('input', applyFiltersAndRender));
+  ['statusFilter','sortBy'].forEach(id=> document.getElementById(id).addEventListener('change', applyFiltersAndRender));
+
+  function planBadge(u){
+    if(u.plan === 'paid'){
+      const exp = u.plan_expiry ? fmtDate(u.plan_expiry) : '—';
+      return `<span class="badge paid">পেইড (${exp} পর্যন্ত)</span>`;
+    }
+    return `<span class="badge free">ফ্রি</span>`;
   }
 
   function renderUsers(list){
     const tbody = document.getElementById('usersTableBody');
     if(list.length === 0){
-      tbody.innerHTML = '<tr><td colspan="6" class="empty-row">কোনো ইউজার পাওয়া যায়নি</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="8" class="empty-row">কোনো ইউজার পাওয়া যায়নি</td></tr>';
       return;
     }
-    tbody.innerHTML = list.map(u => {
-      const joined = u.created_at ? new Date(u.created_at).toLocaleDateString('bn-BD', { year:'numeric', month:'short', day:'numeric' }) : '—';
-      return `
-        <tr>
-          <td>${u.mobile}</td>
-          <td>${joined}</td>
-          <td>${bn(u.customerCount)}</td>
-          <td>${bn(u.dueSum)} টাকা</td>
-          <td><span class="badge ${u.blocked ? 'blocked' : 'active'}">${u.blocked ? 'বন্ধ' : 'সচল'}</span></td>
-          <td>
-            <div class="row-actions">
-              <button class="${u.blocked ? 'btn-unblock' : 'btn-block'}" data-action="toggle-block" data-mobile="${u.mobile}">${u.blocked ? 'চালু করুন' : 'বন্ধ করুন'}</button>
-              <button class="btn-delete" data-action="delete" data-mobile="${u.mobile}">ডিলিট</button>
-            </div>
-          </td>
-        </tr>`;
-    }).join('');
+    tbody.innerHTML = list.map(u => `
+      <tr class="user-row" data-mobile="${u.mobile}">
+        <td>${u.mobile}</td>
+        <td>${fmtDate(u.created_at)}</td>
+        <td>${fmtDateTime(u.last_login)}</td>
+        <td>${bn(u.customerCount)}</td>
+        <td>${bn(u.dueSum)} টাকা</td>
+        <td>${planBadge(u)}</td>
+        <td><span class="badge ${u.blocked ? 'blocked' : 'active'}">${u.blocked ? 'বন্ধ' : 'সচল'}</span></td>
+        <td>
+          <div class="row-actions">
+            <button class="btn-paid" data-action="mark-paid" data-mobile="${u.mobile}">পেইড করুন</button>
+            <button class="${u.blocked ? 'btn-unblock' : 'btn-block'}" data-action="toggle-block" data-mobile="${u.mobile}">${u.blocked ? 'চালু' : 'বন্ধ'}</button>
+            <button class="btn-delete" data-action="delete" data-mobile="${u.mobile}">ডিলিট</button>
+          </div>
+        </td>
+      </tr>`).join('');
   }
-
-  let allUsers = [];
-  document.getElementById('userSearchInput').addEventListener('input', (e)=>{
-    const q = e.target.value.trim();
-    renderUsers(q ? allUsers.filter(u=>u.mobile.includes(q)) : allUsers);
-  });
 
   document.getElementById('usersTableBody').addEventListener('click', async (e)=>{
     const btn = e.target.closest('button');
-    if(!btn) return;
-    const mobile = btn.dataset.mobile;
-    const action = btn.dataset.action;
-    const user = allUsers.find(u=>u.mobile===mobile);
+    if(btn){
+      const mobile = btn.dataset.mobile;
+      const action = btn.dataset.action;
+      const user = allUsers.find(u=>u.mobile===mobile);
 
-    if(action === 'toggle-block'){
-      const newBlocked = !user.blocked;
-      const msg = newBlocked
-        ? `${mobile} নাম্বারের একাউন্টটি বন্ধ করতে চান? এই ইউজার আর লগইন করতে পারবে না।`
-        : `${mobile} নাম্বারের একাউন্টটি আবার চালু করতে চান?`;
-      if(!confirm(msg)) return;
-      btn.disabled = true;
-      const { error } = await sb.from('accounts').update({ blocked: newBlocked }).eq('mobile', mobile);
-      if(error){ alert('আপডেট করা যায়নি: ' + error.message); btn.disabled = false; return; }
-      user.blocked = newBlocked;
-      renderStats();
-      renderUsers(allUsers);
-    }
+      if(action === 'toggle-block'){
+        const newBlocked = !user.blocked;
+        const msg = newBlocked
+          ? `${mobile} নাম্বারের একাউন্টটি বন্ধ করতে চান? এই ইউজার আর লগইন করতে পারবে না।`
+          : `${mobile} নাম্বারের একাউন্টটি আবার চালু করতে চান?`;
+        if(!confirm(msg)) return;
+        btn.disabled = true;
+        const { error } = await sb.from('accounts').update({ blocked: newBlocked }).eq('mobile', mobile);
+        if(error){ alert('আপডেট করা যায়নি: ' + error.message); btn.disabled = false; return; }
+        user.blocked = newBlocked;
+        renderStats(); applyFiltersAndRender();
+      }
 
-    if(action === 'delete'){
-      const msg = `${mobile} নাম্বারের একাউন্ট এবং তার সব কাস্টমার/লেনদেনের তথ্য পুরোপুরি মুছে ফেলতে চান? এই কাজটি ফেরানো যাবে না।`;
-      if(!confirm(msg)) return;
-      btn.disabled = true;
-      const { error: e1 } = await sb.from('user_data').delete().eq('mobile', mobile);
-      const { error: e2 } = await sb.from('accounts').delete().eq('mobile', mobile);
-      if(e1 || e2){ alert('ডিলিট করা যায়নি: ' + ((e1&&e1.message)||(e2&&e2.message))); btn.disabled = false; return; }
-      allUsers = allUsers.filter(u=>u.mobile!==mobile);
-      renderStats();
-      renderUsers(allUsers);
+      if(action === 'delete'){
+        const msg = `${mobile} নাম্বারের একাউন্ট এবং তার সব কাস্টমার/লেনদেনের তথ্য পুরোপুরি মুছে ফেলতে চান? এই কাজটি ফেরানো যাবে না।`;
+        if(!confirm(msg)) return;
+        btn.disabled = true;
+        const { error: e1 } = await sb.from('user_data').delete().eq('mobile', mobile);
+        const { error: e2 } = await sb.from('accounts').delete().eq('mobile', mobile);
+        if(e1 || e2){ alert('ডিলিট করা যায়নি: ' + ((e1&&e1.message)||(e2&&e2.message))); btn.disabled = false; return; }
+        allUsers = allUsers.filter(u=>u.mobile!==mobile);
+        renderStats(); applyFiltersAndRender();
+      }
+
+      if(action === 'mark-paid'){
+        const days = prompt(`${mobile} নাম্বারকে কতদিনের জন্য পেইড করবেন? (দিন সংখ্যা লিখুন, যেমন 30 বা 365)\nফ্রি করতে চাইলে 0 লিখুন।`, '30');
+        if(days === null) return;
+        const n = parseInt(days, 10);
+        if(isNaN(n)) { alert('সঠিক সংখ্যা দিন'); return; }
+        btn.disabled = true;
+        if(n === 0){
+          const { error } = await sb.from('accounts').update({ plan: 'free', plan_expiry: null }).eq('mobile', mobile);
+          if(error){ alert('আপডেট করা যায়নি: ' + error.message); btn.disabled = false; return; }
+          user.plan = 'free'; user.plan_expiry = null;
+        }else{
+          const expiry = new Date(Date.now() + n*24*60*60*1000).toISOString();
+          const { error } = await sb.from('accounts').update({ plan: 'paid', plan_expiry: expiry }).eq('mobile', mobile);
+          if(error){ alert('আপডেট করা যায়নি: ' + error.message); btn.disabled = false; return; }
+          user.plan = 'paid'; user.plan_expiry = expiry;
+        }
+        renderStats(); applyFiltersAndRender();
+        return;
+      }
+      return;
     }
+    // Row click (not on a button) → open detail modal
+    const row = e.target.closest('tr.user-row');
+    if(row) openDetailModal(row.dataset.mobile);
+  });
+
+  /* ================= User Detail Modal ================= */
+  function openDetailModal(mobile){
+    const u = allUsers.find(x=>x.mobile===mobile);
+    if(!u) return;
+    document.getElementById('detailModalMobile').textContent = u.mobile;
+    const modeLabel = { general: 'সাধারণ বাকি', installment: 'সহজ কিস্তি', both: 'উভয়' }[u.businessMode] || 'উভয়';
+    const custRows = (u.customers || []).slice(0, 30).map(c => `
+      <div class="cust-mini-row"><span>${c.name || '—'} ${c.mobile ? '('+c.mobile+')' : ''}</span><span>${bn(c.amount||0)} টাকা</span></div>
+    `).join('') || '<div class="cust-mini-row"><span>কোনো কাস্টমার নেই</span></div>';
+
+    document.getElementById('detailModalBody').innerHTML = `
+      <div class="detail-row"><span class="detail-label">দোকানের নাম</span><span class="detail-value">${u.shopInfo.name || '—'}</span></div>
+      <div class="detail-row"><span class="detail-label">মালিকের নাম</span><span class="detail-value">${u.shopInfo.ownerName || '—'}</span></div>
+      <div class="detail-row"><span class="detail-label">দোকানের ধরন</span><span class="detail-value">${u.shopInfo.shopType || '—'}</span></div>
+      <div class="detail-row"><span class="detail-label">ঠিকানা</span><span class="detail-value">${u.shopInfo.address || '—'}</span></div>
+      <div class="detail-row"><span class="detail-label">ব্যবসার মোড</span><span class="detail-value">${modeLabel}</span></div>
+      <div class="detail-row"><span class="detail-label">যোগ দিয়েছে</span><span class="detail-value">${fmtDate(u.created_at)}</span></div>
+      <div class="detail-row"><span class="detail-label">সর্বশেষ লগইন</span><span class="detail-value">${fmtDateTime(u.last_login)}</span></div>
+      <div class="detail-row"><span class="detail-label">প্ল্যান</span><span class="detail-value">${planBadge(u)}</span></div>
+      <div class="detail-row"><span class="detail-label">মোট বকেয়া</span><span class="detail-value">${bn(u.dueSum)} টাকা</span></div>
+      <div style="font-weight:800; font-size:13px; margin-top:14px;">কাস্টমার তালিকা (${bn(u.customerCount)})</div>
+      <div class="cust-mini-list">${custRows}</div>
+    `;
+    document.getElementById('detailModalOverlay').classList.add('show');
+  }
+  document.getElementById('detailModalCloseBtn').addEventListener('click', ()=>{
+    document.getElementById('detailModalOverlay').classList.remove('show');
+  });
+  document.getElementById('detailModalOverlay').addEventListener('click', (e)=>{
+    if(e.target.id === 'detailModalOverlay') document.getElementById('detailModalOverlay').classList.remove('show');
+  });
+
+  /* ================= CSV Export ================= */
+  document.getElementById('exportCsvBtn').addEventListener('click', ()=>{
+    const header = ['মোবাইল', 'যোগদানের তারিখ', 'সর্বশেষ লগইন', 'কাস্টমার সংখ্যা', 'মোট বকেয়া', 'প্ল্যান', 'অবস্থা'];
+    const rows = allUsers.map(u => [
+      u.mobile, fmtDate(u.created_at), fmtDateTime(u.last_login), u.customerCount, u.dueSum,
+      u.plan === 'paid' ? 'পেইড' : 'ফ্রি', u.blocked ? 'বন্ধ' : 'সচল'
+    ]);
+    const csv = [header, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `users-${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  /* ================= App Config (broadcast + changelog) ================= */
+  let changelogEntries = [];
+
+  async function loadAppConfig(){
+    try{
+      const { data, error } = await sb.from('app_config').select('*').eq('id', 1).maybeSingle();
+      if(error) throw error;
+      if(data){
+        document.getElementById('broadcastText').value = data.broadcast_message || '';
+        document.getElementById('broadcastActive').checked = !!data.broadcast_active;
+        changelogEntries = data.changelog || [];
+        renderChangelog();
+      }
+    }catch(e){ /* app_config table may not exist yet — ignore quietly */ }
+  }
+
+  document.getElementById('saveBroadcastBtn').addEventListener('click', async ()=>{
+    const message = document.getElementById('broadcastText').value.trim();
+    const active = document.getElementById('broadcastActive').checked;
+    const { error } = await sb.from('app_config').upsert({ id: 1, broadcast_message: message, broadcast_active: active });
+    if(error){ alert('সংরক্ষণ করা যায়নি: ' + error.message); return; }
+    alert('ঘোষণা সংরক্ষণ হয়েছে');
+  });
+
+  function renderChangelog(){
+    const list = document.getElementById('changelogList');
+    if(changelogEntries.length === 0){ list.innerHTML = '<div style="color:var(--clr-ink-soft); font-size:12.5px;">কোনো নোট নেই</div>'; return; }
+    list.innerHTML = changelogEntries.slice().reverse().map(e => `
+      <div class="changelog-item"><span>${e.text}</span><span class="changelog-date">${fmtDate(e.date)}</span></div>
+    `).join('');
+  }
+
+  document.getElementById('addChangelogBtn').addEventListener('click', async ()=>{
+    const input = document.getElementById('changelogInput');
+    const text = input.value.trim();
+    if(!text) return;
+    changelogEntries.push({ text, date: new Date().toISOString() });
+    const { error } = await sb.from('app_config').upsert({ id: 1, changelog: changelogEntries });
+    if(error){ alert('সংরক্ষণ করা যায়নি: ' + error.message); changelogEntries.pop(); return; }
+    input.value = '';
+    renderChangelog();
   });
 </script>
 </body>
