@@ -3611,7 +3611,21 @@
     }catch(e){ /* if this check can't be reached, don't lock a legitimate user out */ }
     currentUserMobile = mobile;
     authScreenEl.classList.add('hide');
+    // Best-effort — lets the admin panel show who's actively using the app
+    sb.from('accounts').update({ last_login: new Date().toISOString() }).eq('mobile', mobile).then(()=>{}, ()=>{});
     await loadCustomers();
+    checkBroadcastNotice();
+  }
+
+  // Shows the admin's broadcast message (if one is currently active) once per
+  // app session, as a dismissible banner at the top of the home screen.
+  async function checkBroadcastNotice(){
+    try{
+      const { data } = await sb.from('app_config').select('broadcast_message, broadcast_active').eq('id', 1).maybeSingle();
+      if(data && data.broadcast_active && data.broadcast_message){
+        showToast(data.broadcast_message, 'info');
+      }
+    }catch(e){ /* app_config may not exist yet, or offline — skip quietly */ }
   }
 
   async function initAuth(){
