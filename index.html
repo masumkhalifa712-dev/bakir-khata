@@ -1334,28 +1334,28 @@
     </div>
 
     <div class="nd-body">
-      <!-- ===== CATEGORY: Amount (always visible) ===== -->
-      <div class="nd-field-label">টাকার পরিমান</div>
-      <input type="number" inputmode="decimal" class="nd-amount-input" id="ndAmountInput" placeholder="০" style="margin-bottom:18px;" />
-
-      <!-- ===== CATEGORY: Purchase Price Toggle (দেওয়া/give flow only) ===== -->
-      <div class="nd-toggle-row" id="ndPurchaseRow">
-        <div class="nd-field-label" style="margin-bottom:0;"><span>ক্রয় মূল্য যদি থাকে</span></div>
-        <button class="toggle-switch" id="ndPurchaseToggle" aria-label="ক্রয় মূল্য টগল"><span class="knob"></span></button>
+      <div class="ni-calc-header" style="margin-top:4px;"><span class="dot"></span> বাকির বিবরণ</div>
+      <div class="ni-calc-box">
+        <div class="ni-calc-row">
+          <div class="ni-calc-row-label">টাকার পরিমান</div>
+          <input type="number" inputmode="decimal" class="ni-calc-input" id="ndAmountInput" placeholder="০" />
+        </div>
+        <div class="ni-calc-row" id="ndPurchaseRow">
+          <div class="ni-calc-row-label"><span>ক্রয় মূল্য যদি থাকে</span></div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <input type="number" inputmode="decimal" class="ni-calc-input" id="ndPurchasePriceInput" placeholder="০" style="width:64px; display:none;" />
+            <button class="toggle-switch" id="ndPurchaseToggle" aria-label="ক্রয় মূল্য টগল"><span class="knob"></span></button>
+          </div>
+        </div>
+        <div class="ni-calc-row" style="align-items:flex-start;">
+          <div class="ni-calc-row-label" style="padding-top:8px;">নোট</div>
+          <textarea class="ci-textarea" id="ndNoteInput" placeholder="যেমনঃ আজকের কিস্তি দেওয়া" style="text-align:left;"></textarea>
+        </div>
       </div>
-
-      <div class="nd-purchase-price-field" id="ndPurchasePriceField">
-        <div class="nd-field-label">ক্রয় মূল্য</div>
-        <input type="number" inputmode="decimal" class="nd-amount-input" id="ndPurchasePriceInput" placeholder="০" />
-      </div>
-
-      <!-- ===== CATEGORY: Note ===== -->
-      <div class="nd-field-label">নোট</div>
-      <textarea class="nd-note-textarea" id="ndNoteInput" placeholder="যেমনঃ আজকের কিস্তি দেওয়া"></textarea>
 
       <!-- ===== CATEGORY: Image / SMS / Due Date (compact card, matches কিস্তি আদায়) ===== -->
       <div class="nd-utility-card">
-        <div class="nd-utility-row">
+        <div class="nd-utility-row" style="display:none;">
           <div class="nd-utility-row-label">ছবি</div>
           <div class="nd-utility-row-right">
             <button class="nd-image-btn" id="ndImageBtn" aria-label="ছবি যোগ করুন">
@@ -1518,23 +1518,20 @@
     </div>
 
     <div class="ni-body">
-      <!-- ===== CATEGORY: Purchase Price Toggle (top of page, optional/cost tracking) ===== -->
-      <div class="nd-toggle-row" style="margin-top:4px;">
-        <div class="nd-field-label" style="margin-bottom:0;"><span>ক্রয় মূল্য যদি থাকে</span></div>
-        <button class="toggle-switch" id="niPurchaseToggle" aria-label="ক্রয় মূল্য টগল"><span class="knob"></span></button>
-      </div>
-      <div class="nd-purchase-price-field" id="niPurchasePriceField">
-        <div class="nd-field-label">ক্রয় মূল্য</div>
-        <input type="number" inputmode="decimal" class="nd-amount-input" id="niPurchasePriceInput" placeholder="০" />
-      </div>
-
-      <!-- ===== CATEGORY: Product Name ===== -->
-      <div class="nd-field-label">পণ্যের নাম</div>
-      <input type="text" class="nd-amount-input" id="niProductNameInput" placeholder="যেমনঃ স্যামসাং A15 মোবাইল" style="margin-bottom:18px;" />
-
       <!-- ===== CATEGORY: টাকার হিসাব (auto-calculated installment plan) ===== -->
-      <div class="ni-calc-header"><span class="dot"></span> টাকার হিসাব</div>
+      <div class="ni-calc-header" style="margin-top:4px;"><span class="dot"></span> টাকার হিসাব</div>
       <div class="ni-calc-box">
+        <div class="ni-calc-row">
+          <div class="ni-calc-row-label">ক্রয় মূল্য যদি থাকে</div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <input type="number" inputmode="decimal" class="ni-calc-input" id="niPurchasePriceInput" placeholder="০" style="width:64px; display:none;" />
+            <button class="toggle-switch" id="niPurchaseToggle" aria-label="ক্রয় মূল্য টগল"><span class="knob"></span></button>
+          </div>
+        </div>
+        <div class="ni-calc-row">
+          <div class="ni-calc-row-label">পণ্যের নাম</div>
+          <input type="text" class="ni-calc-input" id="niProductNameInput" placeholder="যেমনঃ স্যামসাং A15" />
+        </div>
         <div class="ni-calc-row">
           <div class="ni-calc-row-label">পণ্য বিক্রয় মূল্য <span class="req">*</span></div>
           <input type="number" inputmode="decimal" class="ni-calc-input" id="niSalePriceInput" placeholder="" />
@@ -1579,7 +1576,7 @@
 
       <!-- ===== CATEGORY: Image / SMS (compact card, matches কিস্তি আদায়) ===== -->
       <div class="nd-utility-card">
-        <div class="nd-utility-row">
+        <div class="nd-utility-row" style="display:none;">
           <div class="nd-utility-row-label">ছবি</div>
           <div class="nd-utility-row-right">
             <button class="nd-image-btn" id="niImageBtn" aria-label="ছবি যোগ করুন">
@@ -3088,7 +3085,7 @@
     renderProfileCardHeader('nd', currentCustomer);
 
     const purchaseRow = document.getElementById('ndPurchaseRow');
-    const purchaseField = document.getElementById('ndPurchasePriceField');
+    const purchaseInput = document.getElementById('ndPurchasePriceInput');
     const purchaseToggle = document.getElementById('ndPurchaseToggle');
     const dateLabel = document.getElementById('ndDateLabel');
     const dateInput = document.getElementById('ndDateInput');
@@ -3107,7 +3104,7 @@
       // আদায় (collection) flow — no purchase-price toggle, date defaults to today
       document.getElementById('ndTitle').textContent = clickedLabel || 'বাকি আদায়';
       purchaseRow.style.display = 'none';
-      purchaseField.classList.remove('show');
+      purchaseInput.style.display = 'none';
       purchaseToggle.classList.remove('on');
       const today = new Date();
       const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
@@ -3146,7 +3143,7 @@
     if(editingTxIndex === null){
       document.getElementById('niPurchasePriceInput').value = '';
       document.getElementById('niPurchaseToggle').classList.remove('on');
-      document.getElementById('niPurchasePriceField').classList.remove('show');
+      document.getElementById('niPurchasePriceInput').style.display = 'none';
       document.getElementById('niProductNameInput').value = '';
       document.getElementById('niSalePriceInput').value = '';
       document.getElementById('niDownPayment').value = 0;
@@ -3172,7 +3169,7 @@
 
   document.getElementById('niPurchaseToggle').addEventListener('click', function(){
     this.classList.toggle('on');
-    document.getElementById('niPurchasePriceField').classList.toggle('show', this.classList.contains('on'));
+    document.getElementById('niPurchasePriceInput').style.display = this.classList.contains('on') ? '' : 'none';
     recalcInstallmentPlan();
   });
 
@@ -3393,7 +3390,7 @@
 
   document.getElementById('ndPurchaseToggle').addEventListener('click', function(){
     this.classList.toggle('on');
-    document.getElementById('ndPurchasePriceField').classList.toggle('show', this.classList.contains('on'));
+    document.getElementById('ndPurchasePriceInput').style.display = this.classList.contains('on') ? '' : 'none';
   });
   document.getElementById('ndSmsToggle').addEventListener('click', function(){
     this.classList.toggle('on');
