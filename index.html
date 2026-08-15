@@ -2363,13 +2363,14 @@
   function getAllPurchaseEntries(){
     const entries = [];
     customers.forEach(c=>{
-      (c.transactions||[]).forEach(tx=>{
+      (c.transactions||[]).forEach((tx, idx)=>{
         if(tx.purchasePrice && tx.purchasePrice > 0){
           entries.push({
             date: tx.date, time: tx.time,
             productName: tx.productName || tx.note || '—',
             purchasePrice: tx.purchasePrice,
             sortKey: new Date(`${tx.date} ${tx.time||''}`),
+            customer: c, txIndex: idx,
           });
         }
       });
@@ -2377,25 +2378,67 @@
     entries.sort((a,b)=> (isNaN(a.sortKey)?0:a.sortKey.getTime()) - (isNaN(b.sortKey)?0:b.sortKey.getTime()));
     return entries;
   }
+  let currentPurchaseEntries = [];
   function goToPurchaseHistory(){
     closeMenuDrawer();
-    const entries = getAllPurchaseEntries();
+    currentPurchaseEntries = getAllPurchaseEntries();
     document.getElementById('phShopName').textContent = shopInfo.name || 'দোকানের নাম';
+    renderPurchaseHistoryList();
+    appEl.classList.add('show-purchasehistory');
+    pushAppState('purchasehistory');
+  }
+  function renderPurchaseHistoryList(){
     let runningBalance = 0;
-    const rowsHtml = entries.map(e=>{
+    const rowsHtml = currentPurchaseEntries.map((e, i)=>{
       runningBalance += e.purchasePrice;
       return `
-        <div class="cd-tx-row" style="grid-template-columns:1.7fr 1fr 1fr;">
+        <button class="cd-tx-row" data-idx="${i}" style="grid-template-columns:1.7fr 1fr 1fr; width:100%; border:none; text-align:left; cursor:pointer; font-family:inherit;">
           <div><div class="cd-tx-date">${e.date} | ${e.time}</div><div class="cd-tx-note">${e.productName}</div></div>
           <div style="text-align:center; font-weight:700;">${bn(e.purchasePrice)} টাকা</div>
           <div style="text-align:center; font-weight:700;">${bn(runningBalance)} টাকা</div>
-        </div>`;
+        </button>`;
     }).join('');
     document.getElementById('phTxList').innerHTML = rowsHtml || '<div style="text-align:center; padding:30px; color:var(--clr-ink-soft); font-size:13px;">কোনো ক্রয়ের তথ্য নেই</div>';
     document.getElementById('phTotalAmount').textContent = bn(runningBalance) + " টাকা";
     document.getElementById('phTotalPurchase').textContent = bn(runningBalance) + " টাকা";
-    appEl.classList.add('show-purchasehistory');
-    pushAppState('purchasehistory');
+    document.querySelectorAll('#phTxList .cd-tx-row').forEach(row=>{
+      row.addEventListener('click', ()=> openPurchaseEntryDetail(Number(row.dataset.idx)));
+    });
+  }
+  function openPurchaseEntryDetail(i){
+    const e = currentPurchaseEntries[i];
+    if(!e) return;
+    document.getElementById('delModalCustomerName').textContent = `${e.productName}`;
+    document.getElementById('delModalTxList').innerHTML = `
+      <div class="del-modal-tx-row"><span class="del-modal-tx-date">কাস্টমার</span><span class="del-modal-tx-amt">${e.customer.name}</span></div>
+      <div class="del-modal-tx-row"><span class="del-modal-tx-date">${e.date} | ${e.time}</span><span class="del-modal-tx-amt">${bn(e.purchasePrice)} টাকা</span></div>`;
+    document.getElementById('delModalCloseBtn').style.display = 'none';
+    let extraBtns = document.getElementById('phDetailActionRow');
+    if(!extraBtns){
+      extraBtns = document.createElement('div');
+      extraBtns.id = 'phDetailActionRow';
+      extraBtns.style.cssText = 'display:flex; gap:10px; padding:0 16px calc(18px + var(--safe-bottom));';
+      document.querySelector('#delBlockedOverlay .del-modal').appendChild(extraBtns);
+    }
+    extraBtns.innerHTML = `
+      <button id="phDeleteEntryBtn" style="flex:1; padding:13px; border:none; border-radius:12px; background:#FCE7E9; color:var(--clr-primary); font-weight:700; font-size:13.5px; cursor:pointer; font-family:inherit;">মুছে ফেলুন</button>
+      <button id="phCloseDetailBtn" style="flex:1; padding:13px; border:1.4px solid var(--clr-line); border-radius:12px; background:var(--clr-card); color:var(--clr-ink); font-weight:700; font-size:13.5px; cursor:pointer; font-family:inherit;">বন্ধ করুন</button>`;
+    document.getElementById('phDeleteEntryBtn').onclick = async ()=>{
+      const ok = window.confirm('এই ক্রয়ের তথ্যটি মুছে ফেলতে চান? এটা শুধু ক্রয়ের হিসাব থেকে সরাবে, সংশ্লিষ্ট বাকি/কিস্তির এন্ট্রি অক্ষত থাকবে।');
+      if(!ok) return;
+      const tx = e.customer.transactions[e.txIndex];
+      delete tx.purchasePrice;
+      recomputeCustomerTotals(e.customer);
+      await persistCustomers();
+      document.getElementById('delBlockedOverlay').classList.remove('show');
+      currentPurchaseEntries = getAllPurchaseEntries();
+      renderPurchaseHistoryList();
+      showToast('ক্রয়ের তথ্য মুছে ফেলা হয়েছে');
+    };
+    document.getElementById('phCloseDetailBtn').onclick = ()=>{
+      document.getElementById('delBlockedOverlay').classList.remove('show');
+    };
+    document.getElementById('delBlockedOverlay').classList.add('show');
   }
   function closePurchaseHistory(){ appEl.classList.remove('show-purchasehistory'); }
   document.getElementById('menuPurchaseHistoryBtn').addEventListener('click', goToPurchaseHistory);
@@ -3067,6 +3110,9 @@
           <span class="del-modal-tx-date">${tx.date} | ${tx.time}</span>
           <span class="del-modal-tx-amt ${tx.take ? 'take' : 'give'}">${tx.take ? 'নিয়েছি' : 'দিয়েছি'}: ${bn(tx.take || tx.give)} টাকা</span>
         </div>`).join('');
+      document.getElementById('delModalCloseBtn').style.display = '';
+      const extraBtns = document.getElementById('phDetailActionRow');
+      if(extraBtns) extraBtns.innerHTML = '';
       document.getElementById('delBlockedOverlay').classList.add('show');
       return; // deletion is fully blocked while any transaction exists — no way around this
     }
@@ -3297,6 +3343,7 @@
   document.getElementById('niSubmitBtn').addEventListener('click', async ()=>{
     if(!currentCustomer) return;
     const productName = document.getElementById('niProductNameInput').value.trim();
+    const purchasePrice = Number(document.getElementById('niPurchasePriceInput').value) || 0;
     const salePrice = Number(document.getElementById('niSalePriceInput').value) || 0;
     const downPayment = Number(document.getElementById('niDownPayment').value) || 0;
     const remaining = Math.max(0, salePrice - downPayment);
@@ -3308,7 +3355,7 @@
     const firstDateVal = document.getElementById('niFirstInstallmentDate').value;
 
     const planFields = {
-      productName, salePrice, downPayment,
+      productName, salePrice, downPayment, purchasePrice,
       remainingAmount: remaining,
       installmentCount: count,
       perInstallment,
@@ -3540,6 +3587,7 @@
   document.getElementById('ndSubmitBtn').addEventListener('click', async ()=>{
     if(!currentCustomer) return;
     const amt = Number(document.getElementById('ndAmountInput').value) || 0;
+    const purchasePrice = Number(document.getElementById('ndPurchasePriceInput').value) || 0;
     const note = document.getElementById('ndNoteInput').value.trim();
 
     const dateInputVal = document.getElementById('ndDateInput').value;
@@ -3552,6 +3600,7 @@
       const tx = currentCustomer.transactions[editingTxIndex];
       if(tx.take){ tx.take = amt; } else { tx.give = amt; }
       tx.note = note;
+      if(purchasePrice) tx.purchasePrice = purchasePrice;
       if(dueDate) tx.dueDate = dueDate;
       showToast("এন্ট্রি আপডেট হয়েছে");
     }else{
@@ -3563,6 +3612,7 @@
         category: currentEntryCategory,
         take: sheetMode === 'take' ? amt : 0,
         give: sheetMode === 'give' ? amt : 0,
+        ...(purchasePrice ? { purchasePrice } : {}),
         ...(dueDate ? { dueDate } : {}),
       };
       currentCustomer.transactions.push(newTx);
