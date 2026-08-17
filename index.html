@@ -1025,7 +1025,7 @@
       <button class="cd-back" id="phBackBtn" aria-label="ফিরে যান">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
       </button>
-      <div class="cd-title">পণ্য ক্রয়ের বিবরণ</div>
+      <div class="cd-title">ক্রয়-বিক্রয় লাভ-ক্ষতির ইতিহাস</div>
     </div>
 
     <div class="cd-profile-card no-avatar" style="display:block;">
@@ -1403,19 +1403,12 @@
       <div class="ni-calc-header" style="margin-top:4px;"><span class="dot"></span> বাকির বিবরণ</div>
       <div class="ni-calc-box">
         <div class="ni-calc-row">
-          <div class="ni-calc-row-label">টাকার পরিমান</div>
+          <div class="ni-calc-row-label">টাকার পরিমান <span class="req">*</span></div>
           <input type="number" inputmode="decimal" class="ni-calc-input" id="ndAmountInput" placeholder="০" />
-        </div>
-        <div class="ni-calc-row" id="ndPurchaseRow">
-          <div class="ni-calc-row-label"><span>ক্রয় মূল্য যদি থাকে</span></div>
-          <div style="display:flex; align-items:center; gap:8px;">
-            <input type="number" inputmode="decimal" class="ni-calc-input" id="ndPurchasePriceInput" placeholder="০" style="width:64px; display:none;" />
-            <button class="toggle-switch" id="ndPurchaseToggle" aria-label="ক্রয় মূল্য টগল"><span class="knob"></span></button>
-          </div>
         </div>
         <div class="ni-calc-row" style="align-items:flex-start;">
           <div class="ni-calc-row-label" style="padding-top:8px;">নোট</div>
-          <textarea class="ci-textarea" id="ndNoteInput" placeholder="যেমনঃ আজকের কিস্তি দেওয়া" style="text-align:left;"></textarea>
+          <textarea class="ci-textarea" id="ndNoteInput" placeholder="যেমনঃ মুদি মাল বাকিতে বিক্রি" style="text-align:left;"></textarea>
         </div>
       </div>
 
@@ -1431,7 +1424,7 @@
           </div>
         </div>
         <div class="nd-utility-row">
-          <div class="nd-utility-row-label">এসএমএস</div>
+          <div class="nd-utility-row-label" style="font-size:11.5px;">এসএমএস পাঠাতে না চাইলে বন্ধ করুন</div>
           <div class="nd-utility-row-right">
             <div class="nd-sms-pill">
               <button class="toggle-switch on" id="ndSmsToggle" aria-label="এসএমএস টগল"><span class="knob"></span></button>
@@ -1652,7 +1645,7 @@
           </div>
         </div>
         <div class="nd-utility-row">
-          <div class="nd-utility-row-label">এসএমএস</div>
+          <div class="nd-utility-row-label" style="font-size:11.5px;">এসএমএস পাঠাতে না চাইলে বন্ধ করুন</div>
           <div class="nd-utility-row-right">
             <div class="nd-sms-pill">
               <button class="toggle-switch on" id="niSmsToggle" aria-label="এসএমএস টগল"><span class="knob"></span></button>
@@ -1756,7 +1749,7 @@
         </div>
 
         <div class="ci-row" style="border-bottom:none;">
-          <div class="ci-row-label">এসএমএস</div>
+          <div class="ci-row-label" style="font-size:11.5px;">এসএমএস পাঠাতে না চাইলে বন্ধ করুন</div>
           <div class="ci-row-input-wrap" style="justify-content:flex-end;">
             <button class="toggle-switch on" id="ciSmsToggle" aria-label="এসএমএস টগল"><span class="knob"></span></button>
           </div>
@@ -1884,7 +1877,7 @@
       </button>
       <button class="menu-drawer-item" id="menuPurchaseHistoryBtn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-        <span>পণ্য ক্রয়ের হিসাব</span>
+        <span>ক্রয়-বিক্রয় লাভ-ক্ষতি</span>
       </button>
       <button class="menu-drawer-item logout" id="menuLogoutBtn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -2099,10 +2092,32 @@
   }
   const formatDMY = (isoDate) => { const [y,m,d] = isoDate.split('-'); return `${d}-${m}-${y}`; };
 
+  // The native Date constructor can't reliably parse "D/M/YYYY" (it assumes
+  // M/D/YYYY, so anything with a day above 12 silently becomes Invalid Date).
+  // Every filter/sort that depends on a transaction's date goes through this
+  // instead, with a fallback for the old "7 August 2026"-style dates.
+  function parseTxDate(dateStr, timeStr){
+    if(!dateStr) return new Date(NaN);
+    if(dateStr.includes('/')){
+      const parts = dateStr.split('/').map(Number);
+      if(parts.length === 3 && !parts.some(isNaN)){
+        const [d, m, y] = parts;
+        let hours = 0, minutes = 0;
+        if(timeStr){
+          const t = timeStr.split(':').map(Number);
+          hours = t[0]||0; minutes = t[1]||0;
+        }
+        return new Date(y, m-1, d, hours, minutes);
+      }
+    }
+    return new Date(`${dateStr} ${timeStr||''}`.trim());
+  }
+
   function getLastTxDate(c){
     const txs = c.transactions || [];
     if(txs.length === 0) return new Date(0);
-    const d = new Date(txs[txs.length-1].date);
+    const last = txs[txs.length-1];
+    const d = parseTxDate(last.date, last.time);
     return isNaN(d) ? new Date(0) : d;
   }
   let homeListMode = 'receivable'; // 'receivable' (default, unchanged) | 'payable' (দেব list)
@@ -2353,7 +2368,10 @@
   /* ================================================================ */
   /* ================= CATEGORY: Side Menu Drawer ===================== */
   /* ================================================================ */
-  function openMenuDrawer(){ document.getElementById('menuDrawerOverlay').classList.add('show'); }
+  function openMenuDrawer(){
+    document.getElementById('menuPurchaseHistoryBtn').style.display = (shopInfo.businessMode === 'general') ? 'none' : '';
+    document.getElementById('menuDrawerOverlay').classList.add('show');
+  }
   function closeMenuDrawer(){ document.getElementById('menuDrawerOverlay').classList.remove('show'); }
   document.getElementById('menuDrawerOverlay').addEventListener('click', (e)=>{
     if(e.target.id === 'menuDrawerOverlay') closeMenuDrawer();
@@ -2402,9 +2420,10 @@
           const saleAmount = tx.salePrice != null ? tx.salePrice : (tx.give || 0);
           entries.push({
             date: tx.date, time: tx.time,
+            productName: tx.productName || '—',
             purchasePrice: tx.purchasePrice,
             saleAmount,
-            sortKey: new Date(`${tx.date} ${tx.time||''}`),
+            sortKey: parseTxDate(tx.date, tx.time),
             customer: c, txIndex: idx,
           });
         }
@@ -2455,17 +2474,18 @@
       : 'শুরু থেকে এখন পর্যন্ত';
     document.getElementById('phProfitLabel').textContent = `লাভ (${periodLabel})`;
 
-    let runningBalance = 0, totalPurchase = 0, totalSale = 0;
+    let totalPurchase = 0, totalSale = 0;
     const rowsHtml = visible.map((e, i)=>{
       totalPurchase += e.purchasePrice;
       totalSale += e.saleAmount;
-      runningBalance += (e.saleAmount - e.purchasePrice);
+      const entryBalance = e.saleAmount - e.purchasePrice;
+      const custLabel = `${e.customer.name}${e.customer.id ? ' · '+e.customer.id : ''}`;
       return `
         <button class="cd-tx-row" data-idx="${currentPurchaseEntries.indexOf(e)}" style="grid-template-columns:1.4fr 0.85fr 0.85fr 0.9fr; width:100%; border:none; text-align:left; cursor:pointer; font-family:inherit;">
-          <div><div class="cd-tx-date">${e.date}</div><div class="cd-tx-note">${e.customer.name}${e.customer.mobile ? '<br>'+e.customer.mobile : ''}</div></div>
+          <div><div class="cd-tx-date">${e.date}</div><div class="cd-tx-note">${e.productName}<br>${custLabel}${e.customer.mobile ? '<br>'+e.customer.mobile : ''}</div></div>
           <div style="text-align:center; font-weight:700;">${bn(e.purchasePrice)} টাকা</div>
           <div style="text-align:center; font-weight:700;">${bn(e.saleAmount)} টাকা</div>
-          <div style="text-align:center; font-weight:700;">${bn(runningBalance)} টাকা</div>
+          <div style="text-align:center; font-weight:700; color:${entryBalance<0 ? 'var(--clr-owe-to-me)' : 'var(--clr-i-owe)'};">${bn(Math.abs(entryBalance))} টাকা</div>
         </button>`;
     }).join('');
     document.getElementById('phTxList').innerHTML = rowsHtml || '<div style="text-align:center; padding:30px; color:var(--clr-ink-soft); font-size:13px;">এই সময়ে কোনো ক্রয়/বিক্রয়ের তথ্য নেই</div>';
@@ -2494,8 +2514,9 @@
   function openPurchaseEntryDetail(i){
     const e = currentPurchaseEntries[i];
     if(!e) return;
-    document.getElementById('delModalCustomerName').textContent = e.customer.name;
+    document.getElementById('delModalCustomerName').textContent = `${e.customer.name}${e.customer.id ? ' · '+e.customer.id : ''}`;
     document.getElementById('delModalTxList').innerHTML = `
+      <div class="del-modal-tx-row"><span class="del-modal-tx-date">পণ্যের নাম</span><span class="del-modal-tx-amt">${e.productName}</span></div>
       <div class="del-modal-tx-row"><span class="del-modal-tx-date">মোবাইল</span><span class="del-modal-tx-amt">${e.customer.mobile || '—'}</span></div>
       <div class="del-modal-tx-row"><span class="del-modal-tx-date">${e.date} | ${e.time}</span><span class="del-modal-tx-amt"></span></div>
       <div class="del-modal-tx-row"><span class="del-modal-tx-date">ক্রয় মূল্য</span><span class="del-modal-tx-amt">${bn(e.purchasePrice)} টাকা</span></div>
@@ -2600,7 +2621,7 @@
       const matchingTxs = txs.filter(tx=>{
         if(tx.category === 'installment' && !wantInstallment) return false;
         if(tx.category !== 'installment' && !wantGeneral) return false;
-        const d = new Date(tx.date);
+        const d = parseTxDate(tx.date, tx.time);
         if(isNaN(d)) return true; // unparseable date — don't exclude, better to include than silently drop
         if(from && d < from) return false;
         if(to && d > to) return false;
@@ -3322,10 +3343,8 @@
   function goToNewDue(clickedLabel){
     if(!currentCustomer) return;
     renderProfileCardHeader('nd', currentCustomer);
+    document.getElementById('ndSmsToggle').classList.add('on');
 
-    const purchaseRow = document.getElementById('ndPurchaseRow');
-    const purchaseInput = document.getElementById('ndPurchasePriceInput');
-    const purchaseToggle = document.getElementById('ndPurchaseToggle');
     const dateLabel = document.getElementById('ndDateLabel');
     const dateInput = document.getElementById('ndDateInput');
 
@@ -3340,19 +3359,15 @@
     }
 
     if(sheetMode === 'take'){
-      // আদায় (collection) flow — no purchase-price toggle, date defaults to today
+      // আদায় (collection) flow — date defaults to today
       document.getElementById('ndTitle').textContent = clickedLabel || 'বাকি আদায়';
-      purchaseRow.style.display = 'none';
-      purchaseInput.style.display = 'none';
-      purchaseToggle.classList.remove('on');
       const today = new Date();
       const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
       dateLabel.textContent = `${today.getDate()} ${monthNames[today.getMonth()]}`;
       dateInput.value = today.toISOString().slice(0,10);
     }else{
-      // দেওয়া (new due) flow — includes purchase-price toggle, date starts unset
+      // দেওয়া (new due) flow — date starts unset
       document.getElementById('ndTitle').textContent = (editingTxIndex !== null) ? (clickedLabel || 'বাকির এডিট') : 'নতুন বাকি';
-      purchaseRow.style.display = '';
       dateLabel.textContent = 'বাকি পরিশোধের তারিখ';
       dateInput.value = '';
     }
@@ -3375,6 +3390,7 @@
   function goToNewInstallment(){
     if(!currentCustomer) return;
     renderProfileCardHeader('ni', currentCustomer);
+    document.getElementById('niSmsToggle').classList.add('on');
 
     niSubmitBar.classList.remove('show');
     niSubmitBar.style.transform = 'translate(-50%, 0px)';
@@ -3628,10 +3644,6 @@
     offerTxSms('take', currentCustomer, received, currentCustomer.amount, null, closeCollectInstallment, 'ciSmsToggle');
   });
 
-  document.getElementById('ndPurchaseToggle').addEventListener('click', function(){
-    this.classList.toggle('on');
-    document.getElementById('ndPurchasePriceInput').style.display = this.classList.contains('on') ? '' : 'none';
-  });
   document.getElementById('ndSmsToggle').addEventListener('click', function(){
     this.classList.toggle('on');
   });
@@ -3675,7 +3687,7 @@
   document.getElementById('ndSubmitBtn').addEventListener('click', async ()=>{
     if(!currentCustomer) return;
     const amt = Number(document.getElementById('ndAmountInput').value) || 0;
-    const purchasePrice = Number(document.getElementById('ndPurchasePriceInput').value) || 0;
+    if(amt <= 0){ showToast('টাকার পরিমাণ দিন', 'danger'); return; }
     const note = document.getElementById('ndNoteInput').value.trim();
 
     const dateInputVal = document.getElementById('ndDateInput').value;
@@ -3688,7 +3700,6 @@
       const tx = currentCustomer.transactions[editingTxIndex];
       if(tx.take){ tx.take = amt; } else { tx.give = amt; }
       tx.note = note;
-      if(purchasePrice) tx.purchasePrice = purchasePrice;
       if(dueDate) tx.dueDate = dueDate;
       showToast("এন্ট্রি আপডেট হয়েছে");
     }else{
@@ -3700,7 +3711,6 @@
         category: currentEntryCategory,
         take: sheetMode === 'take' ? amt : 0,
         give: sheetMode === 'give' ? amt : 0,
-        ...(purchasePrice ? { purchasePrice } : {}),
         ...(dueDate ? { dueDate } : {}),
       };
       currentCustomer.transactions.push(newTx);
@@ -3740,7 +3750,7 @@
       if(el){ el.addEventListener('focus', reveal); el.addEventListener('input', reveal); }
     });
   }
-  registerDockedSubmitBar(ndSubmitBar, ['ndAmountInput','ndPurchasePriceInput','ndNoteInput']);
+  registerDockedSubmitBar(ndSubmitBar, ['ndAmountInput','ndNoteInput']);
   registerDockedSubmitBar(niSubmitBar, ['niProductNameInput','niSalePriceInput','niPurchasePriceInput','niDownPayment','niInstallmentCount','niLateFee','niNoteInput','niFirstInstallmentDate']);
   registerDockedSubmitBar(ciSubmitBar, ['ciAmountReceived','ciDiscount','ciDescription']);
   if(window.visualViewport){
