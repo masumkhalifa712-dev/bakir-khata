@@ -2666,7 +2666,7 @@
           bodyRows += `<tr style="height:36px;background:${bg};">
             <td style="width:5%;text-align:center;font-weight:bold;border:1px solid #cbd5e0;">${p*ROWS_PER_PAGE+i+1}</td>
             <td style="width:35%;text-align:left;padding-left:8px;border:1px solid #cbd5e0;">
-              <div style="font-weight:bold;font-size:9pt;">${r.name}</div>
+              <div style="font-weight:bold;font-size:9pt;">${r.name}${r.id ? ' · '+r.id : ''}</div>
               <div style="font-size:8.5pt;color:#333;">${r.mobile}</div>
             </td>
             <td style="width:17%;text-align:center;border:1px solid #cbd5e0;">${r.dateInfo}</td>
@@ -3213,7 +3213,7 @@
     if(!currentCustomer) return;
     const txs = currentCustomer.transactions || [];
     if(txs.length > 0){
-      document.getElementById('delModalCustomerName').textContent = `${currentCustomer.name}-এর ${bn(txs.length)}টি লেনদেন আছে`;
+      document.getElementById('delModalCustomerName').textContent = `${currentCustomer.name}${currentCustomer.id ? ' · '+currentCustomer.id : ''}-এর ${bn(txs.length)}টি লেনদেন আছে`;
       document.getElementById('delModalTxList').innerHTML = txs.map(tx => `
         <div class="del-modal-tx-row">
           <span class="del-modal-tx-date">${tx.date} | ${tx.time}</span>
@@ -3225,7 +3225,7 @@
       document.getElementById('delBlockedOverlay').classList.add('show');
       return; // deletion is fully blocked while any transaction exists — no way around this
     }
-    const ok = window.confirm(`${currentCustomer.name}-কে মুছে ফেলতে চান? এই কাজটি ফেরানো যাবে না।`);
+    const ok = window.confirm(`${currentCustomer.name}${currentCustomer.id ? ' · '+currentCustomer.id : ''}-কে মুছে ফেলতে চান? এই কাজটি ফেরানো যাবে না।`);
     if(!ok) return;
     const idx = customers.indexOf(currentCustomer);
     if(idx > -1) customers.splice(idx, 1);
