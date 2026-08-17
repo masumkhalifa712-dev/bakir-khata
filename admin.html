@@ -400,7 +400,7 @@
     document.getElementById('detailModalMobile').textContent = u.mobile;
     const modeLabel = { general: 'সাধারণ বাকি', installment: 'সহজ কিস্তি', both: 'উভয়' }[u.businessMode] || 'উভয়';
     const custRows = (u.customers || []).slice(0, 30).map(c => `
-      <div class="cust-mini-row"><span>${c.name || '—'} ${c.mobile ? '('+c.mobile+')' : ''}</span><span>${bn(c.amount||0)} টাকা</span></div>
+      <div class="cust-mini-row"><span>${c.name || '—'}${c.id ? ' · '+c.id : ''} ${c.mobile ? '('+c.mobile+')' : ''}</span><span>${bn(c.amount||0)} টাকা</span></div>
     `).join('') || '<div class="cust-mini-row"><span>কোনো কাস্টমার নেই</span></div>';
 
     document.getElementById('detailModalBody').innerHTML = `
