@@ -1970,25 +1970,12 @@
 
 <script type="module">
   /* ================================================================ */
-  /* ================= CATEGORY: Firebase Cloud Storage ============== */
+  /* ================= CATEGORY: Photo Upload (Cloudinary) ============ */
   /* ================================================================ */
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-  import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-storage.js";
   import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyCguS2YvH6OHi8BkOFi_s_mVuSEVC4YKl0",
-    authDomain: "dokan-khata-17726-b276b.firebaseapp.com",
-    projectId: "dokan-khata-17726-b276b",
-    storageBucket: "dokan-khata-17726-b276b.firebasestorage.app",
-    messagingSenderId: "140552891666",
-    appId: "1:140552891666:web:b51beaf8cf2dc07a9917cb",
-    measurementId: "G-RL9SDFB88R"
-  };
-  const fbApp = initializeApp(firebaseConfig);
-  const fbStorage = getStorage(fbApp);
-  // Uploads an image file to Firebase Storage under a per-user folder and
-  // returns its public download URL (what we actually store, not the image itself).
+  const CLOUDINARY_CLOUD_NAME = "cazy5ymb";
+  const CLOUDINARY_UPLOAD_PRESET = "bakir-khata";
   // Phone camera photos are often several MB — uploading that raw over mobile
   // data is what was causing the long freeze. Downscale + re-compress to a
   // small JPEG first so the upload finishes in a second or two instead.
@@ -2034,14 +2021,32 @@
       new Promise((_, reject)=> setTimeout(()=> reject(new Error(label + ' timed out')), ms))
     ]);
   }
+  // Uploads to Cloudinary's unsigned upload endpoint and returns the public
+  // secure_url (what we actually store, not the image itself). Same name/
+  // signature as before so Add Customer and কাস্টমার এডিট don't need changes.
   async function uploadPhotoToStorage(file, pathHint){
     let uploadBlob = file;
     try{ uploadBlob = await compressImageFile(file); }
     catch(e){ /* if compression fails for any reason, fall back to the original file */ }
-    const path = `customer-photos/${currentUserMobile}/${pathHint}-${Date.now()}`;
-    const ref = storageRef(fbStorage, path);
-    await withTimeout(uploadBytes(ref, uploadBlob), 15000, 'upload');
-    return await withTimeout(getDownloadURL(ref), 15000, 'download-url');
+    const safeHint = String(pathHint || 'photo').replace(/[^a-zA-Z0-9_-]/g, '_');
+    const formData = new FormData();
+    formData.append('file', uploadBlob, `${safeHint}.jpg`);
+    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+    formData.append('public_id', `${currentUserMobile}/${safeHint}-${Date.now()}`);
+    try{
+      const res = await withTimeout(
+        fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, { method: 'POST', body: formData }),
+        20000, 'upload'
+      );
+      const data = await res.json();
+      if(!res.ok || !data.secure_url){
+        throw new Error((data.error && data.error.message) || 'upload failed');
+      }
+      return data.secure_url;
+    }catch(e){
+      console.error('Photo upload failed:', e && e.message, e);
+      throw e;
+    }
   }
 
   const SUPABASE_URL = "https://tamzreokpnvqpxvkbpiw.supabase.co";
