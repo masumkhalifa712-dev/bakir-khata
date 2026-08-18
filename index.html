@@ -277,6 +277,23 @@
   .mode-card-check svg{ width:12px; height:12px; color:#fff; opacity:0; }
   .mode-card.selected .mode-card-check svg{ opacity:1; }
 
+  /* ================= CATEGORY: Wheel Date Picker (used everywhere) ================= */
+  .wdp-overlay{ position:fixed; inset:0; background:rgba(15,15,20,.45); z-index:720; display:none; align-items:flex-end; justify-content:center; }
+  .wdp-overlay.show{ display:flex; }
+  .wdp-sheet{ width:100%; max-width:480px; background:#fff; border-radius:22px 22px 0 0; padding:20px 0 calc(16px + var(--safe-bottom)); }
+  .wdp-title{ text-align:center; font-size:15px; font-weight:700; color:var(--clr-ink); margin-bottom:14px; }
+  .wdp-wheels{ display:flex; position:relative; height:180px; padding:0 8px; }
+  .wdp-col{ flex:1; overflow-y:scroll; scroll-snap-type:y mandatory; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+  .wdp-col::-webkit-scrollbar{ display:none; }
+  .wdp-item{ height:36px; display:flex; align-items:center; justify-content:center; font-size:16px; color:#B9B9BE; scroll-snap-align:center; font-weight:500; }
+  .wdp-item.center{ color:var(--clr-primary); font-weight:700; font-size:18px; }
+  .wdp-highlight{ position:absolute; top:72px; left:8px; right:8px; height:36px; border-top:1.5px solid var(--clr-line); border-bottom:1.5px solid var(--clr-line); pointer-events:none; }
+  .wdp-actions{ display:flex; gap:10px; padding:18px 16px 0; }
+  .wdp-btn{ flex:1; padding:14px; border:none; border-radius:999px; font-weight:700; font-size:14.5px; cursor:pointer; font-family:inherit; }
+  .wdp-cancel{ background:#F1F1F1; color:var(--clr-ink); }
+  .wdp-ok{ background:var(--clr-primary); color:#fff; }
+  .wdp-trigger{ display:inline-flex; }
+
   .lf-overlay{ position:fixed; inset:0; background:rgba(15,15,20,.6); z-index:610; display:none; align-items:center; justify-content:center; padding:24px; }
 
   .lf-overlay.show{ display:flex; }
@@ -487,6 +504,19 @@
   .cd-avatar img{width:100%;height:100%;object-fit:cover;}
   .cd-profile-main{flex:1; min-width:0;}
   .cd-profile-name{font-size:15.5px; font-weight:700; color:var(--clr-ink);}
+  .cd-name-row{ display:flex; align-items:center; gap:8px; }
+  .cd-photo-icon-btn2{ width:24px; height:24px; border:none; background:none; padding:0; cursor:pointer; color:var(--clr-primary); flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+  .cd-photo-icon-btn2 svg{ width:19px; height:19px; }
+  .cd-photo-icon-btn2.muted{ color:#C9C8C4; }
+  .cd-profile-card.no-avatar .cd-name-row .cd-photo-icon-btn2 svg{ width:22px; height:22px; }
+
+  /* ================= CATEGORY: Full-Screen Photo Viewer ================= */
+  .photo-viewer-overlay{ position:fixed; inset:0; background:rgba(10,10,14,.92); z-index:700; display:none; align-items:center; justify-content:center; }
+  .photo-viewer-overlay.show{ display:flex; }
+  .photo-viewer-close{ position:absolute; top:calc(18px + var(--safe-top)); right:18px; width:38px; height:38px; border-radius:50%; border:none; background:rgba(255,255,255,.12); color:#fff; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .photo-viewer-loading{ color:#fff; font-size:14px; font-weight:600; }
+  .photo-viewer-img{ max-width:92vw; max-height:82vh; border-radius:10px; object-fit:contain; }
+
   .cd-profile-name span{font-weight:600; color:var(--clr-ink-soft); font-size:13px;}
   .cd-profile-phone-row{ display:flex; align-items:center; gap:8px; margin-top:4px; }
   .cd-profile-phone-row span{ font-size:12.5px; font-weight:600; color:var(--clr-ink-soft); }
@@ -1055,12 +1085,12 @@
       <div class="rf-date-row" style="margin-bottom:6px;">
         <div class="rf-date-wrap">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          <input type="date" id="phDateFrom" />
+          <input type="date" class="wdp-input" id="phDateFrom" />
         </div>
         <span class="rf-date-sep">থেকে</span>
         <div class="rf-date-wrap">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          <input type="date" id="phDateTo" />
+          <input type="date" class="wdp-input" id="phDateTo" />
         </div>
       </div>
     </div>
@@ -1093,12 +1123,12 @@
       <div class="rf-date-row">
         <div class="rf-date-wrap">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          <input type="date" id="rfDateFrom" />
+          <input type="date" class="wdp-input" id="rfDateFrom" />
         </div>
         <span class="rf-date-sep">তারিখ হইতে</span>
         <div class="rf-date-wrap">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          <input type="date" id="rfDateTo" />
+          <input type="date" class="wdp-input" id="rfDateTo" />
         </div>
       </div>
 
@@ -1129,7 +1159,7 @@
     <div class="ac-body">
 
       <!-- ===== CATEGORY: Avatar Picker (temporarily disabled per request) ===== -->
-      <div class="avatar-picker" id="avatarPickerWrap" style="display:none;">
+      <div class="avatar-picker" id="avatarPickerWrap">
         <button class="avatar-picker-btn" id="avatarPickerBtn">
           <svg class="person" id="avatarPersonIcon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 4.9-2.2 4.9-4.9S14.7 2.2 12 2.2 7.1 4.4 7.1 7.1 9.3 12 12 12zm0 2.5c-3.3 0-9.8 1.6-9.8 4.9v2.4h19.6v-2.4c0-3.3-6.5-4.9-9.8-4.9z"/></svg>
           <img id="avatarPreview" style="display:none;" alt="প্রোফাইল ছবি" />
@@ -1210,7 +1240,7 @@
     <!-- ===== CATEGORY: Profile Card (no avatar — photos disabled for now) ===== -->
     <div class="cd-profile-card no-avatar">
       <div class="cd-profile-main">
-        <div class="cd-profile-name" id="cdName">নাম <span id="cdId"></span></div>
+        <div class="cd-name-row"><div class="cd-profile-name" id="cdName">নাম <span id="cdId"></span></div><button class="cd-photo-icon-btn2" id="cdPhotoBtn" aria-label="ছবি দেখুন"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></button></div>
         <div class="cd-profile-phone-row">
           <span id="cdPhoneNumber">মোবাইল নম্বর</span>
           <button class="cd-phone-icon-btn call" id="cdCallBtn" aria-label="কল করুন">
@@ -1254,9 +1284,9 @@
       </button>
     </div>
     <div class="cd-custom-range" id="cdCustomRange" style="display:none;">
-      <input type="date" id="cdCustomFrom" />
+      <span class="wdp-trigger"><input type="date" class="wdp-input" id="cdCustomFrom" /></span>
       <span>থেকে</span>
-      <input type="date" id="cdCustomTo" />
+      <span class="wdp-trigger"><input type="date" class="wdp-input" id="cdCustomTo" /></span>
     </div>
 
     <!-- ===== CATEGORY: Transaction Table ===== -->
@@ -1317,6 +1347,12 @@
     <div class="del-modal">
       <div class="del-modal-title" style="margin-top:20px;">কাস্টমারের তথ্য এডিট করুন</div>
       <div style="padding:16px;">
+        <div style="display:flex; justify-content:center; margin-bottom:16px;">
+          <button class="avatar-picker-btn" id="ceEditPhotoBtn" style="width:64px;height:64px;">
+            <svg class="person" id="ceEditPhotoPersonIcon" viewBox="0 0 24 24" fill="currentColor" style="width:30px;height:30px;"><path d="M12 12c2.7 0 4.9-2.2 4.9-4.9S14.7 2.2 12 2.2 7.1 4.4 7.1 7.1 9.3 12 12 12zm0 2.5c-3.3 0-9.8 1.6-9.8 4.9v2.4h19.6v-2.4c0-3.3-6.5-4.9-9.8-4.9z"/></svg>
+            <img id="ceEditPhotoPreview" style="display:none; width:100%; height:100%; object-fit:cover;" alt="প্রোফাইল ছবি" />
+          </button>
+        </div>
         <label class="field-label">নাম</label>
         <div class="field-input-wrap"><input type="text" id="ceEditNameInput" style="border:none; outline:none; width:100%; font-size:14px; font-family:var(--font-body); color:var(--clr-ink);" /></div>
         <div style="height:14px;"></div>
@@ -1374,7 +1410,7 @@
     <!-- ===== CATEGORY: Profile Card (reused) ===== -->
     <div class="cd-profile-card no-avatar">
       <div class="cd-profile-main">
-        <div class="cd-profile-name" id="ndName">নাম <span id="ndId"></span></div>
+        <div class="cd-name-row"><div class="cd-profile-name" id="ndName">নাম <span id="ndId"></span></div><button class="cd-photo-icon-btn2" id="ndPhotoBtn" aria-label="ছবি দেখুন"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></button></div>
         <div class="cd-profile-phone-row">
           <span id="ndPhoneNumber">মোবাইল নম্বর</span>
           <button class="cd-phone-icon-btn call" id="ndCallBtn" aria-label="কল করুন">
@@ -1460,7 +1496,7 @@
     <!-- ===== CATEGORY: Profile Card (reused) ===== -->
     <div class="cd-profile-card no-avatar">
       <div class="cd-profile-main">
-        <div class="cd-profile-name" id="txdName">নাম <span id="txdId"></span></div>
+        <div class="cd-name-row"><div class="cd-profile-name" id="txdName">নাম <span id="txdId"></span></div><button class="cd-photo-icon-btn2" id="txdPhotoBtn" aria-label="ছবি দেখুন"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></button></div>
         <div class="cd-profile-phone-row">
           <span id="txdPhoneNumber">মোবাইল নম্বর</span>
           <button class="cd-phone-icon-btn call" id="txdCallBtn" aria-label="কল করুন">
@@ -1502,6 +1538,7 @@
     <!-- ===== CATEGORY: সহজ কিস্তি বিবরণ — read-only plan fields (installment entries only) ===== -->
     <div id="txdInstallmentFields" style="display:none; padding:0 16px;">
       <div class="ni-calc-box" style="margin-top:16px;">
+        <div class="ni-calc-row"><div class="ni-calc-row-label">রশিদ নাম্বার</div><input type="text" class="ni-calc-input" id="txdReceiptNumber" readonly /></div>
         <div class="ni-calc-row"><div class="ni-calc-row-label">পণ্যের নাম <span class="req">*</span></div><input type="text" class="ni-calc-input" id="txdProductName" readonly /></div>
         <div class="ni-calc-row"><div class="ni-calc-row-label">পণ্য বিক্রয় মূল্য <span class="req">*</span></div><input type="text" class="ni-calc-input" id="txdSalePrice" readonly /></div>
         <div class="ni-calc-row"><div class="ni-calc-row-label">ডাউন পেমেন্ট</div><input type="text" class="ni-calc-input" id="txdDownPayment" readonly /></div>
@@ -1551,7 +1588,7 @@
     <!-- ===== CATEGORY: Profile Card (reused) ===== -->
     <div class="cd-profile-card no-avatar">
       <div class="cd-profile-main">
-        <div class="cd-profile-name" id="niName">নাম <span id="niId"></span></div>
+        <div class="cd-name-row"><div class="cd-profile-name" id="niName">নাম <span id="niId"></span></div><button class="cd-photo-icon-btn2" id="niPhotoBtn" aria-label="ছবি দেখুন"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></button></div>
         <div class="cd-profile-phone-row">
           <span id="niPhoneNumber">মোবাইল নম্বর</span>
           <button class="cd-phone-icon-btn call" id="niCallBtn" aria-label="কল করুন">
@@ -1621,7 +1658,7 @@
         </div>
         <div class="ni-calc-row">
           <div class="ni-calc-row-label">প্রথম কিস্তি <span class="req">*</span></div>
-          <input type="date" class="ni-calc-input" id="niFirstInstallmentDate" />
+          <input type="date" class="ni-calc-input wdp-input" id="niFirstInstallmentDate" />
         </div>
         <div class="ni-calc-row">
           <div class="ni-calc-row-label">বিলম্ব জরিমানা (%) <span class="req">*</span></div>
@@ -1675,7 +1712,7 @@
     <!-- ===== CATEGORY: Profile Card (reused) ===== -->
     <div class="cd-profile-card no-avatar">
       <div class="cd-profile-main">
-        <div class="cd-profile-name" id="ciName">নাম <span id="ciId"></span></div>
+        <div class="cd-name-row"><div class="cd-profile-name" id="ciName">নাম <span id="ciId"></span></div><button class="cd-photo-icon-btn2" id="ciPhotoBtn" aria-label="ছবি দেখুন"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></button></div>
         <div class="cd-profile-phone-row">
           <span id="ciPhoneNumber">মোবাইল নম্বর</span>
           <button class="cd-phone-icon-btn call" id="ciCallBtn" aria-label="কল করুন">
@@ -1710,6 +1747,13 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
             <input type="text" class="ci-input" id="ciDateDisplay" readonly />
             <input type="date" id="ciDateInput" style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;" />
+          </div>
+        </div>
+
+        <div class="ci-row">
+          <div class="ci-row-label">রশিদ নাম্বারঃ</div>
+          <div class="ci-row-input-wrap">
+            <select class="ci-input" id="ciReceiptSelect" style="border:none; outline:none; background:none; width:100%; font-family:inherit;"></select>
           </div>
         </div>
 
@@ -1883,6 +1927,34 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         <span>লগ আউট</span>
       </button>
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- ================= OVERLAY: Full-Screen Photo Viewer ============= -->
+  <!-- ================================================================ -->
+  <div class="photo-viewer-overlay" id="photoViewerOverlay">
+    <button class="photo-viewer-close" id="photoViewerCloseBtn" aria-label="বন্ধ করুন">✕</button>
+    <div class="photo-viewer-loading" id="photoViewerLoading">লোড হচ্ছে...</div>
+    <img class="photo-viewer-img" id="photoViewerImg" style="display:none;" />
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- ================= WHEEL DATE PICKER (used everywhere) =========== -->
+  <!-- ================================================================ -->
+  <div class="wdp-overlay" id="wdpOverlay">
+    <div class="wdp-sheet">
+      <div class="wdp-title" id="wdpTitle">তারিখ নির্বাচন করুন</div>
+      <div class="wdp-wheels">
+        <div class="wdp-highlight"></div>
+        <div class="wdp-col" id="wdpDayCol"></div>
+        <div class="wdp-col" id="wdpMonthCol"></div>
+        <div class="wdp-col" id="wdpYearCol"></div>
+      </div>
+      <div class="wdp-actions">
+        <button class="wdp-btn wdp-cancel" id="wdpCancelBtn">Cancel</button>
+        <button class="wdp-btn wdp-ok" id="wdpOkBtn">OK</button>
+      </div>
     </div>
   </div>
 
@@ -2096,6 +2168,86 @@
   // M/D/YYYY, so anything with a day above 12 silently becomes Invalid Date).
   // Every filter/sort that depends on a transaction's date goes through this
   // instead, with a fallback for the old "7 August 2026"-style dates.
+  /* ================================================================ */
+  /* ================= CATEGORY: Wheel Date Picker (used everywhere) === */
+  /* ================================================================ */
+  const WDP_MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const WDP_ITEM_H = 36;
+  let wdpOnDone = null;
+
+  function wdpBuildColumn(colEl, items, selectedIndex){
+    const pad = `<div style="height:${WDP_ITEM_H*2}px;"></div>`;
+    colEl.innerHTML = pad + items.map((label,i)=>`<div class="wdp-item" data-idx="${i}">${label}</div>`).join('') + pad;
+    colEl.scrollTop = Math.max(0, selectedIndex) * WDP_ITEM_H;
+  }
+  function wdpSelectedIndex(colEl){
+    return Math.round(colEl.scrollTop / WDP_ITEM_H);
+  }
+  function wdpUpdateCenter(colEl){
+    const idx = wdpSelectedIndex(colEl);
+    colEl.querySelectorAll('.wdp-item').forEach(el=>{
+      el.classList.toggle('center', Number(el.dataset.idx) === idx);
+    });
+  }
+  function wdpWireScroll(colEl){
+    let t;
+    colEl.addEventListener('scroll', ()=>{
+      wdpUpdateCenter(colEl);
+      clearTimeout(t);
+      t = setTimeout(()=> wdpUpdateCenter(colEl), 120);
+    });
+  }
+  ['wdpDayCol','wdpMonthCol','wdpYearCol'].forEach(id=> wdpWireScroll(document.getElementById(id)));
+
+  // Opens the wheel picker pre-set to currentIso (or today), and calls
+  // onDone('YYYY-MM-DD') if the user taps OK. Used everywhere in place of
+  // the native date input, so every date field in the app looks the same.
+  function openWheelDatePicker(currentIso, onDone){
+    const d = currentIso ? new Date(currentIso+'T00:00:00') : new Date();
+    const validD = isNaN(d) ? new Date() : d;
+    const days = Array.from({length:31}, (_,i)=> String(i+1));
+    const years = Array.from({length:16}, (_,i)=> String(new Date().getFullYear()-5+i));
+    wdpBuildColumn(document.getElementById('wdpDayCol'), days, validD.getDate()-1);
+    wdpBuildColumn(document.getElementById('wdpMonthCol'), WDP_MONTHS, validD.getMonth());
+    wdpBuildColumn(document.getElementById('wdpYearCol'), years, years.indexOf(String(validD.getFullYear())));
+    setTimeout(()=> ['wdpDayCol','wdpMonthCol','wdpYearCol'].forEach(id=> wdpUpdateCenter(document.getElementById(id))), 60);
+    wdpOnDone = onDone;
+    document.getElementById('wdpOverlay').classList.add('show');
+  }
+  document.getElementById('wdpCancelBtn').addEventListener('click', ()=>{
+    document.getElementById('wdpOverlay').classList.remove('show');
+  });
+  document.getElementById('wdpOverlay').addEventListener('click', (e)=>{
+    if(e.target.id === 'wdpOverlay') document.getElementById('wdpOverlay').classList.remove('show');
+  });
+  document.getElementById('wdpOkBtn').addEventListener('click', ()=>{
+    const dayCol = document.getElementById('wdpDayCol');
+    const monthCol = document.getElementById('wdpMonthCol');
+    const yearCol = document.getElementById('wdpYearCol');
+    const day = wdpSelectedIndex(dayCol) + 1;
+    const month = wdpSelectedIndex(monthCol) + 1;
+    const yearEl = yearCol.querySelector(`[data-idx="${wdpSelectedIndex(yearCol)}"]`);
+    const year = yearEl ? Number(yearEl.textContent) : new Date().getFullYear();
+    const iso = `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    document.getElementById('wdpOverlay').classList.remove('show');
+    if(wdpOnDone) wdpOnDone(iso);
+  });
+  // Wires every plain wdp-input date field: the real input never opens its
+  // native picker (pointer-events off), a tap on its wrapper opens the wheel
+  // picker instead, and OK writes the value back + fires a change event so
+  // existing logic that listens for it keeps working untouched.
+  document.querySelectorAll('input[type="date"].wdp-input').forEach(input=>{
+    input.style.pointerEvents = 'none';
+    const trigger = input.closest('.wdp-trigger, .rf-date-wrap, .ni-calc-row') || input.parentElement;
+    trigger.style.cursor = 'pointer';
+    trigger.addEventListener('click', ()=>{
+      openWheelDatePicker(input.value, (iso)=>{
+        input.value = iso;
+        input.dispatchEvent(new Event('change', { bubbles:true }));
+      });
+    });
+  });
+
   function parseTxDate(dateStr, timeStr){
     if(!dateStr) return new Date(NaN);
     if(dateStr.includes('/')){
@@ -2144,13 +2296,10 @@
     filtered.forEach(c => {
       const row = document.createElement('button');
       row.className = 'customer-card';
-      const avatarInner = c.photo
-        ? `<img src="${c.photo}" style="width:100%;height:100%;object-fit:cover;" />`
-        : c.initial;
       const displayAmount = homeListMode === 'payable' ? (c.generalIOwe||0) : c.amount;
       const amountClass = homeListMode === 'payable' ? 'clear' : (c.amount>0 ? 'due':'clear');
       row.innerHTML = `
-        <div class="avatar" style="background:${c.photo ? 'transparent' : c.color}">${avatarInner}</div>
+        <div class="avatar" style="background:${c.color}">${c.initial}</div>
         <div class="customer-info">
           <div class="customer-name-row">
             <span class="customer-name">${c.name}</span>
@@ -2789,7 +2938,7 @@
   });
 
   /* ================================================================ */
-  /* ================= CATEGORY: Add Customer — Photo Picker ========== */
+  /* ================= CATEGORY: Photo Picker (shared: add + edit) ==== */
   /* ================================================================ */
   const photoSheetOverlay = document.getElementById('photoSheetOverlay');
   const avatarPreview = document.getElementById('avatarPreview');
@@ -2798,8 +2947,11 @@
   const fileGallery = document.getElementById('fileGallery');
   let avatarPhotoDataUrl = null;
   let avatarPhotoFile = null;
+  let ceEditPhotoFile = null;
+  let photoPickerContext = 'add'; // 'add' | 'edit' — decides which preview handlePhotoFile updates
 
-  document.getElementById('avatarPickerBtn').addEventListener('click', ()=> photoSheetOverlay.classList.add('show'));
+  document.getElementById('avatarPickerBtn').addEventListener('click', ()=>{ photoPickerContext = 'add'; photoSheetOverlay.classList.add('show'); });
+  document.getElementById('ceEditPhotoBtn').addEventListener('click', ()=>{ photoPickerContext = 'edit'; photoSheetOverlay.classList.add('show'); });
   document.getElementById('sheetCancelBtn').addEventListener('click', ()=> photoSheetOverlay.classList.remove('show'));
   photoSheetOverlay.addEventListener('click', (e)=>{ if(e.target===photoSheetOverlay) photoSheetOverlay.classList.remove('show'); });
   document.getElementById('sheetCameraBtn').addEventListener('click', ()=>{ photoSheetOverlay.classList.remove('show'); fileCamera.click(); });
@@ -2807,13 +2959,21 @@
 
   function handlePhotoFile(file){
     if(!file) return;
-    avatarPhotoFile = file;
     const reader = new FileReader();
     reader.onload = (e)=>{
-      avatarPhotoDataUrl = e.target.result; // instant local preview only
-      avatarPreview.src = avatarPhotoDataUrl;
-      avatarPreview.style.display = 'block';
-      avatarPersonIcon.style.display = 'none';
+      const dataUrl = e.target.result; // instant local preview only
+      if(photoPickerContext === 'edit'){
+        ceEditPhotoFile = file;
+        document.getElementById('ceEditPhotoPreview').src = dataUrl;
+        document.getElementById('ceEditPhotoPreview').style.display = 'block';
+        document.getElementById('ceEditPhotoPersonIcon').style.display = 'none';
+      }else{
+        avatarPhotoFile = file;
+        avatarPhotoDataUrl = dataUrl;
+        avatarPreview.src = dataUrl;
+        avatarPreview.style.display = 'block';
+        avatarPersonIcon.style.display = 'none';
+      }
     };
     reader.readAsDataURL(file);
   }
@@ -2880,6 +3040,16 @@
     const serial = String(meta.nextSerial).padStart(2,'0'); // grows past 99 naturally (e.g. 101)
     return mm + yy + serial;
   }
+  function generateReceiptNumber(){
+    // Same MM+YY+serial idea as the customer ID, prefixed R so the two never
+    // look alike — one receipt number per সহজ কিস্তি sale, assigned once.
+    const d = new Date();
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    const yy = String(d.getFullYear()).slice(-2);
+    if(!meta.nextReceiptSerial) meta.nextReceiptSerial = 1;
+    const serial = String(meta.nextReceiptSerial).padStart(3,'0');
+    return 'R' + mm + yy + serial;
+  }
 
   function initialsFromName(name){
     const parts = name.trim().split(/\s+/);
@@ -2899,9 +3069,7 @@
     const mobile = mobileInput.value.trim();
     const id = generateCustomerId();
 
-    // Photo upload temporarily disabled per request (was adding noticeable
-    // delay/load) — flip this back to true whenever it's needed again.
-    const PHOTO_UPLOAD_ENABLED = false;
+    const PHOTO_UPLOAD_ENABLED = true;
 
     let photoUrl = null;
     if(PHOTO_UPLOAD_ENABLED && avatarPhotoFile){
@@ -3022,6 +3190,8 @@
       const genRow = genEl.closest('.cd-profile-side-row');
       if(genRow) genRow.style.display = (shopInfo.businessMode === 'installment') ? 'none' : '';
     }
+    const photoBtn = document.getElementById(prefix+'PhotoBtn');
+    if(photoBtn) photoBtn.classList.toggle('muted', !customer.photo);
   }
   function wireProfileCallWhatsapp(prefix){
     const callBtn = document.getElementById(prefix+'CallBtn');
@@ -3036,8 +3206,34 @@
       if(num.startsWith('0')) num = '88' + num; // Bangladesh country code
       window.open(`https://wa.me/${num}`, '_blank');
     });
+    const photoBtn = document.getElementById(prefix+'PhotoBtn');
+    if(photoBtn) photoBtn.addEventListener('click', ()=> openPhotoViewer(currentCustomer));
   }
   ['nd','txd','ni','ci'].forEach(wireProfileCallWhatsapp);
+
+  // The actual photo file only ever loads here, the moment someone taps the
+  // icon — everywhere else in the app just shows a coded initial-letter
+  // avatar, so no image traffic happens until it's explicitly asked for.
+  function openPhotoViewer(customer){
+    if(!customer || !customer.photo){ showToast('কোনো ছবি নেই', 'danger'); return; }
+    const img = document.getElementById('photoViewerImg');
+    const loading = document.getElementById('photoViewerLoading');
+    img.style.display = 'none';
+    loading.style.display = 'block';
+    document.getElementById('photoViewerOverlay').classList.add('show');
+    img.onload = ()=>{ loading.style.display = 'none'; img.style.display = ''; };
+    img.onerror = ()=>{ loading.textContent = 'ছবি লোড করা যায়নি'; };
+    img.src = customer.photo;
+  }
+  function closePhotoViewer(){
+    document.getElementById('photoViewerOverlay').classList.remove('show');
+    document.getElementById('photoViewerImg').src = '';
+    document.getElementById('photoViewerLoading').textContent = 'লোড হচ্ছে...';
+  }
+  document.getElementById('photoViewerCloseBtn').addEventListener('click', closePhotoViewer);
+  document.getElementById('photoViewerOverlay').addEventListener('click', (e)=>{
+    if(e.target.id === 'photoViewerOverlay') closePhotoViewer();
+  });
 
   function renderCustomerDetail(customer){
     currentCustomer = customer;
@@ -3109,6 +3305,7 @@
     const fieldsBlock = document.getElementById('txdInstallmentFields');
     if(tx.category === 'installment' && tx.give){
       fieldsBlock.style.display = 'block';
+      document.getElementById('txdReceiptNumber').value = tx.receiptNumber || '—';
       document.getElementById('txdProductName').value = tx.productName || '';
       document.getElementById('txdSalePrice').value = tx.salePrice != null ? bn(tx.salePrice) : '';
       document.getElementById('txdDownPayment').value = tx.downPayment != null ? bn(tx.downPayment) : '০';
@@ -3185,6 +3382,15 @@
     if(!currentCustomer) return;
     document.getElementById('ceEditNameInput').value = currentCustomer.name || '';
     document.getElementById('ceEditMobileInput').value = currentCustomer.mobile || '';
+    ceEditPhotoFile = null;
+    if(currentCustomer.photo){
+      document.getElementById('ceEditPhotoPreview').src = currentCustomer.photo;
+      document.getElementById('ceEditPhotoPreview').style.display = 'block';
+      document.getElementById('ceEditPhotoPersonIcon').style.display = 'none';
+    }else{
+      document.getElementById('ceEditPhotoPreview').style.display = 'none';
+      document.getElementById('ceEditPhotoPersonIcon').style.display = 'block';
+    }
     document.getElementById('editCustomerOverlay').classList.add('show');
   });
   document.getElementById('ceEditCancelBtn').addEventListener('click', ()=>{
@@ -3200,6 +3406,19 @@
     const mobile = document.getElementById('ceEditMobileInput').value.trim();
     if(!name){ showToast('নাম দিন', 'danger'); return; }
     if(mobile && !/^\d{11}$/.test(mobile)){ showToast('সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন', 'danger'); return; }
+    const saveBtn = document.getElementById('ceEditSaveBtn');
+    if(ceEditPhotoFile){
+      const originalLabel = saveBtn.textContent;
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'ছবি আপলোড হচ্ছে...';
+      try{
+        currentCustomer.photo = await uploadPhotoToStorage(ceEditPhotoFile, currentCustomer.id || name);
+      }catch(e){
+        showToast('ছবি আপলোড করা যায়নি — বাকি তথ্য সেভ হচ্ছে', 'danger');
+      }
+      saveBtn.textContent = originalLabel;
+      saveBtn.disabled = false;
+    }
     currentCustomer.name = name;
     currentCustomer.mobile = mobile;
     currentCustomer.initial = initialsFromName(name);
@@ -3280,6 +3499,7 @@
     if(num.startsWith('0')) num = '88' + num; // Bangladesh country code
     window.open(`https://wa.me/${num}`, '_blank');
   });
+  document.getElementById('cdPhotoBtn').addEventListener('click', ()=> openPhotoViewer(currentCustomer));
   let sheetMode = 'give';
   let editingTxIndex = null;
   let currentEntryCategory = 'general';
@@ -3479,6 +3699,8 @@
       showToast("এন্ট্রি আপডেট হয়েছে");
     }else{
       const { date: __d, time: __t } = nowDateTimeStrings();
+      const receiptNumber = generateReceiptNumber();
+      meta.nextReceiptSerial = (meta.nextReceiptSerial || 1) + 1;
       const newTx = {
         date: __d,
         time: __t,
@@ -3486,6 +3708,7 @@
         category: 'installment',
         take: 0,
         give: remaining,
+        receiptNumber,
         ...(firstDateVal ? { dueDate: firstDateVal } : {}),
         ...planFields,
       };
@@ -3496,7 +3719,7 @@
     currentCustomer.perInstallmentAmount = perInstallment;
 
     recomputeCustomerTotals(currentCustomer);
-    await persistCustomers();
+    await persistCustomersAndMeta();
     renderCustomerDetail(currentCustomer);
     renderList(document.getElementById('searchInput').value);
     if(isNewEntry){
@@ -3579,6 +3802,41 @@
     return `${dd}-${mm}-${d.getFullYear()}`;
   }
 
+  // One entry per সহজ কিস্তি sale that still has money owed on it — used to
+  // populate the রশিদ নাম্বার dropdown and to know which specific product a
+  // given collection payment should count against.
+  let currentCiReceipts = [];
+  function getCustomerReceipts(customer){
+    const sales = (customer.transactions||[]).filter(tx => tx.category==='installment' && tx.give && tx.receiptNumber);
+    return sales.map(saleTx => {
+      const paid = (customer.transactions||[])
+        .filter(tx => tx.category==='installment' && tx.take && tx.receiptNumber === saleTx.receiptNumber)
+        .reduce((s,tx)=>s+tx.take, 0);
+      const remaining = Math.max(0, (saleTx.remainingAmount!=null ? saleTx.remainingAmount : saleTx.give) - paid);
+      return {
+        receiptNumber: saleTx.receiptNumber,
+        productName: saleTx.productName || '',
+        perInstallment: saleTx.perInstallment || 0,
+        remaining,
+      };
+    }).filter(r => r.remaining > 0);
+  }
+  function updateCiReceiptFields(){
+    const idx = Number(document.getElementById('ciReceiptSelect').value);
+    const selected = currentCiReceipts[idx];
+    if(!selected){
+      document.getElementById('ciInstallmentAmount').value = (currentCustomer.perInstallmentAmount || 0).toFixed(2);
+      document.getElementById('ciTotalDueField').value = (currentCustomer.installmentDue || 0).toFixed(2);
+      return;
+    }
+    const combinedPerInstallment = currentCiReceipts.reduce((s,r)=>s+r.perInstallment, 0);
+    document.getElementById('ciInstallmentAmount').value = currentCiReceipts.length > 1
+      ? `${selected.perInstallment.toFixed(2)} / ${combinedPerInstallment.toFixed(2)}`
+      : selected.perInstallment.toFixed(2);
+    document.getElementById('ciTotalDueField').value = selected.remaining.toFixed(2);
+  }
+  document.getElementById('ciReceiptSelect').addEventListener('change', updateCiReceiptFields);
+
   function goToCollectInstallment(){
     if(!currentCustomer) return;
     renderProfileCardHeader('ci', currentCustomer);
@@ -3586,8 +3844,13 @@
     const today = new Date();
     document.getElementById('ciDateInput').value = today.toISOString().slice(0,10);
     document.getElementById('ciDateDisplay').value = formatDMYDash(today);
-    document.getElementById('ciInstallmentAmount').value = (currentCustomer.perInstallmentAmount || 0).toFixed(2);
-    document.getElementById('ciTotalDueField').value = (currentCustomer.installmentDue || 0).toFixed(2);
+
+    currentCiReceipts = getCustomerReceipts(currentCustomer);
+    const select = document.getElementById('ciReceiptSelect');
+    select.innerHTML = currentCiReceipts.map((r,i) => `<option value="${i}">${r.receiptNumber}${r.productName ? ' — '+r.productName : ''}</option>`).join('');
+    select.value = 0; // earliest-taken product first, selected by default
+    updateCiReceiptFields();
+
     document.getElementById('ciAmountReceived').value = '';
     document.getElementById('ciDiscount').value = 0;
     document.getElementById('ciDescription').value = '';
@@ -3608,7 +3871,10 @@
 
   document.getElementById('ciDateDisplay').parentElement.addEventListener('click', ()=>{
     const dateInput = document.getElementById('ciDateInput');
-    if(dateInput.showPicker){ dateInput.showPicker(); } else { dateInput.click(); }
+    openWheelDatePicker(dateInput.value, (iso)=>{
+      dateInput.value = iso;
+      dateInput.dispatchEvent(new Event('change', { bubbles:true }));
+    });
   });
   document.getElementById('ciDateInput').addEventListener('change', (e)=>{
     if(e.target.value){ document.getElementById('ciDateDisplay').value = formatDMYDash(new Date(e.target.value)); }
@@ -3626,6 +3892,7 @@
 
     if(!currentCustomer.transactions) currentCustomer.transactions = [];
     const { date: __d, time: __t } = nowDateTimeStrings();
+    const selectedReceipt = currentCiReceipts[Number(document.getElementById('ciReceiptSelect').value)];
     const newTx = {
       date: __d,
       time: __t,
@@ -3633,6 +3900,7 @@
       category: 'installment',
       take: received + discount,
       give: 0,
+      ...(selectedReceipt ? { receiptNumber: selectedReceipt.receiptNumber } : {}),
     };
     currentCustomer.transactions.push(newTx);
 
@@ -3650,7 +3918,10 @@
 
   document.getElementById('ndDateBtn').addEventListener('click', ()=>{
     const dateInput = document.getElementById('ndDateInput');
-    if(dateInput.showPicker){ dateInput.showPicker(); } else { dateInput.click(); }
+    openWheelDatePicker(dateInput.value, (iso)=>{
+      dateInput.value = iso;
+      dateInput.dispatchEvent(new Event('change', { bubbles:true }));
+    });
   });
   document.getElementById('ndDateInput').addEventListener('change', (e)=>{
     document.getElementById('ndDateLabel').textContent = e.target.value || 'বাকি পরিশোধের তারিখ';
