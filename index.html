@@ -509,6 +509,9 @@
   .cd-photo-icon-btn2 svg{ width:19px; height:19px; }
   .cd-photo-icon-btn2.muted{ color:#C9C8C4; }
   .cd-profile-card.no-avatar .cd-name-row .cd-photo-icon-btn2 svg{ width:22px; height:22px; }
+  .cd-avatar-photo-btn{ width:46px; height:46px; border-radius:50%; border:none; background:#F1E9DD; color:var(--clr-primary); flex-shrink:0; display:flex; align-items:center; justify-content:center; cursor:pointer; margin-right:2px; }
+  .cd-avatar-photo-btn svg{ width:26px; height:26px; }
+  .cd-avatar-photo-btn.muted{ color:#C9C8C4; }
 
   /* ================= CATEGORY: Full-Screen Photo Viewer ================= */
   .photo-viewer-overlay{ position:fixed; inset:0; background:rgba(10,10,14,.92); z-index:700; display:none; align-items:center; justify-content:center; }
@@ -694,9 +697,9 @@
   .txd-action-link.edit{color:#2563A8;}
 
   /* ================= CATEGORY: Action Sheet (photo picker) ================= */
-  .sheet-overlay{ position:absolute; inset:0; background:rgba(0,0,0,.4); z-index:210; opacity:0; pointer-events:none; transition:opacity .2s ease; }
+  .sheet-overlay{ position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:650; opacity:0; pointer-events:none; transition:opacity .2s ease; }
   .sheet-overlay.show{opacity:1; pointer-events:auto;}
-  .sheet{ position:absolute; left:0; right:0; bottom:0; background:var(--clr-card); border-radius:22px 22px 0 0; padding:10px 16px calc(20px + var(--safe-bottom)); transform:translateY(100%); transition:transform .25s cubic-bezier(.4,0,.2,1); }
+  .sheet{ position:absolute; left:0; right:0; bottom:0; max-width:480px; margin:0 auto; background:var(--clr-card); border-radius:22px 22px 0 0; padding:10px 16px calc(20px + var(--safe-bottom)); transform:translateY(100%); transition:transform .25s cubic-bezier(.4,0,.2,1); }
   .sheet-overlay.show .sheet{transform:translateY(0);}
   .sheet-handle{width:38px;height:4px;border-radius:2px;background:var(--clr-line);margin:6px auto 14px;}
   .sheet-title{font-size:14px; font-weight:700; color:var(--clr-ink-soft); padding:0 6px 10px;}
@@ -1239,8 +1242,11 @@
 
     <!-- ===== CATEGORY: Profile Card (no avatar — photos disabled for now) ===== -->
     <div class="cd-profile-card no-avatar">
+      <button class="cd-avatar-photo-btn" id="cdPhotoBtn" aria-label="ছবি দেখুন">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 4.9-2.2 4.9-4.9S14.7 2.2 12 2.2 7.1 4.4 7.1 7.1 9.3 12 12 12zm0 2.5c-3.3 0-9.8 1.6-9.8 4.9v2.4h19.6v-2.4c0-3.3-6.5-4.9-9.8-4.9z"/></svg>
+      </button>
       <div class="cd-profile-main">
-        <div class="cd-name-row"><div class="cd-profile-name" id="cdName">নাম <span id="cdId"></span></div><button class="cd-photo-icon-btn2" id="cdPhotoBtn" aria-label="ছবি দেখুন"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></button></div>
+        <div class="cd-profile-name" id="cdName">নাম <span id="cdId"></span></div>
         <div class="cd-profile-phone-row">
           <span id="cdPhoneNumber">মোবাইল নম্বর</span>
           <button class="cd-phone-icon-btn call" id="cdCallBtn" aria-label="কল করুন">
@@ -1359,7 +1365,7 @@
         <label class="field-label">মোবাইল নাম্বার</label>
         <div class="field-input-wrap"><input type="tel" inputmode="numeric" maxlength="11" id="ceEditMobileInput" style="border:none; outline:none; width:100%; font-size:14px; font-family:var(--font-body); color:var(--clr-ink);" /></div>
       </div>
-      <button class="rf-submit-btn" id="ceEditSaveBtn" style="margin:6px 16px;">সংরক্ষণ করুন</button>
+      <button class="rf-submit-btn" id="ceEditSaveBtn" style="margin:6px 16px; width:auto;">সংরক্ষণ করুন</button>
       <button class="del-modal-close-btn" id="ceEditCancelBtn">বাতিল</button>
     </div>
   </div>
@@ -2206,7 +2212,11 @@
     const d = currentIso ? new Date(currentIso+'T00:00:00') : new Date();
     const validD = isNaN(d) ? new Date() : d;
     const days = Array.from({length:31}, (_,i)=> String(i+1));
-    const years = Array.from({length:16}, (_,i)=> String(new Date().getFullYear()-5+i));
+    // Centered on the target year (not always today's year) so it's always
+    // present in the list — this was the actual cause of the picker landing
+    // on 2021: if the shown date's year fell outside a fixed range, the
+    // lookup silently fell back to index 0.
+    const years = Array.from({length:16}, (_,i)=> String(validD.getFullYear()-5+i));
     wdpBuildColumn(document.getElementById('wdpDayCol'), days, validD.getDate()-1);
     wdpBuildColumn(document.getElementById('wdpMonthCol'), WDP_MONTHS, validD.getMonth());
     wdpBuildColumn(document.getElementById('wdpYearCol'), years, years.indexOf(String(validD.getFullYear())));
