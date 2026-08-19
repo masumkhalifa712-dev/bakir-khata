@@ -1229,7 +1229,7 @@
       <button class="cd-back" id="cdBackBtn" aria-label="ফিরে যান">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
       </button>
-      <div class="cd-title">বাকির বিবরণ</div>
+      <div class="cd-title">কাস্টমার প্রোফাইল</div>
       <div class="cd-topbar-icons">
         <button id="cdPdfBtn" aria-label="পিডিএফ ডাউনলোড">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15h1a1 1 0 0 0 0-2H9v4"/><path d="M12.5 13v4h.5a1.5 1.5 0 0 0 0-4z"/><path d="M17.5 13H16v4"/><path d="M16 15h1"/></svg>
@@ -2581,6 +2581,9 @@
   /* ================================================================ */
   /* ================= CATEGORY: Purchase History Screen ============== */
   /* ================================================================ */
+  // ========================================
+  // ক্রয়ের ইতিহাস (Purchase History)
+  // ========================================
   // Pulls together every তx across every customer that had "ক্রয় মূল্য যদি
   // থাকে" filled in — this page doesn't need its own entry form, since that
   // toggle (on নতুন বাকি and নতুন সহজ কিস্তি) already captures the shop's cost.
@@ -2757,8 +2760,14 @@
     showToast('তথ্য সংরক্ষণ হয়েছে');
     history.back();
   });
+  // ========================================
+  // কাস্টমার প্রোফাইল ও লেনদেন বিবরণ
+  // ========================================
   function goToCustomerDetail(customer){ renderCustomerDetail(customer); appEl.classList.add('show-detail'); pushAppState('detail'); }
   function closeCustomerDetail(){ appEl.classList.remove('show-detail'); }
+  // ========================================
+  // রিপোর্ট তৈরি ও PDF ডাউনলোড
+  // ========================================
   function updateReportFilterModeUI(){
     const wrap = document.getElementById('rfManagementTypeWrap');
     const select = document.getElementById('rfManagementType');
@@ -2934,6 +2943,9 @@
   let selectedType = 'customer';
   const typeCustomerBtn = document.getElementById('typeCustomer');
   const typeSupplierBtn = document.getElementById('typeSupplier');
+  // ========================================
+  // নতুন কাস্টমার যোগ করা
+  // ========================================
   function setType(type){
     selectedType = type;
     typeCustomerBtn.classList.toggle('selected', type==='customer');
@@ -3142,6 +3154,9 @@
   /* ================= CATEGORY: Customer Detail — Render ============= */
   /* ================================================================ */
   let currentCustomer = null;
+  // ========================================
+  // কাস্টমার প্রোফাইল ও লেনদেন বিবরণ
+  // ========================================
   function recomputeCustomerTotals(customer){
     const txs = customer.transactions || [];
     let installmentDue = 0, generalDue = 0, generalIOwe = 0;
@@ -3399,6 +3414,9 @@
     showToast("ফিল্টার (শীঘ্রই আসছে)");
   });
   document.getElementById('cdPdfBtn').addEventListener('click', ()=>showToast("পিডিএফ ডাউনলোড (শীঘ্রই আসছে)"));
+  // ========================================
+  // কাস্টমার তথ্য এডিট
+  // ========================================
   function goToCustomerEdit(){ appEl.classList.add('show-customeredit'); pushAppState('customeredit'); }
   function closeCustomerEdit(){ appEl.classList.remove('show-customeredit'); }
   document.getElementById('cdMenuBtn').addEventListener('click', goToCustomerEdit);
@@ -3530,6 +3548,9 @@
   let currentEntryCategory = 'general';
   const giveTypeSheetOverlay = document.getElementById('giveTypeSheetOverlay');
 
+  // ========================================
+  // এন্ট্রি ফর্ম — নতুন বাকি, নতুন কিস্তি, কিস্তি আদায়
+  // ========================================
   function chooseEntryType(kind){ // kind: 'installment' | 'general'
     giveTypeSheetOverlay.classList.remove('show');
     editingTxIndex = null;
@@ -4030,6 +4051,9 @@
   const ciSubmitBar = document.getElementById('ciSubmitBar');
   const dockedBars = [];
 
+  // ========================================
+  // ডকড সাবমিট বার (স্ক্রল-সহ নিচে আটকানো বাটন)
+  // ========================================
   function repositionDockedBars(){
     if(!window.visualViewport) return;
     const vv = window.visualViewport;
@@ -4058,6 +4082,9 @@
   /* ================================================================ */
   /* ================= CATEGORY: Auth — Sign Up / Sign In ============= */
   /* ================================================================ */
+  // ========================================
+  // Auth — লগইন, রেজিস্ট্রেশন, PIN যাচাই
+  // ========================================
   // Saved locally on THIS device/browser only — lets returning users skip
   // straight to the PIN-login step without retyping their mobile number.
   const AUTH_STORAGE_KEY = 'authAccount';
@@ -4366,6 +4393,9 @@
   // The phone/browser back button fires 'popstate' — we close exactly the
   // topmost open screen in response, so back navigates one screen at a time
   // instead of exiting or reloading the app.
+  // ========================================
+  // ব্যাক বাটন হ্যান্ডলিং
+  // ========================================
   function closeTopmostAppScreen(){
     if(appEl.classList.contains('show-newinstallment')){ closeNewInstallment(); return; }
     if(appEl.classList.contains('show-collectinstallment')){ closeCollectInstallment(); return; }
