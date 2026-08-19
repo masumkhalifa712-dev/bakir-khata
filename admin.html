@@ -203,6 +203,17 @@
   let adminSecret = null;
 
   const bn = n => Number(n||0).toLocaleString('bn-BD');
+  // Same helper as index.html — escapes <, >, &, ", ' so a shop/customer name
+  // typed with markup-like text renders as plain text here instead of running.
+  function escapeHtml(str){
+    if(str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
   const fmtDate = (iso) => iso ? new Date(iso).toLocaleDateString('bn-BD', { year:'numeric', month:'short', day:'numeric' }) : '—';
   const fmtDateTime = (iso) => iso ? new Date(iso).toLocaleDateString('bn-BD', { year:'numeric', month:'short', day:'numeric' }) + ' ' + new Date(iso).toLocaleTimeString('bn-BD', { hour:'2-digit', minute:'2-digit' }) : '—';
 
@@ -399,14 +410,14 @@
     document.getElementById('detailModalMobile').textContent = u.mobile;
     const modeLabel = { general: 'সাধারণ বাকি', installment: 'সহজ কিস্তি', both: 'উভয়' }[u.businessMode] || 'উভয়';
     const custRows = (u.customers || []).slice(0, 30).map(c => `
-      <div class="cust-mini-row"><span>${c.name || '—'}${c.id ? ' · '+c.id : ''} ${c.mobile ? '('+c.mobile+')' : ''}</span><span>${bn(c.amount||0)} টাকা</span></div>
+      <div class="cust-mini-row"><span>${escapeHtml(c.name) || '—'}${c.id ? ' · '+c.id : ''} ${c.mobile ? '('+c.mobile+')' : ''}</span><span>${bn(c.amount||0)} টাকা</span></div>
     `).join('') || '<div class="cust-mini-row"><span>কোনো কাস্টমার নেই</span></div>';
 
     document.getElementById('detailModalBody').innerHTML = `
-      <div class="detail-row"><span class="detail-label">দোকানের নাম</span><span class="detail-value">${u.shopInfo.name || '—'}</span></div>
-      <div class="detail-row"><span class="detail-label">মালিকের নাম</span><span class="detail-value">${u.shopInfo.ownerName || '—'}</span></div>
-      <div class="detail-row"><span class="detail-label">দোকানের ধরন</span><span class="detail-value">${u.shopInfo.shopType || '—'}</span></div>
-      <div class="detail-row"><span class="detail-label">ঠিকানা</span><span class="detail-value">${u.shopInfo.address || '—'}</span></div>
+      <div class="detail-row"><span class="detail-label">দোকানের নাম</span><span class="detail-value">${escapeHtml(u.shopInfo.name) || '—'}</span></div>
+      <div class="detail-row"><span class="detail-label">মালিকের নাম</span><span class="detail-value">${escapeHtml(u.shopInfo.ownerName) || '—'}</span></div>
+      <div class="detail-row"><span class="detail-label">দোকানের ধরন</span><span class="detail-value">${escapeHtml(u.shopInfo.shopType) || '—'}</span></div>
+      <div class="detail-row"><span class="detail-label">ঠিকানা</span><span class="detail-value">${escapeHtml(u.shopInfo.address) || '—'}</span></div>
       <div class="detail-row"><span class="detail-label">ব্যবসার মোড</span><span class="detail-value">${modeLabel}</span></div>
       <div class="detail-row"><span class="detail-label">যোগ দিয়েছে</span><span class="detail-value">${fmtDate(u.created_at)}</span></div>
       <div class="detail-row"><span class="detail-label">সর্বশেষ লগইন</span><span class="detail-value">${fmtDateTime(u.last_login)}</span></div>
@@ -470,7 +481,7 @@
     const list = document.getElementById('changelogList');
     if(changelogEntries.length === 0){ list.innerHTML = '<div style="color:var(--clr-ink-soft); font-size:12.5px;">কোনো নোট নেই</div>'; return; }
     list.innerHTML = changelogEntries.slice().reverse().map(e => `
-      <div class="changelog-item"><span>${e.text}</span><span class="changelog-date">${fmtDate(e.date)}</span></div>
+      <div class="changelog-item"><span>${escapeHtml(e.text)}</span><span class="changelog-date">${fmtDate(e.date)}</span></div>
     `).join('');
   }
 
