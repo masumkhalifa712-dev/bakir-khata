@@ -2053,10 +2053,13 @@
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRhbXpyZW9rcG52cXB4dmticGl3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYwMjU4MTAsImV4cCI6MjEwMTYwMTgxMH0.-ddoBc5pVVLUcrBfxb5RUeSU_wCuQQsLzhfpwDsBsHQ";
   const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  // Per-user data — set once the user is authenticated (see completeAuth below),
-  // so each mobile number's customer list is isolated by a WHERE clause on this value.
+  // Per-user data — set once the user is authenticated (see completeAuth below).
+  // currentUserPin is kept in memory only (never written to localStorage in the
+  // clear beyond what auth already stored) and sent with every RPC call so the
+  // database can re-verify it server-side — this is what lets us lock direct
+  // table access down with RLS while everything else keeps working.
   let currentUserMobile = null;
-  let customersRealtimeChannel = null;
+  let currentUserPin = null;
 
   let customers = [];
   let meta = { nextSerial: 1 };
@@ -2078,19 +2081,19 @@
     customersLoading = true;
     try{
       const { data, error } = await withTimeout(
-        sb.from('user_data').select('customers, meta, shop_info').eq('mobile', currentUserMobile).maybeSingle(),
+        sb.rpc('rpc_get_user_data', { p_mobile: currentUserMobile, p_pin: currentUserPin }),
         10000, 'load-customers'
       );
       if(error) throw error;
-      if(data){
-        customers = data.customers || [];
-        meta = data.meta || { nextSerial: 1 };
-        shopInfo = data.shop_info || { name: '', ownerName: '', shopType: '', address: '', businessMode: 'both' };
+      const row = Array.isArray(data) ? data[0] : data;
+      if(row){
+        customers = row.customers || [];
+        meta = row.meta || { nextSerial: 1 };
+        shopInfo = row.shop_info || { name: '', ownerName: '', shopType: '', address: '', businessMode: 'both' };
         if(!shopInfo.businessMode) shopInfo.businessMode = 'both';
       }else{
         customers = DEFAULT_CUSTOMERS;
         meta = { nextSerial: 1 };
-        await sb.from('user_data').insert({ mobile: currentUserMobile, customers, meta });
       }
     }catch(e){
       storageAvailable = false;
@@ -2100,66 +2103,32 @@
     customersLoading = false;
     renderList();
     applyShopInfoToUI();
-
-    // Live-sync: reflect changes made from any other device automatically
-    if(customersRealtimeChannel) sb.removeChannel(customersRealtimeChannel);
-    customersRealtimeChannel = sb.channel('user_data_' + currentUserMobile)
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'user_data', filter: `mobile=eq.${currentUserMobile}` }, (payload) => {
-        customers = payload.new.customers || [];
-        if(payload.new.shop_info){ shopInfo = payload.new.shop_info; if(!shopInfo.businessMode) shopInfo.businessMode = 'both'; applyShopInfoToUI(); }
-        // Keep currentCustomer pointing at the live object so further edits
-        // (adding another entry, etc.) always mutate data that will actually be saved.
-        if(currentCustomer){
-          const fresh = customers.find(c => c.id === currentCustomer.id);
-          if(fresh) currentCustomer = fresh;
-        }
-        renderList(document.getElementById('searchInput').value);
-      })
-      .subscribe();
   }
-  async function persistShopInfo(){
+  // One shared save path — every persist* helper below just decides which
+  // fields to send; the RPC re-checks the PIN every single time before writing.
+  async function saveUserDataRpc(fields){
     if(!currentUserMobile) return;
     try{
-      const { error } = await sb.from('user_data').upsert({ mobile: currentUserMobile, shop_info: shopInfo });
+      const { error } = await sb.rpc('rpc_save_user_data', {
+        p_mobile: currentUserMobile,
+        p_pin: currentUserPin,
+        p_customers: fields.customers !== undefined ? fields.customers : null,
+        p_meta: fields.meta !== undefined ? fields.meta : null,
+        p_shop_info: fields.shop_info !== undefined ? fields.shop_info : null,
+      });
       if(error) throw error;
     }catch(e){
+      storageAvailable = false;
       showToast("সেভ করা যায়নি — ইন্টারনেট কানেকশন চেক করো", 'danger');
     }
   }
-
-  async function persistCustomers(){
-    if(!currentUserMobile) return;
-    try{
-      const { error } = await sb.from('user_data').upsert({ mobile: currentUserMobile, customers });
-      if(error) throw error;
-    }catch(e){
-      storageAvailable = false;
-      showToast("সেভ করা যায়নি — ইন্টারনেট কানেকশন চেক করো");
-    }
-  }
-
-  async function persistMeta(){
-    if(!currentUserMobile) return;
-    try{
-      const { error } = await sb.from('user_data').upsert({ mobile: currentUserMobile, meta });
-      if(error) throw error;
-    }catch(e){
-      storageAvailable = false;
-    }
-  }
+  async function persistShopInfo(){ await saveUserDataRpc({ shop_info: shopInfo }); }
+  async function persistCustomers(){ await saveUserDataRpc({ customers }); }
+  async function persistMeta(){ await saveUserDataRpc({ meta }); }
   // Saves customers + meta in a single request instead of two — used wherever
   // both change together (e.g. adding a new customer bumps nextSerial too),
   // to cut a network round trip off actions people do most often.
-  async function persistCustomersAndMeta(){
-    if(!currentUserMobile) return;
-    try{
-      const { error } = await sb.from('user_data').upsert({ mobile: currentUserMobile, customers, meta });
-      if(error) throw error;
-    }catch(e){
-      storageAvailable = false;
-      showToast("সেভ করা যায়নি — ইন্টারনেট কানেকশন চেক করো", 'danger');
-    }
-  }
+  async function persistCustomersAndMeta(){ await saveUserDataRpc({ customers, meta }); }
 
   /* ================================================================ */
   /* ================= CATEGORY: Home Screen — List Render =========== */
@@ -4063,18 +4032,35 @@
   function clearAuthAccount(){
     try{ localStorage.removeItem(AUTH_STORAGE_KEY); }catch(e){}
   }
-  // One row per mobile number in the accounts table — so accounts can never
-  // collide or overwrite each other, and each user's PIN lives in its own row.
-  async function saveAuthAccountCloud(mobile, pin){
-    try{ await sb.from('accounts').upsert({ mobile, pin }); }
-    catch(e){ /* local copy above already lets this device log in */ }
-  }
-  async function fetchCloudPin(mobile){
+  // Just checks whether a mobile number is already registered — used on the
+  // phone-entry step to decide signup vs login. Never returns the PIN itself
+  // (it's hashed server-side and never sent to the client at all now).
+  async function checkAccountExists(mobile){
     try{
-      const { data, error } = await sb.from('accounts').select('pin').eq('mobile', mobile).maybeSingle();
+      const { data, error } = await sb.rpc('rpc_account_exists', { p_mobile: mobile });
       if(error) throw error;
-      return data ? data.pin : null;
-    }catch(e){ return undefined; } // undefined = couldn't reach the server (vs null = genuinely no account)
+      return !!data;
+    }catch(e){ return undefined; } // undefined = couldn't reach the server (vs false = genuinely no account)
+  }
+  // Creates a new account or resets the PIN on an existing one — the database
+  // hashes the PIN itself; the plaintext is only ever used for this one call.
+  async function signupOrResetPin(mobile, pin){
+    try{
+      const { error } = await sb.rpc('rpc_signup', { p_mobile: mobile, p_pin: pin });
+      if(error) throw error;
+      return true;
+    }catch(e){ return false; }
+  }
+  // Re-checks a PIN against the server every time (never trusts the locally
+  // cached copy for the actual credential decision — that cache is only used
+  // to skip re-typing the PIN on a device that's already signed in).
+  async function verifyLogin(mobile, pin){
+    try{
+      const { data, error } = await sb.rpc('rpc_verify_login', { p_mobile: mobile, p_pin: pin });
+      if(error) throw error;
+      const row = Array.isArray(data) ? data[0] : data;
+      return row || { ok: false, blocked: false };
+    }catch(e){ return { ok: undefined, blocked: false }; } // ok:undefined = couldn't reach the server
   }
 
   const authScreenEl = document.getElementById('authScreen');
@@ -4133,22 +4119,12 @@
 
   // Called once a mobile number is authenticated — points the app at that
   // user's own isolated customer data and reveals the home screen.
-  async function completeAuth(mobile){
-    // Checked here (the one place every login path funnels through) so an
-    // admin-blocked account is refused whether they're logging in fresh,
-    // auto-logging in on reload, or recovering via a cloud PIN match.
-    try{
-      const { data } = await sb.from('accounts').select('blocked').eq('mobile', mobile).maybeSingle();
-      if(data && data.blocked){
-        showToast('এই একাউন্টটি সাময়িকভাবে বন্ধ রাখা হয়েছে। বিস্তারিত জানতে দোকানের সাথে যোগাযোগ করুন।', 'danger');
-        showAuthStep('phone');
-        return;
-      }
-    }catch(e){ /* if this check can't be reached, don't lock a legitimate user out */ }
+  async function completeAuth(mobile, pin){
     currentUserMobile = mobile;
+    currentUserPin = pin;
     authScreenEl.classList.add('hide');
     // Best-effort — lets the admin panel show who's actively using the app
-    sb.from('accounts').update({ last_login: new Date().toISOString() }).eq('mobile', mobile).then(()=>{}, ()=>{});
+    sb.rpc('rpc_touch_last_login', { p_mobile: mobile }).then(()=>{}, ()=>{});
     await loadCustomers();
     checkBroadcastNotice();
   }
@@ -4157,9 +4133,10 @@
   // app session, as a dismissible banner at the top of the home screen.
   async function checkBroadcastNotice(){
     try{
-      const { data } = await sb.from('app_config').select('broadcast_message, broadcast_active').eq('id', 1).maybeSingle();
-      if(data && data.broadcast_active && data.broadcast_message){
-        showToast(data.broadcast_message, 'info');
+      const { data } = await sb.rpc('rpc_get_broadcast');
+      const row = Array.isArray(data) ? data[0] : data;
+      if(row && row.broadcast_active && row.broadcast_message){
+        showToast(row.broadcast_message, 'info');
       }
     }catch(e){ /* app_config may not exist yet, or offline — skip quietly */ }
   }
@@ -4169,9 +4146,11 @@
     if(saved && saved.mobile && saved.pin){
       // A page reload (including the browser's pull-to-refresh gesture) should
       // never feel like a logout on a device that's already signed in — skip
-      // straight to the app instead of asking for the PIN again.
+      // straight to the app instead of asking for the PIN again. Every actual
+      // data call still re-verifies this PIN server-side, so a blocked/changed
+      // account is caught the moment it tries to load anything, not silently.
       authPhoneValue = saved.mobile;
-      await completeAuth(saved.mobile);
+      await completeAuth(saved.mobile, saved.pin);
     }else{
       showAuthStep('phone');
     }
@@ -4200,11 +4179,11 @@
     btn.disabled = true;
     const originalLabel = btn.textContent;
     btn.textContent = 'যাচাই করা হচ্ছে...';
-    const cloudPin = await fetchCloudPin(val);
+    const exists = await checkAccountExists(val);
     btn.disabled = false;
     btn.textContent = originalLabel;
 
-    if(cloudPin === undefined){
+    if(exists === undefined){
       hint.textContent = 'ইন্টারনেট কানেকশন সমস্যা — আবার চেষ্টা করো';
       wrap.classList.add('error');
       return;
@@ -4212,11 +4191,10 @@
 
     authPhoneValue = val;
     authFirstPin = '';
-    if(cloudPin){
+    if(exists){
       // Existing account found in the cloud — ask for the PIN, don't let
       // them create a new one.
       document.getElementById('authLoginPhoneLabel').textContent = val;
-      saveAuthAccountLocal({ mobile: val, pin: cloudPin }); // cache for next time on this device
       showAuthStep('pin-login');
     }else{
       document.getElementById('authSetupPhoneLabel').textContent = val;
@@ -4290,27 +4268,35 @@
     }else if(authCurrentStep === 'pin-confirm'){
       if(authBuffer === authFirstPin){
         const acc = { mobile: authPhoneValue, pin: authBuffer };
-        saveAuthAccountLocal(acc);          // guaranteed, works offline
-        saveAuthAccountCloud(acc.mobile, acc.pin); // best-effort online backup
-        setTimeout(()=>{ completeAuth(acc.mobile); }, 150);
+        const ok = await signupOrResetPin(acc.mobile, acc.pin);
+        if(!ok){
+          document.getElementById('authConfirmHint').textContent = 'ইন্টারনেট কানেকশন সমস্যা — আবার চেষ্টা করো';
+          shakeCurrentPinBoxes();
+          return;
+        }
+        saveAuthAccountLocal(acc); // remembered locally so this device can skip re-typing the PIN later
+        setTimeout(()=>{ completeAuth(acc.mobile, acc.pin); }, 150);
       }else{
         document.getElementById('authConfirmHint').textContent = 'PIN দুটি মিলেনি, আবার চেষ্টা করুন';
         shakeCurrentPinBoxes();
         setTimeout(()=>{ authFirstPin=''; document.getElementById('authConfirmHint').textContent=''; showAuthStep('pin-setup'); }, 500);
       }
     }else if(authCurrentStep === 'pin-login'){
-      const saved = getSavedAuthAccount();
-      if(saved && authBuffer === saved.pin){
-        setTimeout(()=>completeAuth(saved.mobile), 120);
+      const result = await verifyLogin(authPhoneValue, authBuffer);
+      if(result.ok === undefined){
+        document.getElementById('authLoginHint').textContent = 'ইন্টারনেট কানেকশন সমস্যা — আবার চেষ্টা করো';
+        shakeCurrentPinBoxes();
+        return;
+      }
+      if(result.blocked){
+        document.getElementById('authLoginHint').textContent = 'এই একাউন্টটি সাময়িকভাবে বন্ধ রাখা হয়েছে';
+        shakeCurrentPinBoxes();
+        return;
+      }
+      if(result.ok){
+        saveAuthAccountLocal({ mobile: authPhoneValue, pin: authBuffer });
+        setTimeout(()=>completeAuth(authPhoneValue, authBuffer), 120);
       }else{
-        // Local cache might be stale (e.g. PIN was reset on another device) —
-        // double-check the cloud before declaring the PIN wrong.
-        const cloudPin = await fetchCloudPin(authPhoneValue);
-        if(cloudPin && authBuffer === cloudPin){
-          saveAuthAccountLocal({ mobile: authPhoneValue, pin: cloudPin });
-          setTimeout(()=>completeAuth(authPhoneValue), 120);
-          return;
-        }
         document.getElementById('authLoginHint').textContent = 'ভুল PIN, আবার চেষ্টা করুন';
         shakeCurrentPinBoxes();
         setTimeout(()=>{ authBuffer=''; renderPinBoxes('pin-login'); document.getElementById('authLoginHint').textContent=''; }, 450);
