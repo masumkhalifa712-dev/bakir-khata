@@ -193,8 +193,14 @@
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRhbXpyZW9rcG52cXB4dmticGl3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYwMjU4MTAsImV4cCI6MjEwMTYwMTgxMH0.-ddoBc5pVVLUcrBfxb5RUeSU_wCuQQsLzhfpwDsBsHQ";
   const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  // Step 1 password gate. Change any time — just edit this one line.
+  // Step 1 password gate. Change any time — just edit this one line AND update
+  // the matching hash in Supabase (see the SQL migration notes).
   const ADMIN_PASSWORD = "Khata@Admin2026";
+  // Kept in memory only, sent with every privileged RPC call so the database
+  // can re-verify it server-side before touching any table — this is what
+  // lets accounts/user_data stay locked down (RLS, no direct anon access)
+  // while the admin panel still works.
+  let adminSecret = null;
 
   const bn = n => Number(n||0).toLocaleString('bn-BD');
   const fmtDate = (iso) => iso ? new Date(iso).toLocaleDateString('bn-BD', { year:'numeric', month:'short', day:'numeric' }) : '—';
@@ -205,14 +211,18 @@
   function tryLogin(){
     const val = document.getElementById('adminPasswordInput').value;
     if(val === ADMIN_PASSWORD){
+      adminSecret = val;
       sessionStorage.setItem('adminAuthed', '1');
+      sessionStorage.setItem('adminSecret', val);
       showDashboard();
     }else{
       document.getElementById('adminLoginError').classList.add('show');
     }
   }
   document.getElementById('adminLogoutBtn').addEventListener('click', ()=>{
+    adminSecret = null;
     sessionStorage.removeItem('adminAuthed');
+    sessionStorage.removeItem('adminSecret');
     document.getElementById('dash').classList.remove('show');
     document.getElementById('loginWrap').style.display = 'flex';
     document.getElementById('adminPasswordInput').value = '';
@@ -224,7 +234,10 @@
     loadUsers();
     loadAppConfig();
   }
-  if(sessionStorage.getItem('adminAuthed') === '1') showDashboard();
+  if(sessionStorage.getItem('adminAuthed') === '1'){
+    adminSecret = sessionStorage.getItem('adminSecret');
+    showDashboard();
+  }
 
   /* ================= Users ================= */
   let allUsers = [];
@@ -232,27 +245,19 @@
   async function loadUsers(){
     const tbody = document.getElementById('usersTableBody');
     try{
-      const { data: accounts, error: accErr } = await sb.from('accounts')
-        .select('mobile, created_at, blocked, plan, plan_expiry, last_login')
-        .order('created_at', { ascending: false });
-      if(accErr) throw accErr;
-      const { data: userDataRows, error: udErr } = await sb.from('user_data').select('mobile, customers, shop_info');
-      if(udErr) throw udErr;
+      const { data, error } = await sb.rpc('rpc_admin_list_users', { p_secret: adminSecret });
+      if(error) throw error;
 
-      const dataByMobile = {};
-      (userDataRows || []).forEach(row => { dataByMobile[row.mobile] = row; });
-
-      allUsers = (accounts || []).map(acc => {
-        const row = dataByMobile[acc.mobile] || {};
+      allUsers = (data || []).map(row => {
         const customers = row.customers || [];
         const shopInfo = row.shop_info || {};
         return {
-          mobile: acc.mobile,
-          created_at: acc.created_at,
-          last_login: acc.last_login,
-          blocked: !!acc.blocked,
-          plan: acc.plan || 'free',
-          plan_expiry: acc.plan_expiry,
+          mobile: row.mobile,
+          created_at: row.created_at,
+          last_login: row.last_login,
+          blocked: !!row.blocked,
+          plan: row.plan || 'free',
+          plan_expiry: row.plan_expiry,
           customerCount: customers.length,
           dueSum: customers.reduce((s,c)=> s + (c.amount || 0), 0),
           businessMode: shopInfo.businessMode || 'both',
@@ -350,7 +355,7 @@
           : `${mobile} নাম্বারের একাউন্টটি আবার চালু করতে চান?`;
         if(!confirm(msg)) return;
         btn.disabled = true;
-        const { error } = await sb.from('accounts').update({ blocked: newBlocked }).eq('mobile', mobile);
+        const { error } = await sb.rpc('rpc_admin_toggle_block', { p_secret: adminSecret, p_mobile: mobile, p_blocked: newBlocked });
         if(error){ alert('আপডেট করা যায়নি: ' + error.message); btn.disabled = false; return; }
         user.blocked = newBlocked;
         renderStats(); applyFiltersAndRender();
@@ -360,9 +365,8 @@
         const msg = `${mobile} নাম্বারের একাউন্ট এবং তার সব কাস্টমার/লেনদেনের তথ্য পুরোপুরি মুছে ফেলতে চান? এই কাজটি ফেরানো যাবে না।`;
         if(!confirm(msg)) return;
         btn.disabled = true;
-        const { error: e1 } = await sb.from('user_data').delete().eq('mobile', mobile);
-        const { error: e2 } = await sb.from('accounts').delete().eq('mobile', mobile);
-        if(e1 || e2){ alert('ডিলিট করা যায়নি: ' + ((e1&&e1.message)||(e2&&e2.message))); btn.disabled = false; return; }
+        const { error } = await sb.rpc('rpc_admin_delete_user', { p_secret: adminSecret, p_mobile: mobile });
+        if(error){ alert('ডিলিট করা যায়নি: ' + error.message); btn.disabled = false; return; }
         allUsers = allUsers.filter(u=>u.mobile!==mobile);
         renderStats(); applyFiltersAndRender();
       }
@@ -373,16 +377,11 @@
         const n = parseInt(days, 10);
         if(isNaN(n)) { alert('সঠিক সংখ্যা দিন'); return; }
         btn.disabled = true;
-        if(n === 0){
-          const { error } = await sb.from('accounts').update({ plan: 'free', plan_expiry: null }).eq('mobile', mobile);
-          if(error){ alert('আপডেট করা যায়নি: ' + error.message); btn.disabled = false; return; }
-          user.plan = 'free'; user.plan_expiry = null;
-        }else{
-          const expiry = new Date(Date.now() + n*24*60*60*1000).toISOString();
-          const { error } = await sb.from('accounts').update({ plan: 'paid', plan_expiry: expiry }).eq('mobile', mobile);
-          if(error){ alert('আপডেট করা যায়নি: ' + error.message); btn.disabled = false; return; }
-          user.plan = 'paid'; user.plan_expiry = expiry;
-        }
+        const plan = n === 0 ? 'free' : 'paid';
+        const expiry = n === 0 ? null : new Date(Date.now() + n*24*60*60*1000).toISOString();
+        const { error } = await sb.rpc('rpc_admin_set_plan', { p_secret: adminSecret, p_mobile: mobile, p_plan: plan, p_expiry: expiry });
+        if(error){ alert('আপডেট করা যায়নি: ' + error.message); btn.disabled = false; return; }
+        user.plan = plan; user.plan_expiry = expiry;
         renderStats(); applyFiltersAndRender();
         return;
       }
@@ -447,21 +446,22 @@
 
   async function loadAppConfig(){
     try{
-      const { data, error } = await sb.from('app_config').select('*').eq('id', 1).maybeSingle();
+      const { data, error } = await sb.rpc('rpc_admin_get_config', { p_secret: adminSecret });
       if(error) throw error;
-      if(data){
-        document.getElementById('broadcastText').value = data.broadcast_message || '';
-        document.getElementById('broadcastActive').checked = !!data.broadcast_active;
-        changelogEntries = data.changelog || [];
+      const row = Array.isArray(data) ? data[0] : data;
+      if(row){
+        document.getElementById('broadcastText').value = row.broadcast_message || '';
+        document.getElementById('broadcastActive').checked = !!row.broadcast_active;
+        changelogEntries = row.changelog || [];
         renderChangelog();
       }
-    }catch(e){ /* app_config table may not exist yet — ignore quietly */ }
+    }catch(e){ /* app_config may not exist yet — ignore quietly */ }
   }
 
   document.getElementById('saveBroadcastBtn').addEventListener('click', async ()=>{
     const message = document.getElementById('broadcastText').value.trim();
     const active = document.getElementById('broadcastActive').checked;
-    const { error } = await sb.from('app_config').upsert({ id: 1, broadcast_message: message, broadcast_active: active });
+    const { error } = await sb.rpc('rpc_admin_save_config', { p_secret: adminSecret, p_broadcast_message: message, p_broadcast_active: active, p_changelog: null });
     if(error){ alert('সংরক্ষণ করা যায়নি: ' + error.message); return; }
     alert('ঘোষণা সংরক্ষণ হয়েছে');
   });
@@ -479,7 +479,7 @@
     const text = input.value.trim();
     if(!text) return;
     changelogEntries.push({ text, date: new Date().toISOString() });
-    const { error } = await sb.from('app_config').upsert({ id: 1, changelog: changelogEntries });
+    const { error } = await sb.rpc('rpc_admin_save_config', { p_secret: adminSecret, p_broadcast_message: null, p_broadcast_active: null, p_changelog: changelogEntries });
     if(error){ alert('সংরক্ষণ করা যায়নি: ' + error.message); changelogEntries.pop(); return; }
     input.value = '';
     renderChangelog();
