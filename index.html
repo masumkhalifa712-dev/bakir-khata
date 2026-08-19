@@ -768,6 +768,19 @@
         <button class="auth-primary-btn" id="authPhoneNextBtn">পরবর্তী</button>
       </div>
 
+      <!-- Step: verify mobile via OTP before letting them set a PIN (signup only) -->
+      <div class="auth-step" data-step="otp-signup">
+        <div class="auth-account-row">
+          <span>একাউন্ট নম্বর <b id="authOtpPhoneLabel"></b></span>
+        </div>
+        <div class="auth-pin-title">মোবাইলে পাঠানো ৪ সংখ্যার কোডটি দিন</div>
+        <div class="auth-pin-boxes" id="authPinBoxesOtpSignup">
+          <div class="pin-box"></div><div class="pin-box"></div><div class="pin-box"></div><div class="pin-box"></div>
+        </div>
+        <div class="auth-hint" id="authOtpHint"></div>
+        <button class="auth-forgot-btn" id="authOtpResendBtn" style="margin-top:14px;">OTP আবার পাঠান</button>
+      </div>
+
       <!-- Step: set new PIN (registration) -->
       <div class="auth-step" data-step="pin-setup">
         <div class="auth-account-row">
@@ -4139,8 +4152,10 @@
   let authPhoneValue = '';
   let authFirstPin = '';
   let authBuffer = '';
+  let authIsFreshSignup = false; // only true right after a brand-new number completes OTP — controls whether a device token gets registered
 
   const PIN_BOX_MAP = {
+    'otp-signup': 'authPinBoxesOtpSignup',
     'pin-setup': 'authPinBoxesSetup',
     'pin-confirm': 'authPinBoxesConfirm',
     'pin-login': 'authPinBoxesLogin'
@@ -4150,7 +4165,7 @@
     authCurrentStep = step;
     authBuffer = '';
     authSteps.forEach(s => s.classList.toggle('active', s.dataset.step === step));
-    const isPinStep = step === 'pin-setup' || step === 'pin-confirm' || step === 'pin-login';
+    const isPinStep = step === 'otp-signup' || step === 'pin-setup' || step === 'pin-confirm' || step === 'pin-login';
     authKeypadEl.classList.toggle('show', isPinStep);
     if(isPinStep) renderPinBoxes(step);
     if(step === 'phone'){
@@ -4183,6 +4198,69 @@
     wrap.classList.remove('shake');
     void wrap.offsetWidth;
     wrap.classList.add('shake');
+  }
+
+  // ---- OTP: send-otp / verify-otp Edge Functions ----
+  async function sendOtp(mobile, purpose){
+    try{
+      const { data, error } = await sb.functions.invoke('send-otp', { body: { mobile, purpose } });
+      if(error) throw error;
+      if(data && data.error) return { ok:false, error: data.error };
+      return { ok:true };
+    }catch(e){ return { ok:false, error:'network' }; }
+  }
+  async function verifyOtp(mobile, purpose, otp){
+    try{
+      const { data, error } = await sb.functions.invoke('verify-otp', { body: { mobile, purpose, otp } });
+      if(error) throw error;
+      return data || { success:false, reason:'network' };
+    }catch(e){ return { success:false, reason:'network' }; }
+  }
+  let otpResendTimer = null;
+  function startOtpResendCooldown(){
+    const btn = document.getElementById('authOtpResendBtn');
+    let remaining = 60;
+    btn.disabled = true;
+    btn.textContent = `OTP আবার পাঠান (${remaining})`;
+    clearInterval(otpResendTimer);
+    otpResendTimer = setInterval(()=>{
+      remaining--;
+      if(remaining <= 0){
+        clearInterval(otpResendTimer);
+        btn.disabled = false;
+        btn.textContent = 'OTP আবার পাঠান';
+      }else{
+        btn.textContent = `OTP আবার পাঠান (${remaining})`;
+      }
+    }, 1000);
+  }
+  document.getElementById('authOtpResendBtn').addEventListener('click', async ()=>{
+    const btn = document.getElementById('authOtpResendBtn');
+    btn.disabled = true;
+    const result = await sendOtp(authPhoneValue, 'signup');
+    if(!result.ok){
+      document.getElementById('authOtpHint').textContent = 'পাঠানো যায়নি, একটু পর আবার চেষ্টা করো';
+      btn.disabled = false;
+      return;
+    }
+    document.getElementById('authOtpHint').textContent = 'নতুন কোড পাঠানো হয়েছে';
+    authBuffer = '';
+    renderPinBoxes('otp-signup');
+    startOtpResendCooldown();
+  });
+
+  // ---- Device token (registered once, right after a fresh signup) ----
+  function generateDeviceToken(){
+    if(window.crypto && crypto.randomUUID) return crypto.randomUUID().replace(/-/g, '');
+    return Array.from({length:32}, ()=> Math.floor(Math.random()*16).toString(16)).join('');
+  }
+  async function registerDeviceToken(mobile){
+    const token = generateDeviceToken();
+    try{
+      const { error } = await sb.rpc('rpc_register_device', { p_mobile: mobile, p_device_token: token });
+      if(error) throw error;
+      localStorage.setItem('device_token', token);
+    }catch(e){ /* best-effort — signup itself already succeeded either way */ }
   }
 
   // Called once a mobile number is authenticated — points the app at that
@@ -4265,9 +4343,23 @@
       document.getElementById('authLoginPhoneLabel').textContent = val;
       showAuthStep('pin-login');
     }else{
-      document.getElementById('authSetupPhoneLabel').textContent = val;
-      document.getElementById('authConfirmPhoneLabel').textContent = val;
-      showAuthStep('pin-setup');
+      // New number — verify it's really theirs via OTP before letting them
+      // set a PIN and create an account.
+      btn.disabled = true;
+      btn.textContent = 'কোড পাঠানো হচ্ছে...';
+      const sendResult = await sendOtp(val, 'signup');
+      btn.disabled = false;
+      btn.textContent = originalLabel;
+      if(!sendResult.ok){
+        hint.textContent = sendResult.error === 'network' ? 'ইন্টারনেট কানেকশন সমস্যা — আবার চেষ্টা করো' : 'কোড পাঠানো যায়নি, আবার চেষ্টা করো';
+        wrap.classList.add('error');
+        return;
+      }
+      authIsFreshSignup = true;
+      document.getElementById('authOtpPhoneLabel').textContent = val;
+      document.getElementById('authOtpHint').textContent = '';
+      showAuthStep('otp-signup');
+      startOtpResendCooldown();
     }
   });
   document.getElementById('authPhoneInput').addEventListener('keydown', (e)=>{
@@ -4320,6 +4412,7 @@
     wrap.classList.remove('error');
     authPhoneValue = val;
     authFirstPin = '';
+    authIsFreshSignup = false;
     document.getElementById('authSetupPhoneLabel').textContent = val;
     document.getElementById('authConfirmPhoneLabel').textContent = val;
     showAuthStep('pin-setup');
@@ -4330,7 +4423,24 @@
 
   // ---- Keypad-driven PIN completion ----
   async function handlePinComplete(){
-    if(authCurrentStep === 'pin-setup'){
+    if(authCurrentStep === 'otp-signup'){
+      const result = await verifyOtp(authPhoneValue, 'signup', authBuffer);
+      if(result.success){
+        document.getElementById('authSetupPhoneLabel').textContent = authPhoneValue;
+        document.getElementById('authConfirmPhoneLabel').textContent = authPhoneValue;
+        showAuthStep('pin-setup');
+      }else{
+        if(result.reason === 'too_many_attempts'){
+          document.getElementById('authOtpHint').textContent = 'অনেকবার ভুল হয়েছে — "OTP আবার পাঠান" চাপো';
+        }else if(result.reason === 'expired_or_not_found'){
+          document.getElementById('authOtpHint').textContent = 'কোডের মেয়াদ শেষ — "OTP আবার পাঠান" চাপো';
+        }else{
+          document.getElementById('authOtpHint').textContent = 'ভুল কোড, আবার চেষ্টা করুন';
+        }
+        shakeCurrentPinBoxes();
+        setTimeout(()=>{ authBuffer=''; renderPinBoxes('otp-signup'); }, 450);
+      }
+    }else if(authCurrentStep === 'pin-setup'){
       authFirstPin = authBuffer;
       setTimeout(()=>showAuthStep('pin-confirm'), 150);
     }else if(authCurrentStep === 'pin-confirm'){
@@ -4343,6 +4453,10 @@
           return;
         }
         saveAuthAccountLocal(acc); // remembered locally so this device can skip re-typing the PIN later
+        if(authIsFreshSignup){
+          await registerDeviceToken(acc.mobile); // only for brand-new accounts — not PIN resets
+          authIsFreshSignup = false;
+        }
         setTimeout(()=>{ completeAuth(acc.mobile, acc.pin); }, 150);
       }else{
         document.getElementById('authConfirmHint').textContent = 'PIN দুটি মিলেনি, আবার চেষ্টা করুন';
