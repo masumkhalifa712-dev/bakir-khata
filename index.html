@@ -2134,6 +2134,20 @@
   /* ================= CATEGORY: Home Screen — List Render =========== */
   /* ================================================================ */
   const bn = n => Number(n||0).toLocaleString('bn-BD');
+  // Every place a user-typed value (customer name, note, product name, shop
+  // info, etc.) gets inserted into an innerHTML template goes through this —
+  // turns <, >, &, ", ' into their HTML entities so a name like "<img
+  // src=x onerror=...>" renders as plain text instead of running as markup.
+  // Bengali text, emoji, and normal spacing all pass through unchanged.
+  function escapeHtml(str){
+    if(str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
   // Numeric date + 24-hour time for every transaction timestamp, e.g. "7/8/2026 | 16:40"
   function nowDateTimeStrings(){
     const now = new Date();
@@ -2283,10 +2297,10 @@
       const displayAmount = homeListMode === 'payable' ? (c.generalIOwe||0) : c.amount;
       const amountClass = homeListMode === 'payable' ? 'clear' : (c.amount>0 ? 'due':'clear');
       row.innerHTML = `
-        <div class="avatar" style="background:${c.color}">${c.initial}</div>
+        <div class="avatar" style="background:${c.color}">${escapeHtml(c.initial)}</div>
         <div class="customer-info">
           <div class="customer-name-row">
-            <span class="customer-name">${c.name}</span>
+            <span class="customer-name">${escapeHtml(c.name)}</span>
             ${c.id ? `<span class="customer-id">· ${c.id}</span>` : ``}
           </div>
           <div class="customer-time">${c.mobile || ''}</div>
@@ -2351,8 +2365,8 @@
     card.innerHTML = `
       <div class="toast-icon-wrap">${TOAST_ICONS[type]}</div>
       <div class="toast-body">
-        <div class="toast-title">${title}</div>
-        <div class="toast-message">${message}</div>
+        <div class="toast-title">${escapeHtml(title)}</div>
+        <div class="toast-message">${escapeHtml(message)}</div>
       </div>
       <button class="toast-close" aria-label="বন্ধ করুন">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -2612,10 +2626,10 @@
       totalPurchase += e.purchasePrice;
       totalSale += e.saleAmount;
       const entryBalance = e.saleAmount - e.purchasePrice;
-      const custLabel = `${e.customer.name}${e.customer.id ? ' · '+e.customer.id : ''}`;
+      const custLabel = `${escapeHtml(e.customer.name)}${e.customer.id ? ' · '+e.customer.id : ''}`;
       return `
         <button class="cd-tx-row" data-idx="${currentPurchaseEntries.indexOf(e)}" style="grid-template-columns:1.4fr 0.85fr 0.85fr 0.9fr; width:100%; border:none; text-align:left; cursor:pointer; font-family:inherit;">
-          <div><div class="cd-tx-date">${e.date}</div><div class="cd-tx-note">${e.productName}<br>${custLabel}${e.customer.mobile ? '<br>'+e.customer.mobile : ''}</div></div>
+          <div><div class="cd-tx-date">${e.date}</div><div class="cd-tx-note">${escapeHtml(e.productName)}<br>${custLabel}${e.customer.mobile ? '<br>'+e.customer.mobile : ''}</div></div>
           <div style="text-align:center; font-weight:700;">${bn(e.purchasePrice)} টাকা</div>
           <div style="text-align:center; font-weight:700;">${bn(e.saleAmount)} টাকা</div>
           <div style="text-align:center; font-weight:700; color:${entryBalance<0 ? 'var(--clr-owe-to-me)' : 'var(--clr-i-owe)'};">${bn(Math.abs(entryBalance))} টাকা</div>
@@ -2649,7 +2663,7 @@
     if(!e) return;
     document.getElementById('delModalCustomerName').textContent = `${e.customer.name}${e.customer.id ? ' · '+e.customer.id : ''}`;
     document.getElementById('delModalTxList').innerHTML = `
-      <div class="del-modal-tx-row"><span class="del-modal-tx-date">পণ্যের নাম</span><span class="del-modal-tx-amt">${e.productName}</span></div>
+      <div class="del-modal-tx-row"><span class="del-modal-tx-date">পণ্যের নাম</span><span class="del-modal-tx-amt">${escapeHtml(e.productName)}</span></div>
       <div class="del-modal-tx-row"><span class="del-modal-tx-date">মোবাইল</span><span class="del-modal-tx-amt">${e.customer.mobile || '—'}</span></div>
       <div class="del-modal-tx-row"><span class="del-modal-tx-date">${e.date} | ${e.time}</span><span class="del-modal-tx-amt"></span></div>
       <div class="del-modal-tx-row"><span class="del-modal-tx-date">ক্রয় মূল্য</span><span class="del-modal-tx-amt">${bn(e.purchasePrice)} টাকা</span></div>
@@ -2799,7 +2813,7 @@
           bodyRows += `<tr style="height:36px;background:${bg};">
             <td style="width:5%;text-align:center;font-weight:bold;border:1px solid #cbd5e0;">${p*ROWS_PER_PAGE+i+1}</td>
             <td style="width:35%;text-align:left;padding-left:8px;border:1px solid #cbd5e0;">
-              <div style="font-weight:bold;font-size:9pt;">${r.name}${r.id ? ' · '+r.id : ''}</div>
+              <div style="font-weight:bold;font-size:9pt;">${escapeHtml(r.name)}${r.id ? ' · '+r.id : ''}</div>
               <div style="font-size:8.5pt;color:#333;">${r.mobile}</div>
             </td>
             <td style="width:17%;text-align:center;border:1px solid #cbd5e0;">${r.dateInfo}</td>
@@ -2817,7 +2831,7 @@
       }
       pagesHTML += `
         <div class="page">
-          <div style="font-size:18pt;font-weight:bold;color:#1a365d;">${shopName}</div>
+          <div style="font-size:18pt;font-weight:bold;color:#1a365d;">${escapeHtml(shopName)}</div>
           <div style="font-size:13pt;font-weight:bold;color:#2b6cb0;margin-top:2px;">${typeLabel}</div>
           <div style="font-size:10pt;font-weight:bold;color:#1a202c;margin-top:6px;">তারিখ: ${formatDMYDash(new Date(dateFrom+"T00:00:00"))} থেকে ${formatDMYDash(new Date(dateTo+"T00:00:00"))} <span style="font-weight:normal;font-size:8.5pt;">(পৃষ্ঠা ${p+1}/${pageCount})</span></div>
           <table style="width:100%;border-collapse:collapse;margin-top:10px;">
@@ -2995,7 +3009,7 @@
       if(match){
         duplicateBanner.classList.add('show');
         mobileFieldWrap.classList.add('error');
-        duplicateBannerText.innerHTML = `এই নম্বরে ইতিমধ্যে একজন গ্রাহক আছে — <b>${match.name}</b>`;
+        duplicateBannerText.innerHTML = `এই নম্বরে ইতিমধ্যে একজন গ্রাহক আছে — <b>${escapeHtml(match.name)}</b>`;
         mobileHint.textContent = "";
         return;
       }
@@ -3144,7 +3158,7 @@
   // বাকি breakdown (including the দেব swap when there's an overpayment credit).
   function renderProfileCardHeader(prefix, customer){
     const nameEl = document.getElementById(prefix+'Name');
-    if(nameEl) nameEl.innerHTML = `${customer.name} ${customer.id ? `<span>· ${customer.id}</span>` : ''}`;
+    if(nameEl) nameEl.innerHTML = `${escapeHtml(customer.name)} ${customer.id ? `<span>· ${customer.id}</span>` : ''}`;
     const phoneEl = document.getElementById(prefix+'PhoneNumber');
     if(phoneEl) phoneEl.textContent = customer.mobile || 'মোবাইল নম্বর নেই';
     const totalEl = document.getElementById(prefix+'TotalAmount');
@@ -3240,7 +3254,7 @@
       row.innerHTML = `
         <div>
           <div class="cd-tx-date">${tx.date} | ${tx.time}</div>
-          ${tx.note ? `<div class="cd-tx-note">নোট: ${tx.note}</div>` : ``}
+          ${tx.note ? `<div class="cd-tx-note">নোট: ${escapeHtml(tx.note)}</div>` : ``}
           ${tx.dueDate ? `<div class="cd-tx-note">পেমেন্ট ডেট-${formatDMY(tx.dueDate)}</div>` : ``}
         </div>
         <div class="cd-tx-amt ${tx.take ? 'take' : 'empty'}">${tx.take ? bn(tx.take)+' টাকা' : ''}</div>
@@ -3831,7 +3845,7 @@
 
     currentCiReceipts = getCustomerReceipts(currentCustomer);
     const select = document.getElementById('ciReceiptSelect');
-    select.innerHTML = currentCiReceipts.map((r,i) => `<option value="${i}">${r.receiptNumber}${r.productName ? ' — '+r.productName : ''}</option>`).join('');
+    select.innerHTML = currentCiReceipts.map((r,i) => `<option value="${i}">${r.receiptNumber}${r.productName ? ' — '+escapeHtml(r.productName) : ''}</option>`).join('');
     select.value = 0; // earliest-taken product first, selected by default
     updateCiReceiptFields();
 
