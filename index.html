@@ -1976,6 +1976,9 @@
 
   const CLOUDINARY_CLOUD_NAME = "cazy5ymb";
   const CLOUDINARY_UPLOAD_PRESET = "bakir-khata";
+  // ========================================
+  // ছবি কম্প্রেশন ও Cloudinary আপলোড
+  // ========================================
   // Phone camera photos are often several MB — uploading that raw over mobile
   // data is what was causing the long freeze. Downscale + re-compress to a
   // small JPEG first so the upload finishes in a second or two instead.
@@ -2071,6 +2074,9 @@
   const DEFAULT_CUSTOMERS = [];
 
   let shopInfo = { name: '', ownerName: '', shopType: '', address: '', businessMode: 'both' };
+  // ========================================
+  // Supabase/RPC ডেটা লোড ও সেভ
+  // ========================================
   function applyShopInfoToUI(){
     document.getElementById('shopName').textContent = shopInfo.name || 'দোকানের নাম';
     document.getElementById('menuDrawerShopName').textContent = shopInfo.name || 'দোকানের নাম';
@@ -2134,6 +2140,9 @@
   /* ================= CATEGORY: Home Screen — List Render =========== */
   /* ================================================================ */
   const bn = n => Number(n||0).toLocaleString('bn-BD');
+  // ========================================
+  // সাধারণ হেল্পার ফাংশন (এস্কেপিং, তারিখ-সময়)
+  // ========================================
   // Every place a user-typed value (customer name, note, product name, shop
   // info, etc.) gets inserted into an innerHTML template goes through this —
   // turns <, >, &, ", ' into their HTML entities so a name like "<img
