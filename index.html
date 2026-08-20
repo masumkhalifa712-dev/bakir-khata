@@ -499,8 +499,8 @@
   .cd-topbar-icons button{background:none; border:none; cursor:pointer; color:#241a00; display:flex; padding:2px;}
   .cd-topbar-icons svg{width:21px;height:21px;}
 
-  .cd-profile-card{ margin:14px 16px 0; background:linear-gradient(160deg, #FDF1D6, #FBE7BA); border-radius:var(--radius-lg); overflow:hidden; display:flex; flex-direction:column; }
-  .cd-profile-top{ display:flex; gap:12px; align-items:center; padding:16px; }
+  .cd-profile-card{ margin:14px 16px 20px; background:#FBF8F0; border-radius:var(--radius-lg); overflow:visible; display:flex; flex-direction:column; box-shadow:0 1px 4px rgba(0,0,0,.06); }
+  .cd-profile-top{ display:flex; gap:12px; align-items:flex-start; padding:16px 16px 20px; }
   .cd-avatar{ width:58px;height:58px; border-radius:14px; flex-shrink:0; overflow:hidden; background:#D9D2BC; display:flex;align-items:center;justify-content:center; font-weight:700; font-size:18px; color:#6B5B2A; }
   .cd-avatar img{width:100%;height:100%;object-fit:cover;}
   .cd-profile-main{flex:1; min-width:0;}
@@ -514,17 +514,17 @@
   .cd-avatar-photo-btn svg{ width:26px; height:26px; }
   .cd-avatar-photo-btn.muted{ color:#C9C8C4; }
 
-  /* Reference-design profile card: real photo thumbnail (or a coloured
-     initial-letter square when no photo is on file) shown directly — no more
-     tap-to-reveal — plus a full-width dark সর্বমোট বাকি banner along the
-     bottom of the card. Shared by all 5 screens via renderProfileCardHeader. */
-  .cd-profile-photo-wrap{ width:64px; height:64px; border-radius:14px; overflow:hidden; flex-shrink:0; border:2px solid rgba(255,255,255,.7); box-shadow:0 1px 5px rgba(0,0,0,.12); cursor:pointer; background:#D9D2BC; padding:0; display:block; }
+  /* Reference-design profile card: bigger top-aligned photo with a light
+     frame, name/ID beside it, a bordered pill for phone+call+whatsapp below,
+     দেনার বিবরণ stats on the right, and a floating rounded সর্বমোট বাকি
+     banner beneath the card. Shared by all 5 screens via renderProfileCardHeader. */
+  .cd-profile-photo-wrap{ width:84px; height:84px; border-radius:12px; overflow:hidden; flex-shrink:0; border:3px solid #fff; box-shadow:0 0 0 1.5px #E3D9BE, 0 2px 6px rgba(0,0,0,.1); cursor:pointer; background:#D9D2BC; padding:0; display:block; margin-top:2px; }
   .cd-profile-photo-wrap img{ width:100%; height:100%; object-fit:cover; display:block; }
-  .cd-profile-photo-fallback{ width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:22px; color:#fff; }
-  .cd-profile-side-title{ font-size:11px; font-weight:700; color:var(--clr-ink-soft); margin-bottom:8px; }
-  .cd-profile-total-banner{ background:linear-gradient(160deg, #1B2E4A, #0F1B2E); color:#fff; padding:13px 18px; display:flex; align-items:center; justify-content:space-between; }
-  .cd-profile-total-banner .label{ font-size:13px; font-weight:600; opacity:.85; }
-  .cd-profile-total-banner .amount{ font-family:var(--font-display); font-size:18px; font-weight:700; }
+  .cd-profile-photo-fallback{ width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:28px; color:#fff; }
+  .cd-profile-side-title{ font-size:12px; font-weight:700; color:#1B2E4A; margin-bottom:10px; }
+  .cd-profile-total-banner{ position:relative; z-index:1; margin:-14px 16px 0; background:linear-gradient(160deg, #1B2E4A, #0F1B2E); color:#fff; padding:13px 20px; border-radius:999px; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 4px 14px rgba(15,27,46,.35); }
+  .cd-profile-total-banner .label{ font-size:13.5px; font-weight:700; color:#fff; }
+  .cd-profile-total-banner .amount{ font-family:var(--font-display); font-size:16px; font-weight:800; color:#FF8A65; }
 
   /* ================= CATEGORY: Full-Screen Photo Viewer ================= */
   .photo-viewer-overlay{ position:fixed; inset:0; background:rgba(10,10,14,.92); z-index:700; display:none; align-items:center; justify-content:center; }
@@ -534,19 +534,19 @@
   .photo-viewer-img{ max-width:92vw; max-height:82vh; border-radius:10px; object-fit:contain; }
 
   .cd-profile-name span{font-weight:600; color:var(--clr-ink-soft); font-size:13px;}
-  .cd-profile-phone-row{ display:flex; align-items:center; gap:8px; margin-top:4px; }
-  .cd-profile-phone-row span{ font-size:12.5px; font-weight:600; color:var(--clr-ink-soft); }
+  .cd-profile-phone-row{ display:flex; align-items:center; gap:8px; margin-top:10px; background:#fff; border:1.4px solid #EDE6D2; border-radius:999px; padding:6px 8px 6px 14px; }
+  .cd-profile-phone-row span{ font-size:13px; font-weight:700; color:var(--clr-ink); flex:1; letter-spacing:.3px; }
   .cd-phone-icon-btn{ width:29px; height:29px; border-radius:50%; border:none; display:flex; align-items:center; justify-content:center; flex-shrink:0; cursor:pointer; }
   .cd-phone-icon-btn svg{ width:16px; height:16px; }
-  .cd-phone-icon-btn.call{ background:#fff; color:#1E8A4C; border:1.5px solid #CDEBDA; }
+  .cd-phone-icon-btn.call{ background:#F3F1EA; color:#3B3B3B; border:none; }
   .cd-phone-icon-btn.whatsapp{ background:#25D366; color:#fff; }
   .cd-profile-total-label{font-size:12.5px; color:var(--clr-ink-soft); margin-top:6px; font-weight:600;}
   .cd-profile-total-amount{font-family:var(--font-display); font-size:23px; font-weight:700; color:var(--clr-owe-to-me); margin-top:1px;}
-  .cd-profile-side{text-align:right; flex-shrink:0;}
+  .cd-profile-side{text-align:right; flex-shrink:0; padding-top:2px;}
   .cd-profile-side-row{margin-bottom:10px;}
   .cd-profile-side-row:last-child{margin-bottom:0;}
   .cd-profile-side-label{font-size:11px; color:var(--clr-ink-soft); font-weight:600;}
-  .cd-profile-side-amount{font-size:14.5px; font-weight:700; color:var(--clr-ink); margin-top:2px;}
+  .cd-profile-side-amount{font-size:15px; font-weight:800; color:#1B2E4A; margin-top:2px;}
 
   .cd-profile-card.no-avatar .cd-profile-name{ font-size:19px; }
   .cd-profile-card.no-avatar .cd-profile-phone-row span{ font-size:16px; }
