@@ -499,12 +499,13 @@
   .cd-topbar-icons button{background:none; border:none; cursor:pointer; color:#241a00; display:flex; padding:2px;}
   .cd-topbar-icons svg{width:21px;height:21px;}
 
-  .cd-profile-card{ margin:14px 16px 20px; background:#FBF8F0; border-radius:var(--radius-lg); overflow:visible; display:flex; flex-direction:column; box-shadow:0 1px 4px rgba(0,0,0,.06); }
-  .cd-profile-top{ display:flex; gap:12px; align-items:flex-start; padding:16px 16px 20px; }
+  .cd-profile-card{ margin:14px 16px 20px; background:linear-gradient(160deg, #FFEFD9, #FFE1BC); border-radius:var(--radius-lg); overflow:visible; display:flex; flex-direction:column; box-shadow:0 1px 4px rgba(0,0,0,.06); }
+  .cd-profile-top{ display:flex; gap:12px; align-items:flex-start; padding:16px 16px 14px; }
   .cd-avatar{ width:58px;height:58px; border-radius:14px; flex-shrink:0; overflow:hidden; background:#D9D2BC; display:flex;align-items:center;justify-content:center; font-weight:700; font-size:18px; color:#6B5B2A; }
   .cd-avatar img{width:100%;height:100%;object-fit:cover;}
   .cd-profile-main{flex:1; min-width:0;}
-  .cd-profile-name{font-size:15.5px; font-weight:700; color:var(--clr-ink);}
+  .cd-profile-name{font-size:18px; font-weight:800; color:var(--clr-ink); line-height:1.25;}
+  .cd-profile-id{ font-size:12.5px; font-weight:600; color:var(--clr-ink-soft); margin-top:2px; }
   .cd-name-row{ display:flex; align-items:center; gap:8px; }
   .cd-photo-icon-btn2{ width:24px; height:24px; border:none; background:none; padding:0; cursor:pointer; color:var(--clr-primary); flex-shrink:0; display:flex; align-items:center; justify-content:center; }
   .cd-photo-icon-btn2 svg{ width:19px; height:19px; }
@@ -518,11 +519,11 @@
      frame, name/ID beside it, a bordered pill for phone+call+whatsapp below,
      দেনার বিবরণ stats on the right, and a floating rounded সর্বমোট বাকি
      banner beneath the card. Shared by all 5 screens via renderProfileCardHeader. */
-  .cd-profile-photo-wrap{ width:84px; height:84px; border-radius:12px; overflow:hidden; flex-shrink:0; border:3px solid #fff; box-shadow:0 0 0 1.5px #E3D9BE, 0 2px 6px rgba(0,0,0,.1); cursor:pointer; background:#D9D2BC; padding:0; display:block; margin-top:2px; }
+  .cd-profile-photo-wrap{ width:68px; height:86px; border-radius:10px; overflow:hidden; flex-shrink:0; border:3px solid #fff; box-shadow:0 0 0 1.5px #E3D9BE, 0 2px 6px rgba(0,0,0,.1); cursor:pointer; background:#D9D2BC; padding:0; display:block; margin:2px 0 0 -2px; }
   .cd-profile-photo-wrap img{ width:100%; height:100%; object-fit:cover; display:block; }
   .cd-profile-photo-fallback{ width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:28px; color:#fff; }
   .cd-profile-side-title{ font-size:12px; font-weight:700; color:#1B2E4A; margin-bottom:10px; }
-  .cd-profile-total-banner{ position:relative; z-index:1; margin:-14px 16px 0; background:linear-gradient(160deg, #1B2E4A, #0F1B2E); color:#fff; padding:13px 20px; border-radius:999px; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 4px 14px rgba(15,27,46,.35); }
+  .cd-profile-total-banner{ position:relative; z-index:1; width:fit-content; margin:-6px auto 0; background:linear-gradient(160deg, #1B2E4A, #0F1B2E); color:#fff; padding:13px 32px; border-radius:999px; display:flex; align-items:center; justify-content:center; gap:10px; box-shadow:0 4px 14px rgba(15,27,46,.35); }
   .cd-profile-total-banner .label{ font-size:13.5px; font-weight:700; color:#fff; }
   .cd-profile-total-banner .amount{ font-family:var(--font-display); font-size:16px; font-weight:800; color:#FF8A65; }
 
@@ -534,8 +535,8 @@
   .photo-viewer-img{ max-width:92vw; max-height:82vh; border-radius:10px; object-fit:contain; }
 
   .cd-profile-name span{font-weight:600; color:var(--clr-ink-soft); font-size:13px;}
-  .cd-profile-phone-row{ display:flex; align-items:center; gap:8px; margin-top:10px; background:#fff; border:1.4px solid #EDE6D2; border-radius:999px; padding:6px 8px 6px 14px; }
-  .cd-profile-phone-row span{ font-size:13px; font-weight:700; color:var(--clr-ink); flex:1; letter-spacing:.3px; }
+  .cd-profile-phone-row{ display:flex; align-items:center; gap:8px; margin:0 16px 18px; background:#fff; border:1.4px solid #EDE6D2; border-radius:999px; padding:8px 8px 8px 16px; }
+  .cd-profile-phone-row span{ font-size:17px; font-weight:800; color:var(--clr-ink); flex:1; letter-spacing:.3px; }
   .cd-phone-icon-btn{ width:29px; height:29px; border-radius:50%; border:none; display:flex; align-items:center; justify-content:center; flex-shrink:0; cursor:pointer; }
   .cd-phone-icon-btn svg{ width:16px; height:16px; }
   .cd-phone-icon-btn.call{ background:#F3F1EA; color:#3B3B3B; border:none; }
@@ -1286,16 +1287,8 @@
           <div class="cd-profile-photo-fallback" id="cdProfilePhotoFallback"></div>
         </button>
         <div class="cd-profile-main">
-          <div class="cd-profile-name" id="cdName">নাম <span id="cdId"></span></div>
-          <div class="cd-profile-phone-row">
-            <span id="cdPhoneNumber">মোবাইল নম্বর</span>
-            <button class="cd-phone-icon-btn call" id="cdCallBtn" aria-label="কল করুন">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.98.36 1.94.68 2.87a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.21-1.21a2 2 0 0 1 2.11-.45c.93.32 1.89.55 2.87.68A2 2 0 0 1 22 16.92z"/></svg>
-            </button>
-            <button class="cd-phone-icon-btn whatsapp" id="cdWhatsappBtn" aria-label="WhatsApp">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.36 5.07L2 22l5.06-1.33A9.94 9.94 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.6 0-3.1-.44-4.38-1.2l-.31-.18-3 .79.8-2.92-.2-.3A7.94 7.94 0 0 1 4 12c0-4.41 3.59-8 8-8s8 3.59 8 8-3.59 8-8 8zm4.4-5.6c-.24-.12-1.44-.71-1.66-.79-.22-.08-.38-.12-.55.12-.16.24-.63.79-.77.95-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.18-.71-.63-1.19-1.42-1.33-1.66-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.55-1.32-.75-1.81-.2-.48-.4-.41-.55-.42-.14-.01-.3-.01-.46-.01-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.7 2.6 4.12 3.64.58.25 1.03.4 1.38.51.58.18 1.11.16 1.53.1.47-.07 1.44-.59 1.64-1.16.2-.57.2-1.06.14-1.16-.06-.1-.22-.16-.46-.28z"/></svg>
-            </button>
-          </div>
+          <div class="cd-profile-name" id="cdName">নাম</div>
+          <div class="cd-profile-id" id="cdId"></div>
         </div>
         <div class="cd-profile-side">
           <div class="cd-profile-side-title">দেনার বিবরণ</div>
@@ -1308,6 +1301,15 @@
             <div class="cd-profile-side-amount" id="cdGeneralDue">০ টাকা</div>
           </div>
         </div>
+      </div>
+      <div class="cd-profile-phone-row">
+        <span id="cdPhoneNumber">মোবাইল নম্বর</span>
+        <button class="cd-phone-icon-btn call" id="cdCallBtn" aria-label="কল করুন">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.98.36 1.94.68 2.87a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.21-1.21a2 2 0 0 1 2.11-.45c.93.32 1.89.55 2.87.68A2 2 0 0 1 22 16.92z"/></svg>
+        </button>
+        <button class="cd-phone-icon-btn whatsapp" id="cdWhatsappBtn" aria-label="WhatsApp">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.36 5.07L2 22l5.06-1.33A9.94 9.94 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.6 0-3.1-.44-4.38-1.2l-.31-.18-3 .79.8-2.92-.2-.3A7.94 7.94 0 0 1 4 12c0-4.41 3.59-8 8-8s8 3.59 8 8-3.59 8-8 8zm4.4-5.6c-.24-.12-1.44-.71-1.66-.79-.22-.08-.38-.12-.55.12-.16.24-.63.79-.77.95-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.18-.71-.63-1.19-1.42-1.33-1.66-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.55-1.32-.75-1.81-.2-.48-.4-.41-.55-.42-.14-.01-.3-.01-.46-.01-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.7 2.6 4.12 3.64.58.25 1.03.4 1.38.51.58.18 1.11.16 1.53.1.47-.07 1.44-.59 1.64-1.16.2-.57.2-1.06.14-1.16-.06-.1-.22-.16-.46-.28z"/></svg>
+        </button>
       </div>
       <div class="cd-profile-total-banner">
         <span class="label">সর্বমোট বাকি</span>
@@ -1465,16 +1467,8 @@
           <div class="cd-profile-photo-fallback" id="ndProfilePhotoFallback"></div>
         </button>
         <div class="cd-profile-main">
-          <div class="cd-profile-name" id="ndName">নাম <span id="ndId"></span></div>
-          <div class="cd-profile-phone-row">
-            <span id="ndPhoneNumber">মোবাইল নম্বর</span>
-            <button class="cd-phone-icon-btn call" id="ndCallBtn" aria-label="কল করুন">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.98.36 1.94.68 2.87a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.21-1.21a2 2 0 0 1 2.11-.45c.93.32 1.89.55 2.87.68A2 2 0 0 1 22 16.92z"/></svg>
-            </button>
-            <button class="cd-phone-icon-btn whatsapp" id="ndWhatsappBtn" aria-label="WhatsApp">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.36 5.07L2 22l5.06-1.33A9.94 9.94 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.6 0-3.1-.44-4.38-1.2l-.31-.18-3 .79.8-2.92-.2-.3A7.94 7.94 0 0 1 4 12c0-4.41 3.59-8 8-8s8 3.59 8 8-3.59 8-8 8zm4.4-5.6c-.24-.12-1.44-.71-1.66-.79-.22-.08-.38-.12-.55.12-.16.24-.63.79-.77.95-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.18-.71-.63-1.19-1.42-1.33-1.66-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.55-1.32-.75-1.81-.2-.48-.4-.41-.55-.42-.14-.01-.3-.01-.46-.01-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.7 2.6 4.12 3.64.58.25 1.03.4 1.38.51.58.18 1.11.16 1.53.1.47-.07 1.44-.59 1.64-1.16.2-.57.2-1.06.14-1.16-.06-.1-.22-.16-.46-.28z"/></svg>
-            </button>
-          </div>
+          <div class="cd-profile-name" id="ndName">নাম</div>
+          <div class="cd-profile-id" id="ndId"></div>
         </div>
         <div class="cd-profile-side">
           <div class="cd-profile-side-title">দেনার বিবরণ</div>
@@ -1487,6 +1481,15 @@
             <div class="cd-profile-side-amount" id="ndGeneralDue">০ টাকা</div>
           </div>
         </div>
+      </div>
+      <div class="cd-profile-phone-row">
+        <span id="ndPhoneNumber">মোবাইল নম্বর</span>
+        <button class="cd-phone-icon-btn call" id="ndCallBtn" aria-label="কল করুন">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.98.36 1.94.68 2.87a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.21-1.21a2 2 0 0 1 2.11-.45c.93.32 1.89.55 2.87.68A2 2 0 0 1 22 16.92z"/></svg>
+        </button>
+        <button class="cd-phone-icon-btn whatsapp" id="ndWhatsappBtn" aria-label="WhatsApp">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.36 5.07L2 22l5.06-1.33A9.94 9.94 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.6 0-3.1-.44-4.38-1.2l-.31-.18-3 .79.8-2.92-.2-.3A7.94 7.94 0 0 1 4 12c0-4.41 3.59-8 8-8s8 3.59 8 8-3.59 8-8 8zm4.4-5.6c-.24-.12-1.44-.71-1.66-.79-.22-.08-.38-.12-.55.12-.16.24-.63.79-.77.95-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.18-.71-.63-1.19-1.42-1.33-1.66-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.55-1.32-.75-1.81-.2-.48-.4-.41-.55-.42-.14-.01-.3-.01-.46-.01-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.7 2.6 4.12 3.64.58.25 1.03.4 1.38.51.58.18 1.11.16 1.53.1.47-.07 1.44-.59 1.64-1.16.2-.57.2-1.06.14-1.16-.06-.1-.22-.16-.46-.28z"/></svg>
+        </button>
       </div>
       <div class="cd-profile-total-banner">
         <span class="label">সর্বমোট বাকি</span>
@@ -1560,16 +1563,8 @@
           <div class="cd-profile-photo-fallback" id="txdProfilePhotoFallback"></div>
         </button>
         <div class="cd-profile-main">
-          <div class="cd-profile-name" id="txdName">নাম <span id="txdId"></span></div>
-          <div class="cd-profile-phone-row">
-            <span id="txdPhoneNumber">মোবাইল নম্বর</span>
-            <button class="cd-phone-icon-btn call" id="txdCallBtn" aria-label="কল করুন">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.98.36 1.94.68 2.87a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.21-1.21a2 2 0 0 1 2.11-.45c.93.32 1.89.55 2.87.68A2 2 0 0 1 22 16.92z"/></svg>
-            </button>
-            <button class="cd-phone-icon-btn whatsapp" id="txdWhatsappBtn" aria-label="WhatsApp">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.36 5.07L2 22l5.06-1.33A9.94 9.94 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.6 0-3.1-.44-4.38-1.2l-.31-.18-3 .79.8-2.92-.2-.3A7.94 7.94 0 0 1 4 12c0-4.41 3.59-8 8-8s8 3.59 8 8-3.59 8-8 8zm4.4-5.6c-.24-.12-1.44-.71-1.66-.79-.22-.08-.38-.12-.55.12-.16.24-.63.79-.77.95-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.18-.71-.63-1.19-1.42-1.33-1.66-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.55-1.32-.75-1.81-.2-.48-.4-.41-.55-.42-.14-.01-.3-.01-.46-.01-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.7 2.6 4.12 3.64.58.25 1.03.4 1.38.51.58.18 1.11.16 1.53.1.47-.07 1.44-.59 1.64-1.16.2-.57.2-1.06.14-1.16-.06-.1-.22-.16-.46-.28z"/></svg>
-            </button>
-          </div>
+          <div class="cd-profile-name" id="txdName">নাম</div>
+          <div class="cd-profile-id" id="txdId"></div>
         </div>
         <div class="cd-profile-side">
           <div class="cd-profile-side-title">দেনার বিবরণ</div>
@@ -1582,6 +1577,15 @@
             <div class="cd-profile-side-amount" id="txdGeneralDue">০ টাকা</div>
           </div>
         </div>
+      </div>
+      <div class="cd-profile-phone-row">
+        <span id="txdPhoneNumber">মোবাইল নম্বর</span>
+        <button class="cd-phone-icon-btn call" id="txdCallBtn" aria-label="কল করুন">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.98.36 1.94.68 2.87a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.21-1.21a2 2 0 0 1 2.11-.45c.93.32 1.89.55 2.87.68A2 2 0 0 1 22 16.92z"/></svg>
+        </button>
+        <button class="cd-phone-icon-btn whatsapp" id="txdWhatsappBtn" aria-label="WhatsApp">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.36 5.07L2 22l5.06-1.33A9.94 9.94 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.6 0-3.1-.44-4.38-1.2l-.31-.18-3 .79.8-2.92-.2-.3A7.94 7.94 0 0 1 4 12c0-4.41 3.59-8 8-8s8 3.59 8 8-3.59 8-8 8zm4.4-5.6c-.24-.12-1.44-.71-1.66-.79-.22-.08-.38-.12-.55.12-.16.24-.63.79-.77.95-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.18-.71-.63-1.19-1.42-1.33-1.66-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.55-1.32-.75-1.81-.2-.48-.4-.41-.55-.42-.14-.01-.3-.01-.46-.01-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.7 2.6 4.12 3.64.58.25 1.03.4 1.38.51.58.18 1.11.16 1.53.1.47-.07 1.44-.59 1.64-1.16.2-.57.2-1.06.14-1.16-.06-.1-.22-.16-.46-.28z"/></svg>
+        </button>
       </div>
       <div class="cd-profile-total-banner">
         <span class="label">সর্বমোট বাকি</span>
@@ -1661,16 +1665,8 @@
           <div class="cd-profile-photo-fallback" id="niProfilePhotoFallback"></div>
         </button>
         <div class="cd-profile-main">
-          <div class="cd-profile-name" id="niName">নাম <span id="niId"></span></div>
-          <div class="cd-profile-phone-row">
-            <span id="niPhoneNumber">মোবাইল নম্বর</span>
-            <button class="cd-phone-icon-btn call" id="niCallBtn" aria-label="কল করুন">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.98.36 1.94.68 2.87a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.21-1.21a2 2 0 0 1 2.11-.45c.93.32 1.89.55 2.87.68A2 2 0 0 1 22 16.92z"/></svg>
-            </button>
-            <button class="cd-phone-icon-btn whatsapp" id="niWhatsappBtn" aria-label="WhatsApp">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.36 5.07L2 22l5.06-1.33A9.94 9.94 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.6 0-3.1-.44-4.38-1.2l-.31-.18-3 .79.8-2.92-.2-.3A7.94 7.94 0 0 1 4 12c0-4.41 3.59-8 8-8s8 3.59 8 8-3.59 8-8 8zm4.4-5.6c-.24-.12-1.44-.71-1.66-.79-.22-.08-.38-.12-.55.12-.16.24-.63.79-.77.95-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.18-.71-.63-1.19-1.42-1.33-1.66-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.55-1.32-.75-1.81-.2-.48-.4-.41-.55-.42-.14-.01-.3-.01-.46-.01-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.7 2.6 4.12 3.64.58.25 1.03.4 1.38.51.58.18 1.11.16 1.53.1.47-.07 1.44-.59 1.64-1.16.2-.57.2-1.06.14-1.16-.06-.1-.22-.16-.46-.28z"/></svg>
-            </button>
-          </div>
+          <div class="cd-profile-name" id="niName">নাম</div>
+          <div class="cd-profile-id" id="niId"></div>
         </div>
         <div class="cd-profile-side">
           <div class="cd-profile-side-title">দেনার বিবরণ</div>
@@ -1683,6 +1679,15 @@
             <div class="cd-profile-side-amount" id="niGeneralDue">০ টাকা</div>
           </div>
         </div>
+      </div>
+      <div class="cd-profile-phone-row">
+        <span id="niPhoneNumber">মোবাইল নম্বর</span>
+        <button class="cd-phone-icon-btn call" id="niCallBtn" aria-label="কল করুন">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.98.36 1.94.68 2.87a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.21-1.21a2 2 0 0 1 2.11-.45c.93.32 1.89.55 2.87.68A2 2 0 0 1 22 16.92z"/></svg>
+        </button>
+        <button class="cd-phone-icon-btn whatsapp" id="niWhatsappBtn" aria-label="WhatsApp">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.36 5.07L2 22l5.06-1.33A9.94 9.94 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.6 0-3.1-.44-4.38-1.2l-.31-.18-3 .79.8-2.92-.2-.3A7.94 7.94 0 0 1 4 12c0-4.41 3.59-8 8-8s8 3.59 8 8-3.59 8-8 8zm4.4-5.6c-.24-.12-1.44-.71-1.66-.79-.22-.08-.38-.12-.55.12-.16.24-.63.79-.77.95-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.18-.71-.63-1.19-1.42-1.33-1.66-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.55-1.32-.75-1.81-.2-.48-.4-.41-.55-.42-.14-.01-.3-.01-.46-.01-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.7 2.6 4.12 3.64.58.25 1.03.4 1.38.51.58.18 1.11.16 1.53.1.47-.07 1.44-.59 1.64-1.16.2-.57.2-1.06.14-1.16-.06-.1-.22-.16-.46-.28z"/></svg>
+        </button>
       </div>
       <div class="cd-profile-total-banner">
         <span class="label">সর্বমোট বাকি</span>
@@ -1794,16 +1799,8 @@
           <div class="cd-profile-photo-fallback" id="ciProfilePhotoFallback"></div>
         </button>
         <div class="cd-profile-main">
-          <div class="cd-profile-name" id="ciName">নাম <span id="ciId"></span></div>
-          <div class="cd-profile-phone-row">
-            <span id="ciPhoneNumber">মোবাইল নম্বর</span>
-            <button class="cd-phone-icon-btn call" id="ciCallBtn" aria-label="কল করুন">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.98.36 1.94.68 2.87a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.21-1.21a2 2 0 0 1 2.11-.45c.93.32 1.89.55 2.87.68A2 2 0 0 1 22 16.92z"/></svg>
-            </button>
-            <button class="cd-phone-icon-btn whatsapp" id="ciWhatsappBtn" aria-label="WhatsApp">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.36 5.07L2 22l5.06-1.33A9.94 9.94 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.6 0-3.1-.44-4.38-1.2l-.31-.18-3 .79.8-2.92-.2-.3A7.94 7.94 0 0 1 4 12c0-4.41 3.59-8 8-8s8 3.59 8 8-3.59 8-8 8zm4.4-5.6c-.24-.12-1.44-.71-1.66-.79-.22-.08-.38-.12-.55.12-.16.24-.63.79-.77.95-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.18-.71-.63-1.19-1.42-1.33-1.66-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.55-1.32-.75-1.81-.2-.48-.4-.41-.55-.42-.14-.01-.3-.01-.46-.01-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.7 2.6 4.12 3.64.58.25 1.03.4 1.38.51.58.18 1.11.16 1.53.1.47-.07 1.44-.59 1.64-1.16.2-.57.2-1.06.14-1.16-.06-.1-.22-.16-.46-.28z"/></svg>
-            </button>
-          </div>
+          <div class="cd-profile-name" id="ciName">নাম</div>
+          <div class="cd-profile-id" id="ciId"></div>
         </div>
         <div class="cd-profile-side">
           <div class="cd-profile-side-title">দেনার বিবরণ</div>
@@ -1816,6 +1813,15 @@
             <div class="cd-profile-side-amount" id="ciGeneralDue">০ টাকা</div>
           </div>
         </div>
+      </div>
+      <div class="cd-profile-phone-row">
+        <span id="ciPhoneNumber">মোবাইল নম্বর</span>
+        <button class="cd-phone-icon-btn call" id="ciCallBtn" aria-label="কল করুন">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.98.36 1.94.68 2.87a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.21-1.21a2 2 0 0 1 2.11-.45c.93.32 1.89.55 2.87.68A2 2 0 0 1 22 16.92z"/></svg>
+        </button>
+        <button class="cd-phone-icon-btn whatsapp" id="ciWhatsappBtn" aria-label="WhatsApp">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.36 5.07L2 22l5.06-1.33A9.94 9.94 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.6 0-3.1-.44-4.38-1.2l-.31-.18-3 .79.8-2.92-.2-.3A7.94 7.94 0 0 1 4 12c0-4.41 3.59-8 8-8s8 3.59 8 8-3.59 8-8 8zm4.4-5.6c-.24-.12-1.44-.71-1.66-.79-.22-.08-.38-.12-.55.12-.16.24-.63.79-.77.95-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.18-.71-.63-1.19-1.42-1.33-1.66-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.55-1.32-.75-1.81-.2-.48-.4-.41-.55-.42-.14-.01-.3-.01-.46-.01-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.7 2.6 4.12 3.64.58.25 1.03.4 1.38.51.58.18 1.11.16 1.53.1.47-.07 1.44-.59 1.64-1.16.2-.57.2-1.06.14-1.16-.06-.1-.22-.16-.46-.28z"/></svg>
+        </button>
       </div>
       <div class="cd-profile-total-banner">
         <span class="label">সর্বমোট বাকি</span>
@@ -3282,7 +3288,9 @@
   // বাকি breakdown (including the দেব swap when there's an overpayment credit).
   function renderProfileCardHeader(prefix, customer){
     const nameEl = document.getElementById(prefix+'Name');
-    if(nameEl) nameEl.innerHTML = `${escapeHtml(customer.name)} ${customer.id ? `<span>· ${customer.id}</span>` : ''}`;
+    if(nameEl) nameEl.textContent = customer.name || '';
+    const idEl = document.getElementById(prefix+'Id');
+    if(idEl) idEl.textContent = customer.id ? `ID - ${customer.id}` : '';
     const phoneEl = document.getElementById(prefix+'PhoneNumber');
     if(phoneEl) phoneEl.textContent = customer.mobile || 'মোবাইল নম্বর নেই';
     const totalEl = document.getElementById(prefix+'TotalAmount');
