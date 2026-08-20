@@ -774,6 +774,7 @@
           <span>একাউন্ট নম্বর <b id="authOtpPhoneLabel"></b></span>
         </div>
         <div class="auth-pin-title">মোবাইলে পাঠানো ৪ সংখ্যার কোডটি দিন</div>
+        <div class="auth-hint" id="authOtpNewDeviceNote" style="display:none; margin-bottom:10px;">এটা একটা নতুন ডিভাইস — নিরাপত্তার জন্য OTP যাচাই প্রয়োজন। এতে আপনার আগের ডিভাইসে থাকা সেশন লগ-আউট হয়ে যাবে।</div>
         <div class="auth-pin-boxes" id="authPinBoxesOtpSignup">
           <div class="pin-box"></div><div class="pin-box"></div><div class="pin-box"></div><div class="pin-box"></div>
         </div>
@@ -4164,6 +4165,11 @@
   let authFirstPin = '';
   let authBuffer = '';
   let authIsFreshSignup = false; // only true right after a brand-new number completes OTP — controls whether a device token gets registered
+  // The otp-signup screen is now shared between two flows — brand-new
+  // signups and new-device verification for existing accounts — this tracks
+  // which one is currently active so verify/resend send the right purpose
+  // and handlePinComplete knows where to go next.
+  let authOtpPurpose = 'signup'; // 'signup' | 'new_device'
 
   const PIN_BOX_MAP = {
     'otp-signup': 'authPinBoxesOtpSignup',
@@ -4297,7 +4303,7 @@
   document.getElementById('authOtpResendBtn').addEventListener('click', async ()=>{
     const btn = document.getElementById('authOtpResendBtn');
     btn.disabled = true;
-    const result = await sendOtp(authPhoneValue, 'signup');
+    const result = await sendOtp(authPhoneValue, authOtpPurpose);
     if(!result.ok){
       if(result.locked){ showOtpLockedState(result.unlockAt); return; }
       document.getElementById('authOtpHint').textContent = 'পাঠানো যায়নি, একটু পর আবার চেষ্টা করো';
@@ -4399,13 +4405,54 @@
     authPhoneValue = val;
     authFirstPin = '';
     if(exists){
-      // Existing account found in the cloud — ask for the PIN, don't let
-      // them create a new one.
-      document.getElementById('authLoginPhoneLabel').textContent = val;
-      showAuthStep('pin-login');
+      // Existing account found in the cloud. If this browser already has a
+      // device token that matches what's on file, skip straight to PIN like
+      // before. Otherwise (new browser, or an older device whose token was
+      // replaced by a newer login elsewhere) this counts as a new device —
+      // OTP verification is required before PIN-login, and succeeding here
+      // replaces whatever token was on file (so the OLD device will itself
+      // be treated as new the next time it tries to log in).
+      const savedDeviceToken = localStorage.getItem('device_token');
+      let deviceOk = false;
+      if(savedDeviceToken){
+        try{
+          const { data, error } = await sb.rpc('rpc_check_device', { p_mobile: val, p_device_token: savedDeviceToken });
+          if(!error) deviceOk = !!data;
+        }catch(e){ /* treat as unknown device on any failure — safer default */ }
+      }
+      if(deviceOk){
+        document.getElementById('authLoginPhoneLabel').textContent = val;
+        showAuthStep('pin-login');
+      }else{
+        btn.disabled = true;
+        btn.textContent = 'কোড পাঠানো হচ্ছে...';
+        const sendResult = await sendOtp(val, 'new_device');
+        btn.disabled = false;
+        btn.textContent = originalLabel;
+        authOtpPurpose = 'new_device';
+        authIsFreshSignup = false;
+        authPhoneValue = val;
+        document.getElementById('authOtpPhoneLabel').textContent = val;
+        document.getElementById('authOtpHint').textContent = '';
+        document.getElementById('authOtpNewDeviceNote').style.display = '';
+        if(!sendResult.ok){
+          if(sendResult.locked){
+            showAuthStep('otp-signup');
+            showOtpLockedState(sendResult.unlockAt);
+            return;
+          }
+          hint.textContent = sendResult.error === 'network' ? 'ইন্টারনেট কানেকশন সমস্যা — আবার চেষ্টা করো' : 'কোড পাঠানো যায়নি, আবার চেষ্টা করো';
+          wrap.classList.add('error');
+          return;
+        }
+        showAuthStep('otp-signup');
+        startOtpResendCooldown(sendResult.nextCooldown);
+      }
     }else{
       // New number — verify it's really theirs via OTP before letting them
       // set a PIN and create an account.
+      authOtpPurpose = 'signup';
+      document.getElementById('authOtpNewDeviceNote').style.display = 'none';
       btn.disabled = true;
       btn.textContent = 'কোড পাঠানো হচ্ছে...';
       const sendResult = await sendOtp(val, 'signup');
@@ -4494,11 +4541,17 @@
   // ---- Keypad-driven PIN completion ----
   async function handlePinComplete(){
     if(authCurrentStep === 'otp-signup'){
-      const result = await verifyOtp(authPhoneValue, 'signup', authBuffer);
+      const result = await verifyOtp(authPhoneValue, authOtpPurpose, authBuffer);
       if(result.success){
-        document.getElementById('authSetupPhoneLabel').textContent = authPhoneValue;
-        document.getElementById('authConfirmPhoneLabel').textContent = authPhoneValue;
-        showAuthStep('pin-setup');
+        if(authOtpPurpose === 'new_device'){
+          await registerDeviceToken(authPhoneValue); // replaces whatever token was on file — old device becomes "new" next time
+          document.getElementById('authLoginPhoneLabel').textContent = authPhoneValue;
+          showAuthStep('pin-login');
+        }else{
+          document.getElementById('authSetupPhoneLabel').textContent = authPhoneValue;
+          document.getElementById('authConfirmPhoneLabel').textContent = authPhoneValue;
+          showAuthStep('pin-setup');
+        }
       }else{
         if(result.reason === 'too_many_attempts'){
           document.getElementById('authOtpHint').textContent = 'অনেকবার ভুল হয়েছে — "OTP আবার পাঠান" চাপো';
