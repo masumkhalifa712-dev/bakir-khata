@@ -4515,14 +4515,29 @@
     const hint = document.getElementById('authForgotPhoneHint');
     const wrap = document.getElementById('authForgotPhoneWrap');
     const btn = document.getElementById('authForgotPhoneNextBtn');
-    const saved = getSavedAuthAccount();
     if(!/^01[3-9]\d{8}$/.test(val)){
       hint.textContent = 'সঠিক ১১ সংখ্যার মোবাইল নম্বর দিন';
       wrap.classList.add('error');
       return;
     }
-    if(!saved || val !== saved.mobile){
-      hint.textContent = 'এই নম্বরটি আপনার একাউন্টের নম্বরের সাথে মিলছে না';
+    // Checked against the server (does this number actually have an
+    // account?) instead of the locally-cached "remembered" number — the old
+    // check failed for anyone whose device didn't happen to have that exact
+    // number cached (e.g. after a fresh new-device verification, or a
+    // shared/cleared browser), even though the number itself was correct.
+    const originalCheckLabel = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'যাচাই করা হচ্ছে...';
+    const exists = await checkAccountExists(val);
+    btn.disabled = false;
+    btn.textContent = originalCheckLabel;
+    if(exists === undefined){
+      hint.textContent = 'ইন্টারনেট কানেকশন সমস্যা — আবার চেষ্টা করো';
+      wrap.classList.add('error');
+      return;
+    }
+    if(!exists){
+      hint.textContent = 'এই নম্বরে কোনো একাউন্ট পাওয়া যায়নি';
       wrap.classList.add('error');
       return;
     }
