@@ -4212,20 +4212,36 @@
   }
 
   // ---- OTP: send-otp / verify-otp Edge Functions ----
+  // Calls an Edge Function directly instead of sb.functions.invoke() — that
+  // helper treats any non-2xx response (like our 429 rate-limit/lockout
+  // replies) as a generic error and discards the JSON body, which is exactly
+  // where locked/unlock_at/wait_seconds live. Fetching directly means we
+  // always get the real body back, whatever the status code.
+  async function callEdgeFunction(name, body){
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/${name}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'apikey': SUPABASE_ANON_KEY,
+      },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json().catch(()=>({}));
+    return { ok: res.ok, status: res.status, data };
+  }
   async function sendOtp(mobile, purpose){
     try{
-      const { data, error } = await sb.functions.invoke('send-otp', { body: { mobile, purpose } });
-      if(error) throw error;
-      if(data && data.error){
-        return { ok:false, error: data.error, locked: !!data.locked, unlockAt: data.unlock_at, waitSeconds: data.wait_seconds };
+      const { ok, data } = await callEdgeFunction('send-otp', { mobile, purpose });
+      if(!ok || (data && data.error)){
+        return { ok:false, error: (data && data.error) || 'network', locked: !!(data && data.locked), unlockAt: data && data.unlock_at, waitSeconds: data && data.wait_seconds };
       }
       return { ok:true, nextCooldown: data && data.next_cooldown_seconds };
     }catch(e){ return { ok:false, error:'network' }; }
   }
   async function verifyOtp(mobile, purpose, otp){
     try{
-      const { data, error } = await sb.functions.invoke('verify-otp', { body: { mobile, purpose, otp } });
-      if(error) throw error;
+      const { data } = await callEdgeFunction('verify-otp', { mobile, purpose, otp });
       return data || { success:false, reason:'network' };
     }catch(e){ return { success:false, reason:'network' }; }
   }
