@@ -4510,10 +4510,11 @@
   document.getElementById('authForgotPhoneInput').addEventListener('keydown', (e)=>{
     if(e.key === 'Enter') document.getElementById('authForgotPhoneNextBtn').click();
   });
-  document.getElementById('authForgotPhoneNextBtn').addEventListener('click', ()=>{
+  document.getElementById('authForgotPhoneNextBtn').addEventListener('click', async ()=>{
     const val = document.getElementById('authForgotPhoneInput').value.trim();
     const hint = document.getElementById('authForgotPhoneHint');
     const wrap = document.getElementById('authForgotPhoneWrap');
+    const btn = document.getElementById('authForgotPhoneNextBtn');
     const saved = getSavedAuthAccount();
     if(!/^01[3-9]\d{8}$/.test(val)){
       hint.textContent = 'সঠিক ১১ সংখ্যার মোবাইল নম্বর দিন';
@@ -4527,12 +4528,37 @@
     }
     hint.textContent = '';
     wrap.classList.remove('error');
+
+    // PIN reset is sensitive enough that even a recognized device still
+    // needs OTP — no rpc_check_device shortcut here, unlike normal login.
+    const originalLabel = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'কোড পাঠানো হচ্ছে...';
+    const sendResult = await sendOtp(val, 'forgot_pin');
+    btn.disabled = false;
+    btn.textContent = originalLabel;
+
     authPhoneValue = val;
     authFirstPin = '';
     authIsFreshSignup = false;
+    authOtpPurpose = 'forgot_pin';
+    document.getElementById('authOtpPhoneLabel').textContent = val;
+    document.getElementById('authOtpHint').textContent = '';
+    document.getElementById('authOtpNewDeviceNote').style.display = 'none';
+    if(!sendResult.ok){
+      if(sendResult.locked){
+        showAuthStep('otp-signup');
+        showOtpLockedState(sendResult.unlockAt);
+        return;
+      }
+      hint.textContent = sendResult.error === 'network' ? 'ইন্টারনেট কানেকশন সমস্যা — আবার চেষ্টা করো' : 'কোড পাঠানো যায়নি, আবার চেষ্টা করো';
+      wrap.classList.add('error');
+      return;
+    }
     document.getElementById('authSetupPhoneLabel').textContent = val;
     document.getElementById('authConfirmPhoneLabel').textContent = val;
-    showAuthStep('pin-setup');
+    showAuthStep('otp-signup');
+    startOtpResendCooldown(sendResult.nextCooldown);
   });
   document.getElementById('authForgotCancelBtn').addEventListener('click', ()=>{
     showAuthStep('pin-login');
