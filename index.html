@@ -275,9 +275,18 @@
   .gr-section-title{ font-size:12.5px; font-weight:700; color:var(--clr-ink-soft); padding:0 16px 8px; }
   .gr-group{ margin-bottom:14px; }
   .gr-group-title{ font-size:12px; font-weight:700; padding:0 16px 6px; }
-  .gr-cust-row{ display:flex; align-items:center; justify-content:space-between; width:calc(100% - 32px); margin:0 16px 6px; padding:12px 14px; border:none; border-radius:12px; background:var(--clr-card); box-shadow:0 1px 3px rgba(0,0,0,.04); cursor:pointer; font-family:inherit; text-align:left; }
-  .gr-cust-row span:first-child{ font-size:13px; font-weight:700; color:var(--clr-ink); line-height:1.5; }
-  .gr-cust-row span:last-child{ font-size:13px; font-weight:700; color:var(--clr-owe-to-me); flex-shrink:0; margin-left:10px; }
+  .gr-cust-row{ display:grid; grid-template-columns:1.6fr 1fr 0.9fr; align-items:center; gap:6px; width:calc(100% - 32px); margin:0 16px 6px; padding:12px 14px; border:none; border-radius:12px; background:var(--clr-card); box-shadow:0 1px 3px rgba(0,0,0,.04); cursor:pointer; font-family:inherit; text-align:left; }
+  .gr-cust-name{ font-size:13px; font-weight:700; color:var(--clr-ink); line-height:1.4; }
+  .gr-cust-taken-date{ font-size:11px; font-weight:600; color:var(--clr-ink-soft); margin-top:2px; }
+  .gr-cust-due-date{ font-size:12px; font-weight:700; text-align:center; color:var(--clr-ink); }
+  .gr-cust-amount{ font-size:13px; font-weight:700; color:var(--clr-owe-to-me); text-align:right; }
+  .gr-cust-row.urgent-soon{ background:#FFF6D6; }
+  .gr-cust-row.urgent-today{ background:#FFDCDC; }
+  .gr-cust-row.urgent-overdue{ background:#C8102E; }
+  .gr-cust-row.urgent-overdue .gr-cust-name,
+  .gr-cust-row.urgent-overdue .gr-cust-taken-date,
+  .gr-cust-row.urgent-overdue .gr-cust-due-date,
+  .gr-cust-row.urgent-overdue .gr-cust-amount{ color:#fff; }
   .gr-empty{ text-align:center; padding:30px 16px; color:var(--clr-ink-soft); font-size:13px; }
 
   /* ================= CATEGORY: Business Mode Settings ================= */
@@ -1126,30 +1135,32 @@
     <div class="gr-panel" id="grGeneralPanel">
       <div class="ss-body" style="padding-bottom:0;">
         <select class="rf-select" id="grGeneralPeriodSelect" style="margin-bottom:14px;">
-          <option value="week">এই সপ্তাহ</option>
-          <option value="month" selected>এই মাস</option>
+          <option value="today">আজকের দিন</option>
+          <option value="week" selected>এই সপ্তাহ</option>
+          <option value="month">এই মাস</option>
         </select>
       </div>
       <div class="gr-summary-row">
         <div class="gr-summary-box"><div class="gr-summary-label">নতুন বাকি দিয়েছি</div><div class="gr-summary-amount" id="grGeneralGivenAmount">০ টাকা</div></div>
         <div class="gr-summary-box"><div class="gr-summary-label">আদায় হয়েছে</div><div class="gr-summary-amount" id="grGeneralCollectedAmount">০ টাকা</div></div>
       </div>
-      <div class="gr-section-title">বকেয়ার মেয়াদ অনুযায়ী তালিকা</div>
+      <div class="gr-section-title">পরিশোধের তারিখ অনুযায়ী তালিকা</div>
       <div id="grAgingGroups"></div>
     </div>
 
     <div class="gr-panel" id="grInstallmentPanel" style="display:none;">
       <div class="ss-body" style="padding-bottom:0;">
         <select class="rf-select" id="grInstallmentPeriodSelect" style="margin-bottom:14px;">
-          <option value="week">এই সপ্তাহ</option>
-          <option value="month" selected>এই মাস</option>
+          <option value="today">আজকের দিন</option>
+          <option value="week" selected>এই সপ্তাহ</option>
+          <option value="month">এই মাস</option>
         </select>
       </div>
       <div class="gr-summary-row">
         <div class="gr-summary-box"><div class="gr-summary-label">নতুন বিক্রি</div><div class="gr-summary-amount" id="grInstSoldAmount">০ টাকা</div></div>
         <div class="gr-summary-box"><div class="gr-summary-label">আদায় হয়েছে</div><div class="gr-summary-amount" id="grInstCollectedAmount">০ টাকা</div></div>
       </div>
-      <div class="gr-section-title">কিস্তির আসন্ন তারিখ (আগামী ৭ দিন)</div>
+      <div class="gr-section-title">পরিশোধের তারিখ অনুযায়ী তালিকা</div>
       <div id="grUpcomingList"></div>
     </div>
   </section>
@@ -2773,8 +2784,8 @@
   /* ================= CATEGORY: Group Reminder (গ্রুপ তাগাদা) ========= */
   /* ================================================================ */
   function goToGroupReminder(){
-    document.getElementById('grGeneralPeriodSelect').value = 'month';
-    document.getElementById('grInstallmentPeriodSelect').value = 'month';
+    document.getElementById('grGeneralPeriodSelect').value = 'week';
+    document.getElementById('grInstallmentPeriodSelect').value = 'week';
     switchGroupReminderTab('general');
     appEl.classList.add('show-groupreminder');
     pushAppState('groupreminder');
@@ -2787,21 +2798,58 @@
     document.getElementById('grInstallmentPanel').style.display = tab==='installment' ? '' : 'none';
     if(tab==='general') renderGeneralReminderTab(); else renderInstallmentReminderTab();
   }
+  // Only used for the summary boxes (নতুন বাকি দিয়েছি / বিক্রি, আদায়) — those
+  // still count by when the transaction was ENTERED, unlike the due-date list.
   function groupReminderPeriodStart(periodVal){
     const now = new Date();
+    if(periodVal === 'today'){ const d = new Date(now); d.setHours(0,0,0,0); return d; }
     if(periodVal === 'week'){
       const d = new Date(now); d.setDate(d.getDate() - d.getDay()); d.setHours(0,0,0,0); return d;
     }
     return new Date(now.getFullYear(), now.getMonth(), 1);
   }
+  // The due-date list's window is forward-looking from today (today only /
+  // next 7 days / next 30 days) — overdue items always show regardless of
+  // the selected window, since those need attention no matter what.
+  function groupReminderWindowDays(periodVal){
+    return periodVal === 'today' ? 0 : periodVal === 'week' ? 7 : 30;
+  }
   function goToCustomerFromGroupReminder(id){
     const cust = customers.find(c=>c.id === id);
     if(cust){ closeGroupReminder(); goToCustomerDetail(cust); }
   }
+  function formatGrDate(d){
+    if(!d || isNaN(d)) return '—';
+    return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
+  }
+  // Urgency banding shared by both tabs: yellow within 3 days out, light red
+  // due today, dark red once the due date has passed.
+  function grUrgencyClass(daysUntil){
+    if(daysUntil < 0) return 'urgent-overdue';
+    if(daysUntil === 0) return 'urgent-today';
+    if(daysUntil <= 3) return 'urgent-soon';
+    return '';
+  }
+  function renderGrRow(name, id, takenDate, dueDate, daysUntil, amount){
+    const cls = grUrgencyClass(daysUntil);
+    return `
+      <button class="gr-cust-row ${cls}" data-id="${id}">
+        <div>
+          <div class="gr-cust-name">${escapeHtml(name)}${id?' · '+id:''}</div>
+          <div class="gr-cust-taken-date">তারিখ: ${formatGrDate(takenDate)}</div>
+        </div>
+        <div class="gr-cust-due-date">${formatGrDate(dueDate)}</div>
+        <div class="gr-cust-amount">${bn(amount)} টাকা</div>
+      </button>`;
+  }
   // সাধারণ বাকি — এই প্ল্যাটফর্মের লেনদেনের হিসাব সহজ কিস্তি থেকে সম্পূর্ণ
-  // আলাদা রাখা হয়েছে (category !== 'installment' দিয়ে ফিল্টার করা)।
+  // আলাদা রাখা হয়েছে (category !== 'installment' দিয়ে ফিল্টার করা)। প্রতিটা
+  // কাস্টমারের পরিশোধের তারিখ ধরা হয় তার সবচেয়ে সাম্প্রতিক "দিচ্ছি" এন্ট্রির
+  // নিজস্ব তারিখ থেকে — এন্ট্রিতে তারিখ বসানো থাকলে সেটাই, না থাকলে সেই
+  // এন্ট্রির দিন থেকে ১ মাস পর ধরে নেওয়া হয়।
   function renderGeneralReminderTab(){
-    const start = groupReminderPeriodStart(document.getElementById('grGeneralPeriodSelect').value);
+    const periodVal = document.getElementById('grGeneralPeriodSelect').value;
+    const start = groupReminderPeriodStart(periodVal);
     let given = 0, collected = 0;
     customers.forEach(c=>{
       (c.transactions||[]).forEach(tx=>{
@@ -2815,40 +2863,30 @@
     document.getElementById('grGeneralGivenAmount').textContent = bn(given) + ' টাকা';
     document.getElementById('grGeneralCollectedAmount').textContent = bn(collected) + ' টাকা';
 
-    const now = new Date();
-    const groups = { old: [], mid: [], fresh: [] };
+    const today = new Date(); today.setHours(0,0,0,0);
+    const windowDays = groupReminderWindowDays(periodVal);
+    const rows = [];
     customers.forEach(c=>{
       if((c.generalDue||0) <= 0) return;
       const generalGives = (c.transactions||[]).filter(tx=>tx.category!=='installment' && tx.give);
-      let lastDate = null;
+      let lastTx = null, lastDate = null;
       generalGives.forEach(tx=>{
         const d = parseTxDate(tx.date, tx.time);
-        if(!isNaN(d) && (!lastDate || d > lastDate)) lastDate = d;
+        if(!isNaN(d) && (!lastDate || d > lastDate)){ lastDate = d; lastTx = tx; }
       });
-      if(!lastDate) return;
-      const daysSince = Math.floor((now - lastDate) / (1000*60*60*24));
-      const entry = { customer:c, days:daysSince };
-      if(daysSince >= 30) groups.old.push(entry);
-      else if(daysSince >= 7) groups.mid.push(entry);
-      else groups.fresh.push(entry);
+      if(!lastTx) return;
+      const dueDate = lastTx.dueDate
+        ? new Date(lastTx.dueDate+'T00:00:00')
+        : new Date(lastDate.getTime() + 30*24*60*60*1000); // no due date set — assume 1 month from when it was given
+      const daysUntil = Math.round((dueDate - today) / (1000*60*60*24));
+      if(daysUntil > windowDays) return; // still further out than the selected window — overdue always passes this check
+      rows.push({ customer:c, takenDate:lastDate, dueDate, daysUntil });
     });
-    const labels = [
-      { key:'old', label:'৩০ দিনের বেশি পুরনো', color:'var(--clr-primary)' },
-      { key:'mid', label:'৭-৩০ দিন', color:'#C98B1D' },
-      { key:'fresh', label:'৭ দিনের কম', color:'var(--clr-ink-soft)' },
-    ];
+    rows.sort((a,b)=>a.daysUntil-b.daysUntil);
     const container = document.getElementById('grAgingGroups');
-    const html = labels.map(g=>{
-      const list = groups[g.key];
-      if(list.length===0) return '';
-      const rows = list.sort((a,b)=>b.days-a.days).map(e=>`
-        <button class="gr-cust-row" data-id="${e.customer.id}">
-          <span>${escapeHtml(e.customer.name)}${e.customer.id?' · '+e.customer.id:''}</span>
-          <span>${bn(e.customer.generalDue)} টাকা</span>
-        </button>`).join('');
-      return `<div class="gr-group"><div class="gr-group-title" style="color:${g.color};">${g.label} (${list.length})</div>${rows}</div>`;
-    }).join('');
-    container.innerHTML = html || '<div class="gr-empty">কোনো সাধারণ বাকি নেই</div>';
+    container.innerHTML = rows.map(e=>
+      renderGrRow(e.customer.name, e.customer.id, e.takenDate, e.dueDate, e.daysUntil, e.customer.generalDue)
+    ).join('') || '<div class="gr-empty">এই সময়ে কারো পরিশোধের তারিখ নেই</div>';
     container.querySelectorAll('.gr-cust-row').forEach(row=>{
       row.addEventListener('click', ()=> goToCustomerFromGroupReminder(row.dataset.id));
     });
@@ -2857,9 +2895,11 @@
     return type==='daily' ? 1 : type==='weekly' ? 7 : 30;
   }
   // সহজ কিস্তি — এখানেও শুধু installment-category লেনদেনই ধরা হচ্ছে, সাধারণ
-  // বাকির সাথে কোনো মিশ্রণ নেই।
+  // বাকির সাথে কোনো মিশ্রণ নেই। পরের কিস্তির তারিখ হিসাব হয় প্রথম কিস্তির
+  // তারিখ + (যতগুলো কিস্তি দেওয়া হয়ে গেছে × কিস্তির ধরন অনুযায়ী দিনসংখ্যা)।
   function renderInstallmentReminderTab(){
-    const start = groupReminderPeriodStart(document.getElementById('grInstallmentPeriodSelect').value);
+    const periodVal = document.getElementById('grInstallmentPeriodSelect').value;
+    const start = groupReminderPeriodStart(periodVal);
     let sold = 0, collected = 0;
     customers.forEach(c=>{
       (c.transactions||[]).forEach(tx=>{
@@ -2873,8 +2913,9 @@
     document.getElementById('grInstSoldAmount').textContent = bn(sold) + ' টাকা';
     document.getElementById('grInstCollectedAmount').textContent = bn(collected) + ' টাকা';
 
-    const now = new Date(); now.setHours(0,0,0,0);
-    const upcoming = [];
+    const today = new Date(); today.setHours(0,0,0,0);
+    const windowDays = groupReminderWindowDays(periodVal);
+    const rows = [];
     customers.forEach(c=>{
       getCustomerReceipts(c).forEach(r=>{
         const saleTx = (c.transactions||[]).find(tx=>tx.receiptNumber===r.receiptNumber && tx.give);
@@ -2883,21 +2924,16 @@
         const interval = installmentIntervalDays(saleTx.installmentType);
         const firstDate = new Date(saleTx.dueDate+'T00:00:00');
         const nextDue = new Date(firstDate.getTime() + paidCount*interval*24*60*60*1000);
-        const daysUntil = Math.round((nextDue - now) / (1000*60*60*24));
-        if(daysUntil <= 7) upcoming.push({ customer:c, receipt:r, daysUntil });
+        const daysUntil = Math.round((nextDue - today) / (1000*60*60*24));
+        if(daysUntil > windowDays) return;
+        rows.push({ customer:c, receipt:r, takenDate:parseTxDate(saleTx.date, saleTx.time), dueDate:nextDue, daysUntil });
       });
     });
-    upcoming.sort((a,b)=>a.daysUntil-b.daysUntil);
+    rows.sort((a,b)=>a.daysUntil-b.daysUntil);
     const container = document.getElementById('grUpcomingList');
-    container.innerHTML = upcoming.map(e=>{
-      const label = e.daysUntil<0 ? `${Math.abs(e.daysUntil)} দিন বাকি পড়ে গেছে` : e.daysUntil===0 ? 'আজ' : e.daysUntil===1 ? 'আগামীকাল' : `${e.daysUntil} দিন পর`;
-      const color = e.daysUntil<0 ? 'var(--clr-primary)' : e.daysUntil<=1 ? '#C98B1D' : 'var(--clr-ink-soft)';
-      return `
-        <button class="gr-cust-row" data-id="${e.customer.id}">
-          <span>${escapeHtml(e.customer.name)}${e.customer.id?' · '+e.customer.id:''}<br><span style="font-weight:600; color:${color};">${label}</span></span>
-          <span>${bn(e.receipt.perInstallment)} টাকা</span>
-        </button>`;
-    }).join('') || '<div class="gr-empty">আগামী ৭ দিনে কোনো কিস্তি নেই</div>';
+    container.innerHTML = rows.map(e=>
+      renderGrRow(e.customer.name, e.customer.id, e.takenDate, e.dueDate, e.daysUntil, e.receipt.perInstallment)
+    ).join('') || '<div class="gr-empty">এই সময়ে কোনো কিস্তির তারিখ নেই</div>';
     container.querySelectorAll('.gr-cust-row').forEach(row=>{
       row.addEventListener('click', ()=> goToCustomerFromGroupReminder(row.dataset.id));
     });
