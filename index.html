@@ -4419,12 +4419,15 @@
   async function completeAuth(mobile, pin){
     currentUserMobile = mobile;
     currentUserPin = pin;
-    authScreenEl.classList.add('hide');
     // Best-effort — lets the admin panel show who's actively using the app
     sb.rpc('rpc_touch_last_login', { p_mobile: mobile }).then(()=>{}, ()=>{});
     await loadCustomers();
     checkBroadcastNotice();
+    // Applied WHILE still hidden behind the logo screen, so whatever page
+    // reappears is the right one immediately — no flash of the home screen
+    // in between (which happened when this ran after the logo was hidden).
     restoreLastScreen();
+    authScreenEl.classList.add('hide');
   }
   // A pull-to-refresh gesture fully reloads the page (all JS state is lost),
   // so without this, every refresh would bounce back to the home screen even
