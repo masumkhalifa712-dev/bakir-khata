@@ -226,6 +226,7 @@
   .quick-actions{ display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin:18px 14px 0; }
   .quick-action{ display:flex; flex-direction:column; align-items:center; gap:8px; background:none; border:none; cursor:pointer; padding:6px 2px; color:var(--clr-ink); }
   .quick-action .qa-icon{ width:46px;height:46px;border-radius:16px; display:flex;align-items:center;justify-content:center; background:var(--clr-card); box-shadow:0 2px 10px rgba(0,0,0,.05); }
+  .qa-badge{ position:absolute; top:-5px; right:-5px; min-width:18px; height:18px; padding:0 4px; border-radius:999px; background:var(--clr-primary); color:#fff; font-size:10.5px; font-weight:700; display:flex; align-items:center; justify-content:center; box-shadow:0 1px 3px rgba(0,0,0,.25); }
   .quick-action .qa-icon svg{width:22px;height:22px;}
   .quick-action span{font-size:11.5px; font-weight:600; line-height:1.25;}
   .quick-action:active .qa-icon{transform:scale(.92);}
@@ -279,6 +280,11 @@
   .gr-cust-name{ font-size:13px; font-weight:700; color:var(--clr-ink); line-height:1.4; }
   .gr-cust-taken-date{ font-size:11px; font-weight:600; color:var(--clr-ink-soft); margin-top:2px; }
   .gr-cust-due-date{ font-size:12px; font-weight:700; text-align:center; color:var(--clr-ink); }
+  .gr-cust-elapsed{ font-size:10.5px; font-weight:600; color:var(--clr-ink-soft); text-align:center; margin-top:2px; }
+  .gr-col-headers{ display:grid; grid-template-columns:1.6fr 1fr 0.9fr; gap:6px; padding:0 30px 6px 30px; }
+  .gr-col-headers span{ font-size:10px; font-weight:700; color:var(--clr-ink-soft); }
+  .gr-col-headers span:nth-child(2){ text-align:center; }
+  .gr-col-headers span:nth-child(3){ text-align:right; }
   .gr-cust-amount{ font-size:13px; font-weight:700; color:var(--clr-owe-to-me); text-align:right; }
   .gr-cust-row.urgent-soon{ background:#FFF6D6; }
   .gr-cust-row.urgent-today{ background:#FFDCDC; }
@@ -286,6 +292,7 @@
   .gr-cust-row.urgent-overdue .gr-cust-name,
   .gr-cust-row.urgent-overdue .gr-cust-taken-date,
   .gr-cust-row.urgent-overdue .gr-cust-due-date,
+  .gr-cust-row.urgent-overdue .gr-cust-elapsed,
   .gr-cust-row.urgent-overdue .gr-cust-amount{ color:#fff; }
   .gr-empty{ text-align:center; padding:30px 16px; color:var(--clr-ink-soft); font-size:13px; }
 
@@ -963,8 +970,11 @@
           <span>ক্যাশবক্স</span>
         </button>
         <button class="quick-action" data-action="reminder">
-          <span class="qa-icon" style="color:#2E9E5B;"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg></span>
-          <span>গ্রুপ তাগাদা</span>
+          <span class="qa-icon" style="color:#2E9E5B; position:relative;">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+            <span class="qa-badge" id="grBadge" style="display:none;">0</span>
+          </span>
+          <span>বাকি আদায়</span>
         </button>
       </div>
 
@@ -1124,7 +1134,7 @@
       <button class="cd-back" id="grBackBtn" aria-label="ফিরে যান">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
       </button>
-      <div class="cd-title">গ্রুপ তাগাদা</div>
+      <div class="cd-title">বাকি আদায়</div>
     </div>
 
     <div class="gr-tabs">
@@ -1145,6 +1155,11 @@
         <div class="gr-summary-box"><div class="gr-summary-label">আদায় হয়েছে</div><div class="gr-summary-amount" id="grGeneralCollectedAmount">০ টাকা</div></div>
       </div>
       <div class="gr-section-title">পরিশোধের তারিখ অনুযায়ী তালিকা</div>
+      <div class="gr-col-headers">
+        <span>বিক্রয় তারিখ ও কাস্টমার</span>
+        <span>পরিশোধ তারিখ ও খেলাপি</span>
+        <span>বাকির পরিমাণ</span>
+      </div>
       <div id="grAgingGroups"></div>
     </div>
 
@@ -1161,6 +1176,11 @@
         <div class="gr-summary-box"><div class="gr-summary-label">আদায় হয়েছে</div><div class="gr-summary-amount" id="grInstCollectedAmount">০ টাকা</div></div>
       </div>
       <div class="gr-section-title">পরিশোধের তারিখ অনুযায়ী তালিকা</div>
+      <div class="gr-col-headers">
+        <span>বিক্রয় তারিখ ও কাস্টমার</span>
+        <span>পরিশোধ তারিখ ও খেলাপি</span>
+        <span>বাকির পরিমাণ</span>
+      </div>
       <div id="grUpcomingList"></div>
     </div>
   </section>
@@ -2270,6 +2290,7 @@
     customersLoading = false;
     renderList();
     applyShopInfoToUI();
+    updateGroupReminderBadge();
   }
   // One shared save path — every persist* helper below just decides which
   // fields to send; the RPC re-checks the PIN every single time before writing.
@@ -2284,6 +2305,7 @@
         p_shop_info: fields.shop_info !== undefined ? fields.shop_info : null,
       });
       if(error) throw error;
+      if(fields.customers !== undefined) updateGroupReminderBadge();
     }catch(e){
       storageAvailable = false;
       showToast("সেভ করা যায়নি — ইন্টারনেট কানেকশন চেক করো", 'danger');
@@ -2783,6 +2805,22 @@
   /* ================================================================ */
   /* ================= CATEGORY: Group Reminder (গ্রুপ তাগাদা) ========= */
   /* ================================================================ */
+  // Small red counter on the বাকি আদায় home icon — total entries (both
+  // platforms combined) that are due today or already overdue, regardless
+  // of whatever period filter is currently selected inside the screen.
+  function updateGroupReminderBadge(){
+    const badge = document.getElementById('grBadge');
+    if(!badge) return;
+    const urgentGeneral = collectGeneralDueRows().filter(e => e.daysUntil <= 0).length;
+    const urgentInstallment = collectInstallmentDueRows().filter(e => e.daysUntil <= 0).length;
+    const total = urgentGeneral + urgentInstallment;
+    if(total > 0){
+      badge.textContent = bn(total);
+      badge.style.display = 'flex';
+    }else{
+      badge.style.display = 'none';
+    }
+  }
   function goToGroupReminder(){
     document.getElementById('grGeneralPeriodSelect').value = 'week';
     document.getElementById('grInstallmentPeriodSelect').value = 'week';
@@ -2832,13 +2870,20 @@
   }
   function renderGrRow(name, id, takenDate, dueDate, daysUntil, amount){
     const cls = grUrgencyClass(daysUntil);
+    const today = new Date(); today.setHours(0,0,0,0);
+    const daysSinceTaken = (!takenDate || isNaN(takenDate)) ? null : Math.max(0, Math.floor((today - takenDate) / (1000*60*60*24)));
+    const daysOverdue = daysUntil < 0 ? Math.abs(daysUntil) : 0; // fresh count starting only once the due date itself has passed
+    const elapsedLine = daysSinceTaken !== null ? `${bn(daysSinceTaken)} দিন/${bn(daysOverdue)} দিন` : '';
     return `
       <button class="gr-cust-row ${cls}" data-id="${id}">
         <div>
           <div class="gr-cust-name">${escapeHtml(name)}${id?' · '+id:''}</div>
           <div class="gr-cust-taken-date">তারিখ: ${formatGrDate(takenDate)}</div>
         </div>
-        <div class="gr-cust-due-date">${formatGrDate(dueDate)}</div>
+        <div>
+          <div class="gr-cust-due-date">${formatGrDate(dueDate)}</div>
+          ${elapsedLine ? `<div class="gr-cust-elapsed">${elapsedLine}</div>` : ''}
+        </div>
         <div class="gr-cust-amount">${bn(amount)} টাকা</div>
       </button>`;
   }
@@ -2847,6 +2892,29 @@
   // কাস্টমারের পরিশোধের তারিখ ধরা হয় তার সবচেয়ে সাম্প্রতিক "দিচ্ছি" এন্ট্রির
   // নিজস্ব তারিখ থেকে — এন্ট্রিতে তারিখ বসানো থাকলে সেটাই, না থাকলে সেই
   // এন্ট্রির দিন থেকে ১ মাস পর ধরে নেওয়া হয়।
+  // Collects every customer's সাধারণ বাকি due-date row, unfiltered by any
+  // period window — used both by the tab (which then filters to the
+  // selected window) and by the badge count (which only needs today/overdue).
+  function collectGeneralDueRows(){
+    const today = new Date(); today.setHours(0,0,0,0);
+    const rows = [];
+    customers.forEach(c=>{
+      if((c.generalDue||0) <= 0) return;
+      const generalGives = (c.transactions||[]).filter(tx=>tx.category!=='installment' && tx.give);
+      let lastTx = null, lastDate = null;
+      generalGives.forEach(tx=>{
+        const d = parseTxDate(tx.date, tx.time);
+        if(!isNaN(d) && (!lastDate || d > lastDate)){ lastDate = d; lastTx = tx; }
+      });
+      if(!lastTx) return;
+      const dueDate = lastTx.dueDate
+        ? new Date(lastTx.dueDate+'T00:00:00')
+        : new Date(lastDate.getTime() + 30*24*60*60*1000); // no due date set — assume 1 month from when it was given
+      const daysUntil = Math.round((dueDate - today) / (1000*60*60*24));
+      rows.push({ customer:c, takenDate:lastDate, dueDate, daysUntil });
+    });
+    return rows;
+  }
   function renderGeneralReminderTab(){
     const periodVal = document.getElementById('grGeneralPeriodSelect').value;
     const start = groupReminderPeriodStart(periodVal);
@@ -2863,25 +2931,9 @@
     document.getElementById('grGeneralGivenAmount').textContent = bn(given) + ' টাকা';
     document.getElementById('grGeneralCollectedAmount').textContent = bn(collected) + ' টাকা';
 
-    const today = new Date(); today.setHours(0,0,0,0);
     const windowDays = groupReminderWindowDays(periodVal);
-    const rows = [];
-    customers.forEach(c=>{
-      if((c.generalDue||0) <= 0) return;
-      const generalGives = (c.transactions||[]).filter(tx=>tx.category!=='installment' && tx.give);
-      let lastTx = null, lastDate = null;
-      generalGives.forEach(tx=>{
-        const d = parseTxDate(tx.date, tx.time);
-        if(!isNaN(d) && (!lastDate || d > lastDate)){ lastDate = d; lastTx = tx; }
-      });
-      if(!lastTx) return;
-      const dueDate = lastTx.dueDate
-        ? new Date(lastTx.dueDate+'T00:00:00')
-        : new Date(lastDate.getTime() + 30*24*60*60*1000); // no due date set — assume 1 month from when it was given
-      const daysUntil = Math.round((dueDate - today) / (1000*60*60*24));
-      if(daysUntil > windowDays) return; // still further out than the selected window — overdue always passes this check
-      rows.push({ customer:c, takenDate:lastDate, dueDate, daysUntil });
-    });
+    // overdue (daysUntil<0) always passes this check regardless of window
+    const rows = collectGeneralDueRows().filter(e => e.daysUntil <= windowDays);
     rows.sort((a,b)=>a.daysUntil-b.daysUntil);
     const container = document.getElementById('grAgingGroups');
     container.innerHTML = rows.map(e=>
@@ -2893,6 +2945,25 @@
   }
   function installmentIntervalDays(type){
     return type==='daily' ? 1 : type==='weekly' ? 7 : 30;
+  }
+  // Same idea for সহজ কিস্তি — unfiltered collector, reused by the tab and
+  // the badge count.
+  function collectInstallmentDueRows(){
+    const today = new Date(); today.setHours(0,0,0,0);
+    const rows = [];
+    customers.forEach(c=>{
+      getCustomerReceipts(c).forEach(r=>{
+        const saleTx = (c.transactions||[]).find(tx=>tx.receiptNumber===r.receiptNumber && tx.give);
+        if(!saleTx || !saleTx.dueDate) return;
+        const paidCount = (c.transactions||[]).filter(tx=>tx.receiptNumber===r.receiptNumber && tx.take).length;
+        const interval = installmentIntervalDays(saleTx.installmentType);
+        const firstDate = new Date(saleTx.dueDate+'T00:00:00');
+        const nextDue = new Date(firstDate.getTime() + paidCount*interval*24*60*60*1000);
+        const daysUntil = Math.round((nextDue - today) / (1000*60*60*24));
+        rows.push({ customer:c, receipt:r, takenDate:parseTxDate(saleTx.date, saleTx.time), dueDate:nextDue, daysUntil });
+      });
+    });
+    return rows;
   }
   // সহজ কিস্তি — এখানেও শুধু installment-category লেনদেনই ধরা হচ্ছে, সাধারণ
   // বাকির সাথে কোনো মিশ্রণ নেই। পরের কিস্তির তারিখ হিসাব হয় প্রথম কিস্তির
@@ -2913,22 +2984,8 @@
     document.getElementById('grInstSoldAmount').textContent = bn(sold) + ' টাকা';
     document.getElementById('grInstCollectedAmount').textContent = bn(collected) + ' টাকা';
 
-    const today = new Date(); today.setHours(0,0,0,0);
     const windowDays = groupReminderWindowDays(periodVal);
-    const rows = [];
-    customers.forEach(c=>{
-      getCustomerReceipts(c).forEach(r=>{
-        const saleTx = (c.transactions||[]).find(tx=>tx.receiptNumber===r.receiptNumber && tx.give);
-        if(!saleTx || !saleTx.dueDate) return;
-        const paidCount = (c.transactions||[]).filter(tx=>tx.receiptNumber===r.receiptNumber && tx.take).length;
-        const interval = installmentIntervalDays(saleTx.installmentType);
-        const firstDate = new Date(saleTx.dueDate+'T00:00:00');
-        const nextDue = new Date(firstDate.getTime() + paidCount*interval*24*60*60*1000);
-        const daysUntil = Math.round((nextDue - today) / (1000*60*60*24));
-        if(daysUntil > windowDays) return;
-        rows.push({ customer:c, receipt:r, takenDate:parseTxDate(saleTx.date, saleTx.time), dueDate:nextDue, daysUntil });
-      });
-    });
+    const rows = collectInstallmentDueRows().filter(e => e.daysUntil <= windowDays);
     rows.sort((a,b)=>a.daysUntil-b.daysUntil);
     const container = document.getElementById('grUpcomingList');
     container.innerHTML = rows.map(e=>
