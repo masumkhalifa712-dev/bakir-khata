@@ -189,8 +189,25 @@
   .home-top{ flex-shrink:0; }
   .home-scroll{ flex:1; min-height:0; overflow-y:auto; -webkit-overflow-scrolling:touch; }
 
-  /* FAB & bottom nav live outside the screens so screen-slide transforms never move them */
-  #app.show-add .fab, #app.show-add .bottom-nav{ display:none; }
+  /* FAB & bottom nav live outside the screens so screen-slide transforms
+     never move them — but that also means every screen must explicitly hide
+     them, otherwise they show through on top of that screen's own content.
+     One rule covering every non-home screen state, instead of listing them
+     piecemeal (which is how আগে বাকি আদায়/ক্রয়-বিক্রয়/settings/etc. ended
+     up leaking the home page's FAB through). */
+  #app.show-add .fab, #app.show-add .bottom-nav,
+  #app.show-detail .fab, #app.show-detail .bottom-nav,
+  #app.show-txdetail .fab, #app.show-txdetail .bottom-nav,
+  #app.show-newdue .fab, #app.show-newdue .bottom-nav,
+  #app.show-customeredit .fab, #app.show-customeredit .bottom-nav,
+  #app.show-newinstallment .fab, #app.show-newinstallment .bottom-nav,
+  #app.show-collectinstallment .fab, #app.show-collectinstallment .bottom-nav,
+  #app.show-report .fab, #app.show-report .bottom-nav,
+  #app.show-shopsettings .fab, #app.show-shopsettings .bottom-nav,
+  #app.show-appsettings .fab, #app.show-appsettings .bottom-nav,
+  #app.show-purchasehistory .fab, #app.show-purchasehistory .bottom-nav,
+  #app.show-groupreminder .fab, #app.show-groupreminder .bottom-nav
+  { display:none; }
 
   /* ================= CATEGORY: Header Section (Home) ================= */
   .header{
