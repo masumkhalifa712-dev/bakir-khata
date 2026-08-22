@@ -2299,9 +2299,37 @@
       showToast("ইন্টারনেট/ক্লাউড কানেকশন সমস্যা — সাময়িকভাবে অফলাইন ডেটা দেখানো হচ্ছে", 'danger');
     }
     customersLoading = false;
+    await repairLegacyInstallmentEntries();
     renderList();
     applyShopInfoToUI();
     updateGroupReminderBadge();
+  }
+  // পুরনো সহজ কিস্তি এন্ট্রি (রশিদ নাম্বার ফিচার আসার আগে যোগ করা) মেরামত
+  // করে — রশিদ নাম্বার আর প্রথম কিস্তির তারিখ না থাকলে সেই এন্ট্রির নিজের
+  // বিক্রয়ের তারিখ থেকেই বসিয়ে দেয়, যাতে "বাকি আদায়" তালিকা আর কিস্তি
+  // আদায়ের রশিদ ড্রপডাউনে এই পুরনো এন্ট্রিগুলোও দেখা যায়। কোনো ডেটা মোছে
+  // না, শুধু অনুপস্থিত ক্ষেত্র ভরাট হয় — একবার প্যাচ হয়ে গেলে পরের বার আর
+  // কিছু বদলাবে না (তাই সেভ কলও শুধু আসলেই কিছু বদলালে হয়)।
+  async function repairLegacyInstallmentEntries(){
+    let patched = false;
+    customers.forEach(c=>{
+      (c.transactions||[]).forEach(tx=>{
+        if(tx.category !== 'installment' || !tx.give) return;
+        const saleDate = parseTxDate(tx.date, tx.time);
+        if(!tx.receiptNumber){
+          tx.receiptNumber = generateReceiptNumber(isNaN(saleDate) ? null : saleDate);
+          meta.nextReceiptSerial = (meta.nextReceiptSerial || 1) + 1;
+          patched = true;
+        }
+        if(!tx.dueDate && !isNaN(saleDate)){
+          tx.dueDate = `${saleDate.getFullYear()}-${String(saleDate.getMonth()+1).padStart(2,'0')}-${String(saleDate.getDate()).padStart(2,'0')}`;
+          patched = true;
+        }
+      });
+    });
+    if(patched){
+      await saveUserDataRpc({ customers, meta });
+    }
   }
   // One shared save path — every persist* helper below just decides which
   // fields to send; the RPC re-checks the PIN every single time before writing.
