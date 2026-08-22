@@ -348,13 +348,15 @@
   /* ================= CATEGORY: কিস্তিতে বিক্রয় রিপোর্ট (সময়সূচি বিস্তারিত) ================= */
   .id-header-card{ background:var(--clr-card); border-radius:16px; padding:18px 16px; margin-bottom:16px; box-shadow:0 1px 4px rgba(0,0,0,.05); }
   .id-product-name{ font-size:16.5px; font-weight:800; color:var(--clr-ink); }
-  .id-receipt-line{ font-size:12.5px; color:var(--clr-ink-soft); font-weight:600; margin-top:2px; }
+  .id-receipt-row{ display:flex; justify-content:space-between; align-items:center; margin-top:2px; gap:8px; }
+  .id-receipt-line{ font-size:12.5px; color:var(--clr-ink-soft); font-weight:600; }
+  .id-installment-count{ font-size:11.5px; font-weight:700; color:var(--clr-primary); background:#FFF0EE; padding:4px 9px; border-radius:999px; flex-shrink:0; white-space:nowrap; }
   .id-progress-wrap{ margin-top:14px; }
   .id-progress-bar{ height:8px; border-radius:999px; background:var(--clr-line); overflow:hidden; }
   .id-progress-fill{ height:100%; background:linear-gradient(90deg, var(--clr-primary), var(--clr-primary-dark)); border-radius:999px; transition:width .3s ease; }
   .id-progress-label{ font-size:11.5px; font-weight:700; color:var(--clr-ink-soft); margin-top:6px; }
-  .id-stat-row{ display:flex; justify-content:space-between; margin-top:16px; gap:8px; }
-  .id-stat{ flex:1; text-align:center; }
+  .id-stat-row{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px 8px; margin-top:16px; }
+  .id-stat{ text-align:center; }
   .id-stat-label{ font-size:11px; color:var(--clr-ink-soft); font-weight:600; }
   .id-stat-value{ font-size:14px; font-weight:800; color:var(--clr-ink); margin-top:3px; }
   .id-late-fee-line{ margin-top:12px; padding:9px 12px; border-radius:10px; background:#FFF0EE; color:var(--clr-primary); font-size:12.5px; font-weight:700; text-align:center; }
@@ -1303,16 +1305,15 @@
     <div style="padding:16px;">
       <div class="id-header-card">
         <div class="id-product-name" id="idProductName">পণ্যের নাম</div>
-        <div class="id-receipt-line" id="idReceiptLine">রশিদ · ক্রেতার নাম</div>
+        <div class="id-receipt-row">
+          <div class="id-receipt-line" id="idReceiptLine">রশিদ · ক্রেতার নাম</div>
+          <div class="id-installment-count" id="idInstallmentCount">০ কিস্তিতে পরিশোধ</div>
+        </div>
         <div class="id-progress-wrap">
           <div class="id-progress-bar"><div class="id-progress-fill" id="idProgressFill" style="width:0%;"></div></div>
-          <div class="id-progress-label" id="idProgressLabel">০/০ কিস্তি শেষ</div>
+          <div class="id-progress-label" id="idProgressLabel">০/০ টাকা পরিশোধিত</div>
         </div>
-        <div class="id-stat-row">
-          <div class="id-stat"><div class="id-stat-label">মোট মূল্য</div><div class="id-stat-value" id="idTotalValue">০ টাকা</div></div>
-          <div class="id-stat"><div class="id-stat-label">পরিশোধিত</div><div class="id-stat-value" id="idPaidValue">০ টাকা</div></div>
-          <div class="id-stat"><div class="id-stat-label">বর্তমান বাকি</div><div class="id-stat-value" id="idDueValue">০ টাকা</div></div>
-        </div>
+        <div class="id-stat-row" id="idStatRow"></div>
         <div class="id-late-fee-line" id="idLateFeeLine" style="display:none;"></div>
         <div class="id-finish-line" id="idFinishLine"></div>
       </div>
@@ -3223,27 +3224,31 @@
   // saleTx-এর schedule আর সংশ্লিষ্ট receiptNumber-এর সব 'take' লেনদেন মিলিয়ে
   // প্রতিটা কিস্তির অবস্থা বের করে — 'paid' (পরিশোধিত), 'due' (তারিখ পার হয়ে
   // গেছে বা আজই, এখনো অপরিশোধিত), অথবা 'upcoming' (তারিখ এখনো আসেনি)।
-  // ক্রেতা নির্ধারিত কিস্তির চেয়ে কম/বেশি/অসম টাকা দিলেও যেন এটা ঠিকভাবে
-  // চলে, তাই গণনাটা "কতবার টাকা দিয়েছে" দিয়ে না করে "মোট কত টাকা জমা
-  // হয়েছে" দিয়ে করা হয় — জমা টাকা যতটুকু কিস্তি পূরণ করে ততটুকুই 'paid'।
+  // বাস্তবে একজন ক্রেতা এক মাসে একবারই কিস্তি দিতে আসে — পুরো নির্ধারিত অংক
+  // দিক বা কম, সেই একটা পেমেন্টই সেই মাসের কিস্তি হিসেবে গণ্য হয়। তাই এটা
+  // "মোট কত টাকা জমা হয়েছে" দিয়ে না গুনে "কতবার পেমেন্ট এসেছে" দিয়ে গোনা
+  // হয় — কম দেওয়া টাকাটা schedule-কে আটকে না রেখে সরাসরি মোট বাকির
+  // হিসাবে (getCustomerReceipts-এর remaining, যেটা এই schedule থেকে
+  // স্বাধীন — মোট মূল্য বিয়োগ মোট পরিশোধিত টাকা দিয়ে হিসাব হয়) যোগ থেকে যায়।
   function getScheduleStatus(customer, saleTx){
     if(!saleTx.schedule || !saleTx.schedule.length) return [];
-    const totalPaid = (customer.transactions||[])
+    // পেমেন্টগুলো তারিখ অনুযায়ী সাজিয়ে, i-তম পেমেন্ট i-তম কিস্তির সাথে মিলিয়ে
+    // দেওয়া হয় — এতে প্রতিটা "পরিশোধিত" ঘরে সত্যিকারের যে টাকাটা দেওয়া
+    // হয়েছিল সেটাই দেখানো যায় (নির্ধারিত অংক না, যেহেতু কম/বেশি দেওয়া যায়)।
+    const payments = (customer.transactions||[])
       .filter(tx => tx.category==='installment' && tx.take && tx.receiptNumber === saleTx.receiptNumber)
-      .reduce((s,tx)=>s+tx.take, 0);
+      .sort((a,b) => parseTxDate(a.date,a.time) - parseTxDate(b.date,b.time));
     const today = new Date(); today.setHours(0,0,0,0);
-    let remainingPaid = totalPaid;
     return saleTx.schedule.map((slot, i) => {
-      let status;
-      if(remainingPaid >= slot.amount - 0.01){
+      let status, actualAmount = null;
+      if(i < payments.length){
         status = 'paid';
-        remainingPaid -= slot.amount;
+        actualAmount = payments[i].take;
       }else{
         const slotDate = new Date(slot.date+'T00:00:00');
         status = slotDate <= today ? 'due' : 'upcoming';
-        remainingPaid = 0; // a partial payment on this slot doesn't spill over to mark the next one paid too
       }
-      return { ...slot, index: i+1, status };
+      return { ...slot, index: i+1, status, actualAmount };
     });
   }
   // বিলম্ব জরিমানা — একটা কিস্তি তার তারিখ পার করে অপরিশোধিত থেকে গেলে,
@@ -4736,17 +4741,31 @@
     const r = receipts.find(x => x.receiptNumber === receiptNumber);
     if(!r) return;
     currentInstallmentDetailReceipt = receiptNumber;
+    const saleTx = r.saleTx;
 
     document.getElementById('idProductName').textContent = r.productName || 'পণ্যের নাম নেই';
     document.getElementById('idReceiptLine').textContent = `${r.receiptNumber} · ${currentCustomer.name}${currentCustomer.id ? ' · '+currentCustomer.id : ''}`;
+    document.getElementById('idInstallmentCount').textContent = `${bn(r.totalCount)} কিস্তিতে পরিশোধ`;
 
-    const pct = r.totalCount ? Math.round((r.paidCount / r.totalCount) * 100) : 0;
+    // প্রগ্রেস এখন কিস্তি-সংখ্যা না, টাকার অংক দিয়ে মাপা হয় — ডাউন পেমেন্ট +
+    // এ পর্যন্ত পরিশোধিত কিস্তি, পুরো বিক্রয় মূল্যের কত অংশ সেটাই দেখায়।
+    const salePrice = saleTx.salePrice || r.totalValue;
+    const paidSoFar = (saleTx.downPayment || 0) + r.paid;
+    const pct = salePrice ? Math.min(100, Math.round((paidSoFar / salePrice) * 100)) : 0;
     document.getElementById('idProgressFill').style.width = pct + '%';
-    document.getElementById('idProgressLabel').textContent = `${bn(r.paidCount)}/${bn(r.totalCount)} কিস্তি শেষ`;
+    document.getElementById('idProgressLabel').textContent = `${bn(Math.round(paidSoFar))}/${bn(Math.round(salePrice))} টাকা পরিশোধিত`;
 
-    document.getElementById('idTotalValue').textContent = bn(Math.round(r.totalValue)) + ' টাকা';
-    document.getElementById('idPaidValue').textContent = bn(Math.round(r.paid)) + ' টাকা';
-    document.getElementById('idDueValue').textContent = bn(Math.round(r.remaining)) + ' টাকা';
+    const stats = [
+      { label: 'পণ্য বিক্রয় মূল্য', value: salePrice },
+      { label: 'ডাউন পেমেন্ট', value: saleTx.downPayment || 0 },
+      { label: 'প্রতি কিস্তি', value: saleTx.perInstallment || 0 },
+      { label: 'পরিশোধিত', value: r.paid },
+      { label: 'বর্তমান বাকি', value: r.remaining },
+    ];
+    if(saleTx.purchasePrice) stats.splice(1, 0, { label: 'পণ্য ক্রয় মূল্য', value: saleTx.purchasePrice });
+    document.getElementById('idStatRow').innerHTML = stats.map(s => `
+      <div class="id-stat"><div class="id-stat-label">${s.label}</div><div class="id-stat-value">${bn(Math.round(s.value))} টাকা</div></div>
+    `).join('');
 
     const lateFeeLine = document.getElementById('idLateFeeLine');
     if(r.lateFee > 0){
@@ -4756,7 +4775,7 @@
       lateFeeLine.style.display = 'none';
     }
 
-    const schedule = getScheduleStatus(currentCustomer, r.saleTx);
+    const schedule = getScheduleStatus(currentCustomer, saleTx);
     const lastSlot = schedule[schedule.length-1];
     const finishLine = document.getElementById('idFinishLine');
     if(lastSlot){
@@ -4768,15 +4787,28 @@
 
     const statusLabels = { paid:'পরিশোধিত', due:'বাকি', upcoming:'এখনো আসেনি' };
     const statusIcons = { paid:'✓', due:'!', upcoming:'—' };
-    document.getElementById('idScheduleList').innerHTML = schedule.map(s => `
+    // ডাউন পেমেন্ট বিক্রির সময়ই নেওয়া হয়ে যায়, তাই সবসময় "পরিশোধিত" হিসেবে
+    // তালিকার একদম উপরে দেখানো হয় — না থাকলেও ০ টাকা হিসেবে দেখাবে, যাতে
+    // পুরো হিসাবটা এই এক পেজেই পাওয়া যায়।
+    const downPaymentRow = `
+      <div class="id-slot-row">
+        <div class="id-slot-badge paid">✓</div>
+        <div class="id-slot-main">
+          <div class="id-slot-date">ডাউন পেমেন্ট</div>
+          <div class="id-slot-status paid">পরিশোধিত</div>
+        </div>
+        <div class="id-slot-amount">${bn(Math.round(saleTx.downPayment || 0))} টাকা</div>
+      </div>`;
+    const scheduleRows = schedule.map(s => `
       <div class="id-slot-row">
         <div class="id-slot-badge ${s.status}">${statusIcons[s.status]}</div>
         <div class="id-slot-main">
           <div class="id-slot-date">${bn(s.index)}ম কিস্তি — ${formatGrDate(new Date(s.date+'T00:00:00'))}</div>
           <div class="id-slot-status ${s.status}">${statusLabels[s.status]}</div>
         </div>
-        <div class="id-slot-amount">${bn(Math.round(s.amount))} টাকা</div>
+        <div class="id-slot-amount">${bn(Math.round(s.status==='paid' ? s.actualAmount : s.amount))} টাকা</div>
       </div>`).join('');
+    document.getElementById('idScheduleList').innerHTML = downPaymentRow + scheduleRows;
 
     appEl.classList.add('show-installmentdetail');
     pushAppState('installmentdetail');
