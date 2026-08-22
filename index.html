@@ -2377,6 +2377,13 @@
           tx.dueDate = `${saleDate.getFullYear()}-${String(saleDate.getMonth()+1).padStart(2,'0')}-${String(saleDate.getDate()).padStart(2,'0')}`;
           patched = true;
         }
+        if((!tx.schedule || !tx.schedule.length) && tx.dueDate){
+          const count = tx.installmentCount || 1;
+          const perInstallment = tx.perInstallment || tx.give;
+          const type = tx.installmentType || 'monthly';
+          tx.schedule = buildInstallmentSchedule(tx.dueDate, count, type, perInstallment);
+          patched = true;
+        }
       });
     });
     if(patched){
@@ -3105,6 +3112,85 @@
   function installmentIntervalDays(type){
     return type==='daily' ? 1 : type==='weekly' ? 7 : 30;
   }
+  /* ================================================================ */
+  /* ========== CATEGORY: Installment Schedule (সহজ কিস্তি সময়সূচি) === */
+  /* ================================================================ */
+  // প্রথম কিস্তির তারিখ থেকে শুরু করে, কিস্তির ধরন অনুযায়ী দূরত্ব রেখে,
+  // মোট কিস্তি সংখ্যা অনুযায়ী পুরো সময়সূচিটা এক টেবিলে বানিয়ে রাখে — এটাই
+  // এখন থেকে "৩/৬ কিস্তি শেষ", রশিদ-ভিত্তিক পেজ, মিসড-কিস্তি গণনা — সবকিছুর
+  // ভিত্তি হবে। প্রতিটা স্লট শুধু {date, amount} — কে পরিশোধ করেছে সেটা এখানে
+  // সংরক্ষণ করা হয় না, বরং সবসময় আসল লেনদেন থেকে গণনা করা হয় (নিচে
+  // getScheduleStatus দেখো) — যাতে দুই জায়গার হিসাব কখনো একে অপরের সাথে
+  // না মিলে যাওয়ার ঝুঁকি না থাকে।
+  function buildInstallmentSchedule(firstDateIso, count, type, perInstallment){
+    if(!firstDateIso || !count) return [];
+    const interval = installmentIntervalDays(type);
+    const first = new Date(firstDateIso+'T00:00:00');
+    const schedule = [];
+    for(let i=0; i<count; i++){
+      const d = new Date(first.getTime() + i*interval*24*60*60*1000);
+      schedule.push({
+        date: `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`,
+        amount: perInstallment,
+      });
+    }
+    return schedule;
+  }
+  // saleTx-এর schedule আর সংশ্লিষ্ট receiptNumber-এর সব 'take' লেনদেন মিলিয়ে
+  // প্রতিটা কিস্তির অবস্থা বের করে — 'paid' (পরিশোধিত), 'due' (তারিখ পার হয়ে
+  // গেছে বা আজই, এখনো অপরিশোধিত), অথবা 'upcoming' (তারিখ এখনো আসেনি)।
+  // কাস্টমার নির্ধারিত কিস্তির চেয়ে কম/বেশি/অসম টাকা দিলেও যেন এটা ঠিকভাবে
+  // চলে, তাই গণনাটা "কতবার টাকা দিয়েছে" দিয়ে না করে "মোট কত টাকা জমা
+  // হয়েছে" দিয়ে করা হয় — জমা টাকা যতটুকু কিস্তি পূরণ করে ততটুকুই 'paid'।
+  function getScheduleStatus(customer, saleTx){
+    if(!saleTx.schedule || !saleTx.schedule.length) return [];
+    const totalPaid = (customer.transactions||[])
+      .filter(tx => tx.category==='installment' && tx.take && tx.receiptNumber === saleTx.receiptNumber)
+      .reduce((s,tx)=>s+tx.take, 0);
+    const today = new Date(); today.setHours(0,0,0,0);
+    let remainingPaid = totalPaid;
+    return saleTx.schedule.map((slot, i) => {
+      let status;
+      if(remainingPaid >= slot.amount - 0.01){
+        status = 'paid';
+        remainingPaid -= slot.amount;
+      }else{
+        const slotDate = new Date(slot.date+'T00:00:00');
+        status = slotDate <= today ? 'due' : 'upcoming';
+        remainingPaid = 0; // a partial payment on this slot doesn't spill over to mark the next one paid too
+      }
+      return { ...slot, index: i+1, status };
+    });
+  }
+  // বিলম্ব জরিমানা — একটা কিস্তি তার তারিখ পার করে অপরিশোধিত থেকে গেলে,
+  // যতদিন সেই বকেয়া থেকে যায় ততদিন প্রতি মাসের শেষে জরিমানার হারটা তখনকার
+  // অপরিশোধিত অংকের উপর (মূল দামের উপর না) যোগ হতে থাকে — অর্থাৎ চক্রবৃদ্ধি,
+  // যতগুলো পূর্ণ মাস পার হয়ে গেছে ততবার। এটাও কোথাও সেভ হয় না, প্রতিবার
+  // আজকের তারিখ ধরে লাইভ হিসাব হয় — যাতে জরিমানার হার বদলালে বা তারিখ
+  // এগিয়ে গেলে হিসাবটা নিজে থেকেই ঠিক থাকে।
+  function computeLateFeeAccrued(customer, saleTx){
+    if(!saleTx.lateFee || !saleTx.schedule || !saleTx.schedule.length) return 0;
+    const schedule = getScheduleStatus(customer, saleTx);
+    const firstDue = schedule.find(s => s.status === 'due');
+    if(!firstDue) return 0; // এখনো কোনো কিস্তির তারিখই পার হয়নি
+    const overdueSince = new Date(firstDue.date+'T00:00:00');
+    const today = new Date(); today.setHours(0,0,0,0);
+    let months = (today.getFullYear()-overdueSince.getFullYear())*12 + (today.getMonth()-overdueSince.getMonth());
+    if(today.getDate() < overdueSince.getDate()) months--; // এই মাসে এখনো সেই তারিখ আসেনি
+    months = Math.max(0, months);
+    if(months === 0) return 0;
+    const paid = (customer.transactions||[])
+      .filter(tx => tx.category==='installment' && tx.take && tx.receiptNumber === saleTx.receiptNumber)
+      .reduce((s,tx)=>s+tx.take, 0);
+    let outstanding = Math.max(0, (saleTx.remainingAmount!=null ? saleTx.remainingAmount : saleTx.give) - paid);
+    let totalFee = 0;
+    for(let i=0; i<months; i++){
+      const fee = outstanding * (saleTx.lateFee/100);
+      totalFee += fee;
+      outstanding += fee; // পরের মাসের জরিমানা এবার বাড়তি অংকসহ নতুন বকেয়ার উপর বসবে
+    }
+    return totalFee;
+  }
   // Same idea for সহজ কিস্তি — unfiltered collector, reused by the tab and
   // the badge count.
   function collectInstallmentDueRows(){
@@ -3739,6 +3825,14 @@
         }
       }
     });
+    // বিলম্ব জরিমানা — প্রতিটা সহজ কিস্তি রশিদের জন্য আলাদাভাবে হিসাব করে
+    // মোট কিস্তি বাকির সাথে যোগ করা হয়, যাতে এই একটা জায়গা ঠিক করলেই
+    // প্রোফাইল কার্ড, হোম লিস্ট, বাকি আদায়, রিপোর্ট — সব জায়গাতেই আপডেট হয়ে যায়।
+    let lateFeeTotal = 0;
+    txs.filter(tx => tx.category==='installment' && tx.give && tx.receiptNumber && tx.schedule && tx.schedule.length)
+      .forEach(saleTx => { lateFeeTotal += computeLateFeeAccrued(customer, saleTx); });
+    installmentDue += lateFeeTotal;
+    customer.lateFeeAccrued = lateFeeTotal;
     customer.installmentDue = installmentDue;
     customer.generalDue = generalDue;
     customer.generalIOwe = generalIOwe;
@@ -4305,6 +4399,7 @@
       perInstallment,
       installmentType,
       lateFee,
+      schedule: firstDateVal ? buildInstallmentSchedule(firstDateVal, count, installmentType, perInstallment) : [],
     };
 
     if(!currentCustomer.transactions) currentCustomer.transactions = [];
@@ -4502,12 +4597,17 @@
       const paid = (customer.transactions||[])
         .filter(tx => tx.category==='installment' && tx.take && tx.receiptNumber === saleTx.receiptNumber)
         .reduce((s,tx)=>s+tx.take, 0);
-      const remaining = Math.max(0, (saleTx.remainingAmount!=null ? saleTx.remainingAmount : saleTx.give) - paid);
+      const lateFee = computeLateFeeAccrued(customer, saleTx);
+      const remaining = Math.max(0, (saleTx.remainingAmount!=null ? saleTx.remainingAmount : saleTx.give) - paid) + lateFee;
+      const schedule = getScheduleStatus(customer, saleTx);
       return {
         receiptNumber: saleTx.receiptNumber,
         productName: saleTx.productName || '',
         perInstallment: saleTx.perInstallment || 0,
         remaining,
+        lateFee,
+        paidCount: schedule.filter(s=>s.status==='paid').length,
+        totalCount: schedule.length,
       };
     }).filter(r => r.remaining > 0);
   }
@@ -4537,7 +4637,7 @@
 
     currentCiReceipts = getCustomerReceipts(currentCustomer);
     const select = document.getElementById('ciReceiptSelect');
-    select.innerHTML = currentCiReceipts.map((r,i) => `<option value="${i}">${r.receiptNumber}${r.productName ? ' — '+escapeHtml(r.productName) : ''}</option>`).join('');
+    select.innerHTML = currentCiReceipts.map((r,i) => `<option value="${i}">${r.receiptNumber}${r.productName ? ' — '+escapeHtml(r.productName) : ''}${r.totalCount ? ` (${bn(r.paidCount)}/${bn(r.totalCount)})` : ''}${r.lateFee > 0 ? ` ⚠ +${bn(Math.round(r.lateFee))}` : ''}</option>`).join('');
     select.value = 0; // earliest-taken product first, selected by default
     updateCiReceiptFields();
 
