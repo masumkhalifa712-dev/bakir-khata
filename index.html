@@ -277,6 +277,21 @@
   .gr-group{ margin-bottom:14px; }
   .gr-group-title{ font-size:12px; font-weight:700; padding:0 16px 6px; }
   .gr-cust-row{ display:grid; grid-template-columns:1.6fr 1fr 0.9fr; align-items:center; gap:6px; width:calc(100% - 32px); margin:0 16px 6px; padding:12px 14px; border:none; border-radius:12px; background:var(--clr-card); box-shadow:0 1px 3px rgba(0,0,0,.04); cursor:pointer; font-family:inherit; text-align:left; }
+  .gr-select-toggle-btn{ margin-left:auto; padding:7px 13px; border:1.4px solid var(--clr-line); border-radius:999px; background:var(--clr-card); font-size:12px; font-weight:700; color:var(--clr-ink-soft); cursor:pointer; font-family:inherit; }
+  .gr-select-toggle-btn.active{ background:var(--clr-primary); border-color:var(--clr-primary); color:#fff; }
+  .gr-cust-row.selectable{ grid-template-columns:26px 1.6fr 1fr 0.9fr; }
+  .gr-cust-checkbox{ width:20px; height:20px; border-radius:6px; border:2px solid var(--clr-line); flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+  .gr-cust-checkbox svg{ width:13px; height:13px; color:#fff; opacity:0; }
+  .gr-cust-row.checked .gr-cust-checkbox{ background:var(--clr-primary); border-color:var(--clr-primary); }
+  .gr-cust-row.checked .gr-cust-checkbox svg{ opacity:1; }
+  .gr-cust-row.urgent-overdue .gr-cust-checkbox{ border-color:rgba(255,255,255,.6); }
+  .gr-bulk-bar{ position:fixed; left:50%; bottom:calc(16px + var(--safe-bottom)); transform:translateX(-50%); width:calc(100% - 32px); max-width:448px; background:#1B2E4A; border-radius:16px; padding:12px 16px; display:none; align-items:center; justify-content:space-between; gap:10px; box-shadow:0 6px 20px rgba(0,0,0,.25); z-index:60; }
+  .gr-bulk-bar.show{ display:flex; }
+  .gr-bulk-bar span{ color:#fff; font-size:12.5px; font-weight:700; flex-shrink:0; }
+  .gr-bulk-actions{ display:flex; gap:8px; }
+  .gr-bulk-actions button{ padding:9px 14px; border:none; border-radius:10px; font-size:12.5px; font-weight:700; cursor:pointer; font-family:inherit; }
+  #grBulkSmsBtn{ background:#fff; color:#1B2E4A; }
+  #grBulkWhatsappBtn{ background:#25D366; color:#fff; }
   .gr-cust-name{ font-size:13px; font-weight:700; color:var(--clr-ink); line-height:1.4; }
   .gr-cust-taken-date{ font-size:11px; font-weight:600; color:var(--clr-ink-soft); margin-top:2px; }
   .gr-cust-due-date{ font-size:12px; font-weight:700; text-align:center; color:var(--clr-ink); }
@@ -1137,6 +1152,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
       </button>
       <div class="cd-title">বাকি আদায়</div>
+      <button class="gr-select-toggle-btn" id="grSelectModeBtn">নির্বাচন করুন</button>
     </div>
 
     <div class="gr-tabs">
@@ -1185,7 +1201,25 @@
       </div>
       <div id="grUpcomingList"></div>
     </div>
+
+    <div class="gr-bulk-bar" id="grBulkBar">
+      <span id="grBulkCount">০ জন নির্বাচিত</span>
+      <div class="gr-bulk-actions">
+        <button id="grBulkSmsBtn">SMS পাঠান</button>
+        <button id="grBulkWhatsappBtn">WhatsApp</button>
+      </div>
+    </div>
   </section>
+
+  <!-- ================= WhatsApp step-through (one recipient at a time) ================= -->
+  <div class="lf-overlay" id="grWaStepOverlay">
+    <div class="del-modal" style="max-height:none; padding:22px 20px calc(20px + var(--safe-bottom));">
+      <div style="font-weight:800; font-size:15px; margin-bottom:4px;" id="grWaStepTitle">১ / ৫ জনকে পাঠান</div>
+      <div style="font-size:13px; color:var(--clr-ink-soft); margin-bottom:16px;" id="grWaStepName">কাস্টমারের নাম</div>
+      <button class="ss-save-btn" id="grWaStepSendBtn" style="background:#25D366; margin-bottom:10px;">এই কাস্টমারকে WhatsApp পাঠান</button>
+      <button class="ss-save-btn" id="grWaStepNextBtn" style="background:var(--clr-ink-soft);">পরবর্তী</button>
+    </div>
+  </div>
 
   <section class="screen" id="screen-purchaseHistory">
     <div class="cd-topbar">
@@ -2873,14 +2907,22 @@
       badge.style.display = 'none';
     }
   }
+  // বাল্ক তাগাদা — একাধিক কাস্টমার বেছে একসাথে SMS/WhatsApp পাঠানোর জন্য
+  let grSelectMode = false;
+  let grSelectedIds = new Set();
   function goToGroupReminder(){
     document.getElementById('grGeneralPeriodSelect').value = 'week';
     document.getElementById('grInstallmentPeriodSelect').value = 'week';
+    grSelectMode = false;
+    grSelectedIds.clear();
+    document.getElementById('grSelectModeBtn').classList.remove('active');
+    document.getElementById('grSelectModeBtn').textContent = 'নির্বাচন করুন';
+    document.getElementById('grBulkBar').classList.remove('show');
     switchGroupReminderTab('general');
     appEl.classList.add('show-groupreminder');
     pushAppState('groupreminder');
   }
-  function closeGroupReminder(){ appEl.classList.remove('show-groupreminder'); }
+  function closeGroupReminder(){ appEl.classList.remove('show-groupreminder'); document.getElementById('grWaStepOverlay').classList.remove('show'); }
   function switchGroupReminderTab(tab){
     document.getElementById('grTabGeneral').classList.toggle('active', tab==='general');
     document.getElementById('grTabInstallment').classList.toggle('active', tab==='installment');
@@ -2888,6 +2930,27 @@
     document.getElementById('grInstallmentPanel').style.display = tab==='installment' ? '' : 'none';
     if(tab==='general') renderGeneralReminderTab(); else renderInstallmentReminderTab();
   }
+  function updateGrBulkBar(){
+    const bar = document.getElementById('grBulkBar');
+    const count = grSelectedIds.size;
+    if(grSelectMode && count > 0){
+      document.getElementById('grBulkCount').textContent = `${bn(count)} জন নির্বাচিত`;
+      bar.classList.add('show');
+    }else{
+      bar.classList.remove('show');
+    }
+  }
+  document.getElementById('grSelectModeBtn').addEventListener('click', ()=>{
+    grSelectMode = !grSelectMode;
+    grSelectedIds.clear();
+    const btn = document.getElementById('grSelectModeBtn');
+    btn.classList.toggle('active', grSelectMode);
+    btn.textContent = grSelectMode ? 'বাতিল' : 'নির্বাচন করুন';
+    updateGrBulkBar();
+    // re-render whichever tab is currently visible so rows gain/lose checkboxes
+    if(document.getElementById('grTabGeneral').classList.contains('active')) renderGeneralReminderTab();
+    else renderInstallmentReminderTab();
+  });
   // Only used for the summary boxes (নতুন বাকি দিয়েছি / বিক্রি, আদায়) — those
   // still count by when the transaction was ENTERED, unlike the due-date list.
   function groupReminderPeriodStart(periodVal){
@@ -2907,6 +2970,22 @@
   function goToCustomerFromGroupReminder(id){
     const cust = customers.find(c=>c.id === id);
     if(cust){ closeGroupReminder(); goToCustomerDetail(cust); }
+  }
+  // Shared by both tabs' row lists — in selection mode, tapping a row just
+  // toggles its checkbox; otherwise it opens that customer's profile as before.
+  function wireGrRowClicks(container, rerenderFn){
+    container.querySelectorAll('.gr-cust-row').forEach(row=>{
+      row.addEventListener('click', ()=>{
+        if(grSelectMode){
+          const id = row.dataset.id;
+          if(grSelectedIds.has(id)) grSelectedIds.delete(id); else grSelectedIds.add(id);
+          row.classList.toggle('checked');
+          updateGrBulkBar();
+        }else{
+          goToCustomerFromGroupReminder(row.dataset.id);
+        }
+      });
+    });
   }
   function formatGrDate(d){
     if(!d || isNaN(d)) return '—';
@@ -2933,8 +3012,14 @@
     const daysSinceTaken = (!takenDate || isNaN(takenDate.getTime())) ? null : Math.max(0, grDayDiff(takenDate, today));
     const daysOverdue = daysUntil < 0 ? Math.abs(daysUntil) : 0; // fresh count starting only once the due date itself has passed
     const takenLine = daysSinceTaken !== null ? `${formatGrDate(takenDate)} থেকে ${bn(daysSinceTaken)} দিন` : formatGrDate(takenDate);
+    const checked = grSelectedIds.has(id);
+    const checkboxHtml = grSelectMode ? `
+        <div class="gr-cust-checkbox">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>` : '';
     return `
-      <button class="gr-cust-row ${cls}" data-id="${id}">
+      <button class="gr-cust-row ${cls} ${grSelectMode ? 'selectable' : ''} ${checked ? 'checked' : ''}" data-id="${id}">
+        ${checkboxHtml}
         <div>
           <div class="gr-cust-name">${escapeHtml(name)}${id?' · '+id:''}</div>
           <div class="gr-cust-taken-date">${takenLine}</div>
@@ -2998,9 +3083,7 @@
     container.innerHTML = rows.map(e=>
       renderGrRow(e.customer.name, e.customer.id, e.takenDate, e.dueDate, e.daysUntil, e.customer.generalDue)
     ).join('') || '<div class="gr-empty">এই সময়ে কারো পরিশোধের তারিখ নেই</div>';
-    container.querySelectorAll('.gr-cust-row').forEach(row=>{
-      row.addEventListener('click', ()=> goToCustomerFromGroupReminder(row.dataset.id));
-    });
+    wireGrRowClicks(container);
   }
   function installmentIntervalDays(type){
     return type==='daily' ? 1 : type==='weekly' ? 7 : 30;
@@ -3050,9 +3133,7 @@
     container.innerHTML = rows.map(e=>
       renderGrRow(e.customer.name, e.customer.id, e.takenDate, e.dueDate, e.daysUntil, e.receipt.perInstallment)
     ).join('') || '<div class="gr-empty">এই সময়ে কোনো কিস্তির তারিখ নেই</div>';
-    container.querySelectorAll('.gr-cust-row').forEach(row=>{
-      row.addEventListener('click', ()=> goToCustomerFromGroupReminder(row.dataset.id));
-    });
+    wireGrRowClicks(container);
   }
   document.getElementById('grBackBtn').addEventListener('click', ()=> history.back());
   document.getElementById('grTabGeneral').addEventListener('click', ()=> switchGroupReminderTab('general'));
@@ -4272,6 +4353,58 @@
     }
     return `প্রিয় ${customer.name},\nআপনার হিসাবে ${bn(amount)} টাকা বাকি যোগ করা হয়েছে।\nসর্বমোট বাকি: ${bn(due)} টাকা\n\nধন্যবাদান্তে\n${shopName}`;
   }
+
+  /* ================================================================ */
+  /* ================= CATEGORY: বাল্ক তাগাদা (বাকি আদায় থেকে) ========== */
+  /* ================================================================ */
+  document.getElementById('grBulkSmsBtn').addEventListener('click', ()=>{
+    const shopName = document.getElementById('shopName').textContent.trim() || 'দোকানের নাম';
+    const selected = [...grSelectedIds].map(id => customers.find(c=>c.id===id)).filter(c => c && c.mobile);
+    if(selected.length === 0){ showToast('মোবাইল নম্বর আছে এমন কাউকে নির্বাচন করো', 'danger'); return; }
+    // একসাথে অনেকজনকে পাঠানো হচ্ছে বলে বার্তাটা সাধারণ (কারো নির্দিষ্ট টাকার
+    // অংক ছাড়া) — প্রতিটা নাম্বারের জন্য আলাদা অংক বসানো একটামাত্র SMS-এ সম্ভব না।
+    const message = `প্রিয় গ্রাহক,\nআপনার কাছে আমাদের কিছু বাকি টাকা পাওনা আছে। দ্রুত পরিশোধ করার জন্য বিনীত অনুরোধ করা হলো।\n\nধন্যবাদান্তে\n${shopName}`;
+    const numbers = selected.map(c=>c.mobile).join(',');
+    window.location.href = `sms:${numbers}?body=${encodeURIComponent(message)}`;
+  });
+
+  let grWaQueue = [];
+  let grWaIndex = 0;
+  document.getElementById('grBulkWhatsappBtn').addEventListener('click', ()=>{
+    grWaQueue = [...grSelectedIds].map(id => customers.find(c=>c.id===id)).filter(c => c && c.mobile);
+    if(grWaQueue.length === 0){ showToast('মোবাইল নম্বর আছে এমন কাউকে নির্বাচন করো', 'danger'); return; }
+    grWaIndex = 0;
+    showGrWaStep();
+    document.getElementById('grWaStepOverlay').classList.add('show');
+  });
+  // WhatsApp-এ একসাথে একাধিক নম্বরে পাঠানোর কোনো উপায় নেই (wa.me লিংক শুধু
+  // একজনের জন্যই কাজ করে) — তাই একে একে দেখিয়ে, প্রতিটার জন্য নিজস্ব
+  // (ব্যক্তিগতকৃত টাকার অংকসহ) বার্তা তৈরি করে পাঠানো হয়।
+  function showGrWaStep(){
+    const cust = grWaQueue[grWaIndex];
+    document.getElementById('grWaStepTitle').textContent = `${bn(grWaIndex+1)} / ${bn(grWaQueue.length)} জনকে পাঠান`;
+    document.getElementById('grWaStepName').textContent = `${cust.name}${cust.id ? ' · '+cust.id : ''} — ${bn(cust.amount||0)} টাকা বাকি`;
+    document.getElementById('grWaStepNextBtn').textContent = (grWaIndex < grWaQueue.length-1) ? 'পরবর্তী' : 'শেষ করুন';
+  }
+  document.getElementById('grWaStepSendBtn').addEventListener('click', ()=>{
+    const cust = grWaQueue[grWaIndex];
+    if(!cust) return;
+    const message = buildTxSmsMessage('reminder', cust, cust.amount||0, cust.amount||0);
+    let num = (cust.mobile||'').replace(/\D/g,'');
+    if(num.startsWith('0')) num = '88' + num; // Bangladesh country code
+    window.open(`https://wa.me/${num}?text=${encodeURIComponent(message)}`, '_blank');
+  });
+  document.getElementById('grWaStepNextBtn').addEventListener('click', ()=>{
+    grWaIndex++;
+    if(grWaIndex >= grWaQueue.length){
+      document.getElementById('grWaStepOverlay').classList.remove('show');
+      return;
+    }
+    showGrWaStep();
+  });
+  document.getElementById('grWaStepOverlay').addEventListener('click', (e)=>{
+    if(e.target.id === 'grWaStepOverlay') document.getElementById('grWaStepOverlay').classList.remove('show');
+  });
 
   // Called right after a transaction is saved. Shows the SMS/share sheet if the
   // customer has a saved mobile number AND that screen's SMS toggle is on;
