@@ -156,10 +156,6 @@
   #app.show-appsettings #screen-appSettings{ transform:translateX(0); }
   #screen-groupReminder{ transform:translateX(100%); z-index:2; }
   #app.show-groupreminder #screen-groupReminder{ transform:translateX(0); }
-  #screen-installmentSummary{ transform:translateX(100%); z-index:2; }
-  #app.show-installmentsummary #screen-installmentSummary{ transform:translateX(0); }
-  #screen-installmentDetail{ transform:translateX(100%); z-index:3; }
-  #app.show-installmentdetail #screen-installmentDetail{ transform:translateX(0); }
   #screen-purchaseHistory{ transform:translateX(100%); z-index:2; }
   #app.show-purchasehistory #screen-purchaseHistory{ transform:translateX(0); }
   #app.show-report #screen-home{ transform:translateX(-18%); filter:brightness(.92); }
@@ -210,9 +206,7 @@
   #app.show-shopsettings .fab, #app.show-shopsettings .bottom-nav,
   #app.show-appsettings .fab, #app.show-appsettings .bottom-nav,
   #app.show-purchasehistory .fab, #app.show-purchasehistory .bottom-nav,
-  #app.show-groupreminder .fab, #app.show-groupreminder .bottom-nav,
-  #app.show-installmentsummary .fab, #app.show-installmentsummary .bottom-nav,
-  #app.show-installmentdetail .fab, #app.show-installmentdetail .bottom-nav
+  #app.show-groupreminder .fab, #app.show-groupreminder .bottom-nav
   { display:none; }
 
   /* ================= CATEGORY: Header Section (Home) ================= */
@@ -333,44 +327,6 @@
   .gr-cust-row.urgent-overdue .gr-cust-elapsed,
   .gr-cust-row.urgent-overdue .gr-cust-amount{ color:#fff; }
   .gr-empty{ text-align:center; padding:30px 16px; color:var(--clr-ink-soft); font-size:13px; }
-
-  /* ================= CATEGORY: ক্রেতা অনুযায়ী কিস্তিতে বিক্রয় রিপোর্ট (কার্ড লিস্ট) ================= */
-  .is-card{ display:block; width:100%; text-align:left; background:var(--clr-card); border:none; border-radius:14px; padding:14px 16px; margin-bottom:10px; box-shadow:0 1px 4px rgba(0,0,0,.05); cursor:pointer; font-family:inherit; }
-  .is-card-top{ display:flex; justify-content:space-between; align-items:flex-start; }
-  .is-card-receipt{ font-size:14px; font-weight:800; color:var(--clr-ink); }
-  .is-card-date{ font-size:11.5px; color:var(--clr-ink-soft); font-weight:600; margin-top:2px; }
-  .is-card-row{ display:flex; justify-content:space-between; margin-top:10px; }
-  .is-card-stat-label{ font-size:11px; color:var(--clr-ink-soft); font-weight:600; }
-  .is-card-stat-value{ font-size:13.5px; font-weight:700; color:var(--clr-ink); margin-top:2px; }
-  .is-card-stat-value.due{ color:var(--clr-owe-to-me); }
-
-  /* ================= CATEGORY: কিস্তিতে বিক্রয় রিপোর্ট (সময়সূচি বিস্তারিত) ================= */
-  .id-header-card{ background:var(--clr-card); border-radius:16px; padding:18px 16px; margin-bottom:16px; box-shadow:0 1px 4px rgba(0,0,0,.05); }
-  .id-product-name{ font-size:16.5px; font-weight:800; color:var(--clr-ink); }
-  .id-receipt-line{ font-size:12.5px; color:var(--clr-ink-soft); font-weight:600; margin-top:2px; }
-  .id-progress-wrap{ margin-top:14px; }
-  .id-progress-bar{ height:8px; border-radius:999px; background:var(--clr-line); overflow:hidden; }
-  .id-progress-fill{ height:100%; background:linear-gradient(90deg, var(--clr-primary), var(--clr-primary-dark)); border-radius:999px; transition:width .3s ease; }
-  .id-progress-label{ font-size:11.5px; font-weight:700; color:var(--clr-ink-soft); margin-top:6px; }
-  .id-stat-row{ display:flex; justify-content:space-between; margin-top:16px; gap:8px; }
-  .id-stat{ flex:1; text-align:center; }
-  .id-stat-label{ font-size:11px; color:var(--clr-ink-soft); font-weight:600; }
-  .id-stat-value{ font-size:14px; font-weight:800; color:var(--clr-ink); margin-top:3px; }
-  .id-late-fee-line{ margin-top:12px; padding:9px 12px; border-radius:10px; background:#FFF0EE; color:var(--clr-primary); font-size:12.5px; font-weight:700; text-align:center; }
-  .id-finish-line{ margin-top:10px; font-size:11.5px; color:var(--clr-ink-soft); font-weight:600; text-align:center; }
-  .id-section-title{ font-size:12.5px; font-weight:700; color:var(--clr-ink-soft); margin-bottom:8px; }
-  .id-slot-row{ display:flex; align-items:center; gap:12px; background:var(--clr-card); border-radius:12px; padding:11px 14px; margin-bottom:6px; box-shadow:0 1px 3px rgba(0,0,0,.04); }
-  .id-slot-badge{ width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:12px; font-weight:800; }
-  .id-slot-badge.paid{ background:#DFF4E6; color:#1E8A4C; }
-  .id-slot-badge.due{ background:#FFE1DE; color:var(--clr-primary); }
-  .id-slot-badge.upcoming{ background:var(--clr-line); color:var(--clr-ink-soft); }
-  .id-slot-main{ flex:1; }
-  .id-slot-date{ font-size:13px; font-weight:700; color:var(--clr-ink); }
-  .id-slot-status{ font-size:11px; font-weight:600; margin-top:1px; }
-  .id-slot-status.paid{ color:#1E8A4C; }
-  .id-slot-status.due{ color:var(--clr-primary); }
-  .id-slot-status.upcoming{ color:var(--clr-ink-soft); }
-  .id-slot-amount{ font-size:13px; font-weight:700; color:var(--clr-ink); }
 
   /* ================= CATEGORY: Business Mode Settings ================= */
   .mode-card{ display:flex; align-items:center; gap:14px; background:var(--clr-card); border:2px solid var(--clr-line); border-radius:16px; padding:18px 16px; margin-bottom:14px; cursor:pointer; }
@@ -1084,18 +1040,18 @@
    </div>
 
    <div class="home-scroll">
-    <div class="list-meta" id="listMeta">ক্রেতা <b id="customerCount">0</b> / সাপ্লায়ার <b id="supplierCount">0</b></div>
+    <div class="list-meta" id="listMeta">কাস্টমার <b id="customerCount">0</b> / সাপ্লায়ার <b id="supplierCount">0</b></div>
 
     <div class="customer-list" id="customerList"></div>
 
     <div class="empty-state" id="emptyState">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <p id="emptyStateText">কোনো ক্রেতা পাওয়া যায়নি</p>
+      <p id="emptyStateText">কোনো কাস্টমার পাওয়া যায়নি</p>
     </div>
    </div>
   </section>
 
-  <button class="fab" id="addCustomerBtn" aria-label="নতুন ক্রেতা যোগ করুন">
+  <button class="fab" id="addCustomerBtn" aria-label="নতুন কাস্টমার যোগ করুন">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 21c0-3.31 2.69-6 6-6h0"/><circle cx="12" cy="8" r="4"/><line x1="19" y1="16" x2="19" y2="22"/><line x1="16" y1="19" x2="22" y2="19"/></svg>
   </button>
 
@@ -1235,7 +1191,7 @@
       </div>
       <div class="gr-section-title">পরিশোধের তারিখ অনুযায়ী তালিকা</div>
       <div class="gr-col-headers">
-        <span>বিক্রয় তারিখ ও ক্রেতা</span>
+        <span>বিক্রয় তারিখ ও কাস্টমার</span>
         <span>পরিশোধ তারিখ ও খেলাপি</span>
         <span>বাকির পরিমাণ</span>
       </div>
@@ -1256,7 +1212,7 @@
       </div>
       <div class="gr-section-title">পরিশোধের তারিখ অনুযায়ী তালিকা</div>
       <div class="gr-col-headers">
-        <span>বিক্রয় তারিখ ও ক্রেতা</span>
+        <span>বিক্রয় তারিখ ও কাস্টমার</span>
         <span>পরিশোধ তারিখ ও খেলাপি</span>
         <span>বাকির পরিমাণ</span>
       </div>
@@ -1276,50 +1232,11 @@
   <div class="lf-overlay" id="grWaStepOverlay">
     <div class="del-modal" style="max-height:none; padding:22px 20px calc(20px + var(--safe-bottom));">
       <div style="font-weight:800; font-size:15px; margin-bottom:4px;" id="grWaStepTitle">১ / ৫ জনকে পাঠান</div>
-      <div style="font-size:13px; color:var(--clr-ink-soft); margin-bottom:16px;" id="grWaStepName">ক্রেতার নাম</div>
-      <button class="ss-save-btn" id="grWaStepSendBtn" style="background:#25D366; margin-bottom:10px;">এই ক্রেতাকে WhatsApp পাঠান</button>
+      <div style="font-size:13px; color:var(--clr-ink-soft); margin-bottom:16px;" id="grWaStepName">কাস্টমারের নাম</div>
+      <button class="ss-save-btn" id="grWaStepSendBtn" style="background:#25D366; margin-bottom:10px;">এই কাস্টমারকে WhatsApp পাঠান</button>
       <button class="ss-save-btn" id="grWaStepNextBtn" style="background:var(--clr-ink-soft);">পরবর্তী</button>
     </div>
   </div>
-
-  <section class="screen" id="screen-installmentSummary">
-    <div class="cd-topbar">
-      <button class="cd-back" id="isBackBtn" aria-label="ফিরে যান">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
-      </button>
-      <div class="cd-title">ক্রেতা অনুযায়ী কিস্তিতে বিক্রয় রিপোর্ট</div>
-    </div>
-    <div id="isCardsList" style="padding:14px 16px;"></div>
-  </section>
-
-  <section class="screen" id="screen-installmentDetail">
-    <div class="cd-topbar">
-      <button class="cd-back" id="idBackBtn" aria-label="ফিরে যান">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
-      </button>
-      <div class="cd-title">কিস্তিতে বিক্রয় রিপোর্ট</div>
-    </div>
-    <div style="padding:16px;">
-      <div class="id-header-card">
-        <div class="id-product-name" id="idProductName">পণ্যের নাম</div>
-        <div class="id-receipt-line" id="idReceiptLine">রশিদ · ক্রেতার নাম</div>
-        <div class="id-progress-wrap">
-          <div class="id-progress-bar"><div class="id-progress-fill" id="idProgressFill" style="width:0%;"></div></div>
-          <div class="id-progress-label" id="idProgressLabel">০/০ কিস্তি শেষ</div>
-        </div>
-        <div class="id-stat-row">
-          <div class="id-stat"><div class="id-stat-label">মোট মূল্য</div><div class="id-stat-value" id="idTotalValue">০ টাকা</div></div>
-          <div class="id-stat"><div class="id-stat-label">পরিশোধিত</div><div class="id-stat-value" id="idPaidValue">০ টাকা</div></div>
-          <div class="id-stat"><div class="id-stat-label">বর্তমান বাকি</div><div class="id-stat-value" id="idDueValue">০ টাকা</div></div>
-        </div>
-        <div class="id-late-fee-line" id="idLateFeeLine" style="display:none;"></div>
-        <div class="id-finish-line" id="idFinishLine"></div>
-      </div>
-      <div class="id-section-title">কিস্তির সময়সূচি</div>
-      <div id="idScheduleList"></div>
-      <button class="ss-save-btn" id="idCollectBtn" style="margin-top:10px;">এই রশিদে কিস্তি আদায় করুন</button>
-    </div>
-  </section>
 
   <section class="screen" id="screen-purchaseHistory">
     <div class="cd-topbar">
@@ -1424,7 +1341,7 @@
       <button class="ac-back" id="acBackBtn" aria-label="ফিরে যান">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
       </button>
-      <div class="ac-title">নতুন ক্রেতা/সাপ্লায়ার</div>
+      <div class="ac-title">নতুন কাস্টমার/সাপ্লায়ার</div>
     </div>
 
     <div class="ac-body">
@@ -1438,7 +1355,7 @@
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 2l-1.83 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
           </span>
         </button>
-        <div class="avatar-picker-label">ক্রেতার ছবি যোগ করতে<br/>ট্যাপ করুন (ঐচ্ছিক)</div>
+        <div class="avatar-picker-label">কাস্টমারের ছবি যোগ করতে<br/>ট্যাপ করুন (ঐচ্ছিক)</div>
       </div>
       <input type="file" id="fileCamera" accept="image/*" capture="environment" style="display:none;" />
       <input type="file" id="fileGallery" accept="image/*" style="display:none;" />
@@ -1446,7 +1363,7 @@
       <!-- ===== CATEGORY: Customer/Supplier Type Toggle ===== -->
       <div class="type-toggle">
         <button class="type-pill selected" id="typeCustomer" data-type="customer">
-          <span class="radio-dot"></span> ক্রেতা
+          <span class="radio-dot"></span> কাস্টমার
         </button>
         <button class="type-pill" id="typeSupplier" data-type="supplier">
           <span class="radio-dot"></span> সাপ্লায়ার
@@ -1497,7 +1414,7 @@
       <button class="cd-back" id="cdBackBtn" aria-label="ফিরে যান">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
       </button>
-      <div class="cd-title">ক্রেতার প্রোফাইল</div>
+      <div class="cd-title">কাস্টমার প্রোফাইল</div>
       <div class="cd-topbar-icons">
         <button id="cdPdfBtn" aria-label="পিডিএফ ডাউনলোড">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15h1a1 1 0 0 0 0-2H9v4"/><path d="M12.5 13v4h.5a1.5 1.5 0 0 0 0-4z"/><path d="M17.5 13H16v4"/><path d="M16 15h1"/></svg>
@@ -1559,8 +1476,8 @@
         <span>তাগাদা</span>
         <svg class="trailing" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       </button>
-      <button class="cd-quick-action-btn" id="cdInstallmentReportBtn">
-        <span>কিস্তির রিপোর্ট</span>
+      <button class="cd-quick-action-btn" id="cdDateBtn">
+        <span>পরিশোধ</span>
         <svg class="trailing" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
       </button>
     </div>
@@ -1592,16 +1509,16 @@
       <button class="cd-back" id="ceBackBtn" aria-label="ফিরে যান">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
       </button>
-      <div class="cd-title">ক্রেতা এডিট</div>
+      <div class="cd-title">কাস্টমার এডিট</div>
     </div>
     <div class="ce-body">
       <button class="ce-option-row edit" id="ceEditBtn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>
-        <span class="ce-option-label">ক্রেতা এডিট</span>
+        <span class="ce-option-label">কাস্টমার এডিট</span>
       </button>
       <button class="ce-option-row delete" id="ceDeleteBtn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-        <span class="ce-option-label">ক্রেতা ডিলেট</span>
+        <span class="ce-option-label">কাস্টমার ডিলেট</span>
       </button>
     </div>
   </section>
@@ -1614,8 +1531,8 @@
       <div class="del-modal-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
       </div>
-      <div class="del-modal-title" id="delModalCustomerName">ক্রেতার নাম</div>
-      <div class="del-modal-notice">লেনদেন শেষ না হওয়া পর্যন্ত এই ক্রেতা ডিলেট করা যাবে না</div>
+      <div class="del-modal-title" id="delModalCustomerName">কাস্টমারের নাম</div>
+      <div class="del-modal-notice">লেনদেন শেষ না হওয়া পর্যন্ত এই কাস্টমার ডিলেট করা যাবে না</div>
       <div class="del-modal-tx-list" id="delModalTxList"></div>
       <button class="del-modal-close-btn" id="delModalCloseBtn">বন্ধ করুন</button>
     </div>
@@ -1626,7 +1543,7 @@
   <!-- ================================================================ -->
   <div class="del-modal-overlay" id="editCustomerOverlay">
     <div class="del-modal">
-      <div class="del-modal-title" style="margin-top:20px;">ক্রেতার তথ্য এডিট করুন</div>
+      <div class="del-modal-title" style="margin-top:20px;">কাস্টমারের তথ্য এডিট করুন</div>
       <div style="padding:16px;">
         <div style="display:flex; justify-content:center; margin-bottom:16px;">
           <button class="avatar-picker-btn" id="ceEditPhotoBtn" style="width:64px;height:64px;">
@@ -2157,7 +2074,7 @@
   <div class="sheet-overlay" id="txSmsSheetOverlay">
     <div class="sheet">
       <div class="sheet-handle"></div>
-      <div class="sheet-title">লেনদেনের তথ্য ক্রেতাকে জানাতে চান?</div>
+      <div class="sheet-title">লেনদেনের তথ্য কাস্টমারকে জানাতে চান?</div>
       <button class="sheet-option" id="txSmsSendBtn">
         <span class="so-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
         এসএমএস পাঠান
@@ -2206,7 +2123,7 @@
       </div>
 
       <div class="lf-check-row checked" id="lfCustomerRow">
-        <span>ক্রেতা</span>
+        <span>কাস্টমার</span>
         <div class="lf-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
       </div>
       <div class="lf-check-row checked" id="lfSupplierRow">
@@ -2353,7 +2270,7 @@
   }
   // Uploads to Cloudinary's unsigned upload endpoint and returns the public
   // secure_url (what we actually store, not the image itself). Same name/
-  // signature as before so Add Customer and ক্রেতা এডিট don't need changes.
+  // signature as before so Add Customer and কাস্টমার এডিট don't need changes.
   async function uploadPhotoToStorage(file, pathHint){
     let uploadBlob = file;
     try{ uploadBlob = await compressImageFile(file); }
@@ -2628,7 +2545,7 @@
   });
 
   // ========================================
-  // হোম স্ক্রিন — ক্রেতা লিস্ট রেন্ডার
+  // হোম স্ক্রিন — কাস্টমার লিস্ট রেন্ডার
   // ========================================
   function parseTxDate(dateStr, timeStr){
     if(!dateStr) return new Date(NaN);
@@ -2680,7 +2597,7 @@
     else if(listFilterState.dateSort === 'oldest') filtered.sort((a,b)=>getLastTxDate(a)-getLastTxDate(b));
     list.innerHTML = "";
     document.getElementById('emptyState').classList.toggle('show', filtered.length===0);
-    document.getElementById('emptyStateText').textContent = customersLoading ? 'লোড হচ্ছে...' : (homeListMode==='payable' ? 'কাউকে দেওয়ার মতো কিছু নেই' : 'কোনো ক্রেতা পাওয়া যায়নি');
+    document.getElementById('emptyStateText').textContent = customersLoading ? 'লোড হচ্ছে...' : (homeListMode==='payable' ? 'কাউকে দেওয়ার মতো কিছু নেই' : 'কোনো কাস্টমার পাওয়া যায়নি');
 
     filtered.forEach(c => {
       const row = document.createElement('button');
@@ -2862,7 +2779,7 @@
     if(e.target.id === 'lfOverlay') document.getElementById('lfOverlay').classList.remove('show');
   });
   document.getElementById('lfCustomerRow').addEventListener('click', function(){
-    // ক্রেতা/সাপ্লায়ার both stay on by default — at least one must always
+    // কাস্টমার/সাপ্লায়ার both stay on by default — at least one must always
     // remain checked, so the list is never accidentally filtered to nothing.
     if(this.classList.contains('checked') && !document.getElementById('lfSupplierRow').classList.contains('checked')) return;
     this.classList.toggle('checked');
@@ -2919,7 +2836,7 @@
     try{ sessionStorage.setItem('lastScreen', JSON.stringify({ screen: name, customerId: currentCustomer ? currentCustomer.id : null })); }catch(e){}
   }
   function goToAddCustomer(){ appEl.classList.add('show-add'); pushAppState('add'); }
-  function goHome(){ appEl.classList.remove('show-add'); appEl.classList.remove('show-detail'); appEl.classList.remove('show-newdue'); appEl.classList.remove('show-txdetail'); appEl.classList.remove('show-customeredit'); appEl.classList.remove('show-newinstallment'); appEl.classList.remove('show-collectinstallment'); appEl.classList.remove('show-report'); appEl.classList.remove('show-shopsettings'); appEl.classList.remove('show-appsettings'); appEl.classList.remove('show-purchasehistory'); appEl.classList.remove('show-groupreminder'); appEl.classList.remove('show-installmentsummary'); appEl.classList.remove('show-installmentdetail'); resetAddForm(); try{ sessionStorage.removeItem('lastScreen'); }catch(e){} }
+  function goHome(){ appEl.classList.remove('show-add'); appEl.classList.remove('show-detail'); appEl.classList.remove('show-newdue'); appEl.classList.remove('show-txdetail'); appEl.classList.remove('show-customeredit'); appEl.classList.remove('show-newinstallment'); appEl.classList.remove('show-collectinstallment'); appEl.classList.remove('show-report'); appEl.classList.remove('show-shopsettings'); appEl.classList.remove('show-appsettings'); appEl.classList.remove('show-purchasehistory'); appEl.classList.remove('show-groupreminder'); resetAddForm(); try{ sessionStorage.removeItem('lastScreen'); }catch(e){} }
 
   /* ================================================================ */
   /* ================= CATEGORY: Side Menu Drawer ===================== */
@@ -3014,7 +2931,7 @@
       badge.style.display = 'none';
     }
   }
-  // বাল্ক তাগাদা — একাধিক ক্রেতা বেছে একসাথে SMS/WhatsApp পাঠানোর জন্য
+  // বাল্ক তাগাদা — একাধিক কাস্টমার বেছে একসাথে SMS/WhatsApp পাঠানোর জন্য
   let grSelectMode = false;
   let grSelectedIds = new Set();
   function goToGroupReminder(){
@@ -3140,7 +3057,7 @@
   }
   // সাধারণ বাকি — এই প্ল্যাটফর্মের লেনদেনের হিসাব সহজ কিস্তি থেকে সম্পূর্ণ
   // আলাদা রাখা হয়েছে (category !== 'installment' দিয়ে ফিল্টার করা)। প্রতিটা
-  // ক্রেতার পরিশোধের তারিখ ধরা হয় তার সবচেয়ে সাম্প্রতিক "দিচ্ছি" এন্ট্রির
+  // কাস্টমারের পরিশোধের তারিখ ধরা হয় তার সবচেয়ে সাম্প্রতিক "দিচ্ছি" এন্ট্রির
   // নিজস্ব তারিখ থেকে — এন্ট্রিতে তারিখ বসানো থাকলে সেটাই, না থাকলে সেই
   // এন্ট্রির দিন থেকে ১ মাস পর ধরে নেওয়া হয়।
   // Collects every customer's সাধারণ বাকি due-date row, unfiltered by any
@@ -3222,7 +3139,7 @@
   // saleTx-এর schedule আর সংশ্লিষ্ট receiptNumber-এর সব 'take' লেনদেন মিলিয়ে
   // প্রতিটা কিস্তির অবস্থা বের করে — 'paid' (পরিশোধিত), 'due' (তারিখ পার হয়ে
   // গেছে বা আজই, এখনো অপরিশোধিত), অথবা 'upcoming' (তারিখ এখনো আসেনি)।
-  // ক্রেতা নির্ধারিত কিস্তির চেয়ে কম/বেশি/অসম টাকা দিলেও যেন এটা ঠিকভাবে
+  // কাস্টমার নির্ধারিত কিস্তির চেয়ে কম/বেশি/অসম টাকা দিলেও যেন এটা ঠিকভাবে
   // চলে, তাই গণনাটা "কতবার টাকা দিয়েছে" দিয়ে না করে "মোট কত টাকা জমা
   // হয়েছে" দিয়ে করা হয় — জমা টাকা যতটুকু কিস্তি পূরণ করে ততটুকুই 'paid'।
   function getScheduleStatus(customer, saleTx){
@@ -3478,7 +3395,7 @@
     history.back();
   });
   // ========================================
-  // ক্রেতার প্রোফাইল ও লেনদেন বিবরণ
+  // কাস্টমার প্রোফাইল ও লেনদেন বিবরণ
   // ========================================
   function goToCustomerDetail(customer){ renderCustomerDetail(customer); appEl.classList.add('show-detail'); pushAppState('detail'); }
   function closeCustomerDetail(){ appEl.classList.remove('show-detail'); }
@@ -3661,7 +3578,7 @@
   const typeCustomerBtn = document.getElementById('typeCustomer');
   const typeSupplierBtn = document.getElementById('typeSupplier');
   // ========================================
-  // নতুন ক্রেতা যোগ করা
+  // নতুন কাস্টমার যোগ করা
   // ========================================
   function setType(type){
     selectedType = type;
@@ -3852,7 +3769,7 @@
     meta.nextSerial += 1;
     await persistCustomersAndMeta();
     renderList();
-    showToast(`✅ ${selectedType==='customer' ? 'ক্রেতা' : 'সাপ্লায়ার'} যোগ হয়েছে — ${name} (${id})`);
+    showToast(`✅ ${selectedType==='customer' ? 'কাস্টমার' : 'সাপ্লায়ার'} যোগ হয়েছে — ${name} (${id})`);
     goHome();
   });
 
@@ -3875,7 +3792,7 @@
   /* ================================================================ */
   let currentCustomer = null;
   // ========================================
-  // ক্রেতার প্রোফাইল ও লেনদেন বিবরণ
+  // কাস্টমার প্রোফাইল ও লেনদেন বিবরণ
   // ========================================
   function recomputeCustomerTotals(customer){
     const txs = customer.transactions || [];
@@ -4161,7 +4078,7 @@
   });
   document.getElementById('cdPdfBtn').addEventListener('click', ()=>showToast("পিডিএফ ডাউনলোড (শীঘ্রই আসছে)"));
   // ========================================
-  // ক্রেতা তথ্য এডিট
+  // কাস্টমার তথ্য এডিট
   // ========================================
   function goToCustomerEdit(){ appEl.classList.add('show-customeredit'); pushAppState('customeredit'); }
   function closeCustomerEdit(){ appEl.classList.remove('show-customeredit'); }
@@ -4215,7 +4132,7 @@
     renderCustomerDetail(currentCustomer);
     renderList(document.getElementById('searchInput').value);
     document.getElementById('editCustomerOverlay').classList.remove('show');
-    showToast('ক্রেতার তথ্য আপডেট হয়েছে');
+    showToast('কাস্টমারের তথ্য আপডেট হয়েছে');
   });
   document.getElementById('ceDeleteBtn').addEventListener('click', async ()=>{
     if(!currentCustomer) return;
@@ -4241,7 +4158,7 @@
     renderList(document.getElementById('searchInput').value);
     appEl.classList.remove('show-customeredit');
     goHome();
-    showToast("ক্রেতা মুছে ফেলা হয়েছে");
+    showToast("কাস্টমার মুছে ফেলা হয়েছে");
   });
   document.getElementById('delModalCloseBtn').addEventListener('click', ()=>{
     document.getElementById('delBlockedOverlay').classList.remove('show');
@@ -4252,7 +4169,7 @@
   document.getElementById('cdDateBtn').addEventListener('click', ()=>showToast("পরিশোধের তারিখ (শীঘ্রই আসছে)"));
   document.getElementById('cdSmsBtn').addEventListener('click', ()=>{
     if(!currentCustomer) return;
-    if(!currentCustomer.mobile){ showToast('ক্রেতার মোবাইল নম্বর সেভ করা নেই', 'danger'); return; }
+    if(!currentCustomer.mobile){ showToast('কাস্টমারের মোবাইল নম্বর সেভ করা নেই', 'danger'); return; }
     document.getElementById('tagadaChoiceOverlay').classList.add('show');
   });
   document.getElementById('tagadaChoiceCancelBtn').addEventListener('click', ()=>{
@@ -4689,113 +4606,11 @@
         perInstallment: saleTx.perInstallment || 0,
         remaining,
         lateFee,
-        paid,
-        totalValue: saleTx.remainingAmount!=null ? saleTx.remainingAmount : saleTx.give,
-        saleDate: saleTx.date || '',
         paidCount: schedule.filter(s=>s.status==='paid').length,
         totalCount: schedule.length,
-        saleTx,
       };
     }).filter(r => r.remaining > 0);
   }
-
-  /* ================================================================ */
-  /* === CATEGORY: ক্রেতা অনুযায়ী কিস্তিতে বিক্রয় রিপোর্ট + বিস্তারিত === */
-  /* ================================================================ */
-  document.getElementById('cdInstallmentReportBtn').addEventListener('click', goToInstallmentSummary);
-  function goToInstallmentSummary(){
-    if(!currentCustomer) return;
-    const receipts = getCustomerReceipts(currentCustomer);
-    const container = document.getElementById('isCardsList');
-    container.innerHTML = receipts.map(r => `
-      <button class="is-card" data-receipt="${r.receiptNumber}">
-        <div class="is-card-top">
-          <div>
-            <div class="is-card-receipt">${r.receiptNumber}${r.productName ? ' — '+escapeHtml(r.productName) : ''}</div>
-            <div class="is-card-date">বিক্রয়ের তারিখ: ${r.saleDate || '—'}</div>
-          </div>
-        </div>
-        <div class="is-card-row">
-          <div><div class="is-card-stat-label">মোট কিস্তি</div><div class="is-card-stat-value">${bn(r.paidCount)}/${bn(r.totalCount)}</div></div>
-          <div><div class="is-card-stat-label">পাওনা টাকার পরিমাণ</div><div class="is-card-stat-value due">${bn(Math.round(r.remaining))} টাকা</div></div>
-        </div>
-      </button>`).join('') || '<div class="gr-empty">এই ক্রেতার কোনো চলমান কিস্তি নেই</div>';
-    container.querySelectorAll('.is-card').forEach(card=>{
-      card.addEventListener('click', ()=> goToInstallmentDetail(card.dataset.receipt));
-    });
-    appEl.classList.add('show-installmentsummary');
-    pushAppState('installmentsummary');
-  }
-  function closeInstallmentSummary(){ appEl.classList.remove('show-installmentsummary'); }
-  document.getElementById('isBackBtn').addEventListener('click', ()=> history.back());
-
-  let currentInstallmentDetailReceipt = null;
-  function goToInstallmentDetail(receiptNumber){
-    if(!currentCustomer) return;
-    const receipts = getCustomerReceipts(currentCustomer);
-    const r = receipts.find(x => x.receiptNumber === receiptNumber);
-    if(!r) return;
-    currentInstallmentDetailReceipt = receiptNumber;
-
-    document.getElementById('idProductName').textContent = r.productName || 'পণ্যের নাম নেই';
-    document.getElementById('idReceiptLine').textContent = `${r.receiptNumber} · ${currentCustomer.name}${currentCustomer.id ? ' · '+currentCustomer.id : ''}`;
-
-    const pct = r.totalCount ? Math.round((r.paidCount / r.totalCount) * 100) : 0;
-    document.getElementById('idProgressFill').style.width = pct + '%';
-    document.getElementById('idProgressLabel').textContent = `${bn(r.paidCount)}/${bn(r.totalCount)} কিস্তি শেষ`;
-
-    document.getElementById('idTotalValue').textContent = bn(Math.round(r.totalValue)) + ' টাকা';
-    document.getElementById('idPaidValue').textContent = bn(Math.round(r.paid)) + ' টাকা';
-    document.getElementById('idDueValue').textContent = bn(Math.round(r.remaining)) + ' টাকা';
-
-    const lateFeeLine = document.getElementById('idLateFeeLine');
-    if(r.lateFee > 0){
-      lateFeeLine.style.display = '';
-      lateFeeLine.textContent = `বিলম্ব জরিমানা যোগ হয়েছে: +${bn(Math.round(r.lateFee))} টাকা`;
-    }else{
-      lateFeeLine.style.display = 'none';
-    }
-
-    const schedule = getScheduleStatus(currentCustomer, r.saleTx);
-    const lastSlot = schedule[schedule.length-1];
-    const finishLine = document.getElementById('idFinishLine');
-    if(lastSlot){
-      const allPaid = schedule.every(s=>s.status==='paid');
-      finishLine.textContent = allPaid ? 'সব কিস্তি পরিশোধিত' : `আনুমানিক শেষ হবে: ${formatGrDate(new Date(lastSlot.date+'T00:00:00'))}`;
-    }else{
-      finishLine.textContent = '';
-    }
-
-    const statusLabels = { paid:'পরিশোধিত', due:'বাকি', upcoming:'এখনো আসেনি' };
-    const statusIcons = { paid:'✓', due:'!', upcoming:'—' };
-    document.getElementById('idScheduleList').innerHTML = schedule.map(s => `
-      <div class="id-slot-row">
-        <div class="id-slot-badge ${s.status}">${statusIcons[s.status]}</div>
-        <div class="id-slot-main">
-          <div class="id-slot-date">${bn(s.index)}ম কিস্তি — ${formatGrDate(new Date(s.date+'T00:00:00'))}</div>
-          <div class="id-slot-status ${s.status}">${statusLabels[s.status]}</div>
-        </div>
-        <div class="id-slot-amount">${bn(Math.round(s.amount))} টাকা</div>
-      </div>`).join('');
-
-    appEl.classList.add('show-installmentdetail');
-    pushAppState('installmentdetail');
-  }
-  function closeInstallmentDetail(){ appEl.classList.remove('show-installmentdetail'); }
-  document.getElementById('idBackBtn').addEventListener('click', ()=> history.back());
-  document.getElementById('idCollectBtn').addEventListener('click', ()=>{
-    const receiptNumber = currentInstallmentDetailReceipt;
-    closeInstallmentDetail();
-    closeInstallmentSummary();
-    goToCollectInstallment();
-    // কিস্তি আদায়ের রশিদ ড্রপডাউনে এই নির্দিষ্ট রশিদটাই আগে থেকে বাছাই করা থাকবে
-    setTimeout(()=>{
-      const select = document.getElementById('ciReceiptSelect');
-      const idx = currentCiReceipts.findIndex(r => r.receiptNumber === receiptNumber);
-      if(idx >= 0){ select.value = idx; updateCiReceiptFields(); }
-    }, 0);
-  });
-
   function updateCiReceiptFields(){
     const idx = Number(document.getElementById('ciReceiptSelect').value);
     const selected = currentCiReceipts[idx];
@@ -5274,8 +5089,6 @@
       case 'newinstallment':
       case 'collectinstallment':
       case 'customeredit':
-      case 'installmentsummary':
-      case 'installmentdetail':
         if(customer) goToCustomerDetail(customer);
         break;
       default: break; // unknown/old value — just stay home
@@ -5615,8 +5428,6 @@
   // ব্যাক বাটন হ্যান্ডলিং
   // ========================================
   function closeTopmostAppScreen(){
-    if(appEl.classList.contains('show-installmentdetail')){ closeInstallmentDetail(); return; }
-    if(appEl.classList.contains('show-installmentsummary')){ closeInstallmentSummary(); return; }
     if(appEl.classList.contains('show-newinstallment')){ closeNewInstallment(); return; }
     if(appEl.classList.contains('show-collectinstallment')){ closeCollectInstallment(); return; }
     if(appEl.classList.contains('show-newdue')){ closeNewDue(); return; }
