@@ -316,6 +316,8 @@
   .wdp-overlay.show{ display:flex; }
   .wdp-sheet{ width:100%; max-width:480px; background:#fff; border-radius:22px 22px 0 0; padding:20px 0 calc(16px + var(--safe-bottom)); }
   .wdp-title{ text-align:center; font-size:15px; font-weight:700; color:var(--clr-ink); margin-bottom:14px; }
+  .wdp-col-labels{ display:flex; padding:0 8px; margin-bottom:2px; }
+  .wdp-col-labels span{ flex:1; text-align:center; font-size:11px; font-weight:700; color:var(--clr-ink-soft); }
   .wdp-wheels{ display:flex; position:relative; height:180px; padding:0 8px; }
   .wdp-col{ flex:1; overflow-y:scroll; scroll-snap-type:y mandatory; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
   .wdp-col::-webkit-scrollbar{ display:none; }
@@ -1800,6 +1802,12 @@
           </div>
         </div>
         <div class="ni-calc-row">
+          <div class="ni-calc-row-label">বিক্রয়ের তারিখ</div>
+          <div class="wdp-trigger">
+            <input type="date" class="ni-calc-input wdp-input" id="niSaleDateInput" />
+          </div>
+        </div>
+        <div class="ni-calc-row">
           <div class="ni-calc-row-label">পণ্যের নাম</div>
           <input type="text" class="ni-calc-input" id="niProductNameInput" placeholder="যেমনঃ স্যামসাং A15" />
         </div>
@@ -2130,6 +2138,9 @@
   <div class="wdp-overlay" id="wdpOverlay">
     <div class="wdp-sheet">
       <div class="wdp-title" id="wdpTitle">তারিখ নির্বাচন করুন</div>
+      <div class="wdp-col-labels">
+        <span>তারিখ</span><span>মাস</span><span>সাল/বছর</span>
+      </div>
       <div class="wdp-wheels">
         <div class="wdp-highlight"></div>
         <div class="wdp-col" id="wdpDayCol"></div>
@@ -2357,7 +2368,7 @@
   /* ================================================================ */
   /* ================= CATEGORY: Wheel Date Picker (used everywhere) === */
   /* ================================================================ */
-  const WDP_MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const WDP_MONTHS = ['01','02','03','04','05','06','07','08','09','10','11','12'];
   const WDP_ITEM_H = 36;
   let wdpOnDone = null;
 
@@ -2459,6 +2470,13 @@
       }
     }
     return new Date(`${dateStr} ${timeStr||''}`.trim());
+  }
+  // For prefilling a <input type="date"> (which needs yyyy-mm-dd) from a
+  // stored D/M/YYYY transaction date.
+  function dmyToIsoDate(dateStr){
+    const d = parseTxDate(dateStr);
+    if(isNaN(d)) return '';
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
   }
 
   function getLastTxDate(c){
@@ -2868,21 +2886,28 @@
     if(daysUntil <= 3) return 'urgent-soon';
     return '';
   }
+  // Both dates normalized to midnight before diffing, so a transaction's
+  // original clock time (e.g. 16:40) can't shift the day count off by one.
+  function grDayDiff(from, to){
+    const a = new Date(from.getFullYear(), from.getMonth(), from.getDate());
+    const b = new Date(to.getFullYear(), to.getMonth(), to.getDate());
+    return Math.round((b - a) / (1000*60*60*24));
+  }
   function renderGrRow(name, id, takenDate, dueDate, daysUntil, amount){
     const cls = grUrgencyClass(daysUntil);
-    const today = new Date(); today.setHours(0,0,0,0);
-    const daysSinceTaken = (!takenDate || isNaN(takenDate)) ? null : Math.max(0, Math.floor((today - takenDate) / (1000*60*60*24)));
+    const today = new Date();
+    const daysSinceTaken = (!takenDate || isNaN(takenDate.getTime())) ? null : Math.max(0, grDayDiff(takenDate, today));
     const daysOverdue = daysUntil < 0 ? Math.abs(daysUntil) : 0; // fresh count starting only once the due date itself has passed
-    const elapsedLine = daysSinceTaken !== null ? `${bn(daysSinceTaken)} দিন/${bn(daysOverdue)} দিন` : '';
+    const takenLine = daysSinceTaken !== null ? `${formatGrDate(takenDate)} থেকে ${bn(daysSinceTaken)} দিন` : formatGrDate(takenDate);
     return `
       <button class="gr-cust-row ${cls}" data-id="${id}">
         <div>
           <div class="gr-cust-name">${escapeHtml(name)}${id?' · '+id:''}</div>
-          <div class="gr-cust-taken-date">তারিখ: ${formatGrDate(takenDate)}</div>
+          <div class="gr-cust-taken-date">${takenLine}</div>
         </div>
         <div>
           <div class="gr-cust-due-date">${formatGrDate(dueDate)}</div>
-          ${elapsedLine ? `<div class="gr-cust-elapsed">${elapsedLine}</div>` : ''}
+          <div class="gr-cust-elapsed">${bn(daysOverdue)} দিন</div>
         </div>
         <div class="gr-cust-amount">${bn(amount)} টাকা</div>
       </button>`;
@@ -3468,10 +3493,13 @@
     const serial = String(meta.nextSerial).padStart(2,'0'); // grows past 99 naturally (e.g. 101)
     return mm + yy + serial;
   }
-  function generateReceiptNumber(){
+  function generateReceiptNumber(forDate){
     // Same MM+YY+serial idea as the customer ID, prefixed R so the two never
     // look alike — one receipt number per সহজ কিস্তি sale, assigned once.
-    const d = new Date();
+    // Uses the sale's own date (বিক্রয়ের তারিখ) if one was selected, so a
+    // back-dated or future-dated entry still gets a receipt number matching
+    // when the sale actually happened, not necessarily today.
+    const d = (forDate && !isNaN(forDate)) ? forDate : new Date();
     const mm = String(d.getMonth()+1).padStart(2,'0');
     const yy = String(d.getFullYear()).slice(-2);
     if(!meta.nextReceiptSerial) meta.nextReceiptSerial = 1;
@@ -3793,6 +3821,7 @@
     if(tx.give && tx.category === 'installment'){
       sheetMode = 'give';
       goToNewInstallment();
+      document.getElementById('niSaleDateInput').value = dmyToIsoDate(tx.date) || new Date().toISOString().slice(0,10);
       document.getElementById('niProductNameInput').value = tx.productName || '';
       document.getElementById('niSalePriceInput').value = (tx.salePrice != null ? tx.salePrice : tx.give) || '';
       document.getElementById('niDownPayment').value = tx.downPayment || 0;
@@ -4068,6 +4097,7 @@
     niSubmitBar.style.transform = 'translate(-50%, 0px)';
 
     if(editingTxIndex === null){
+      document.getElementById('niSaleDateInput').value = new Date().toISOString().slice(0,10);
       document.getElementById('niPurchasePriceInput').value = '';
       document.getElementById('niPurchaseToggle').classList.remove('on');
       document.getElementById('niPurchasePriceInput').style.display = 'none';
@@ -4129,6 +4159,8 @@
     const lateFee = Number(document.getElementById('niLateFee').value) || 0;
     const note = document.getElementById('niNoteInput').value.trim();
     const firstDateVal = document.getElementById('niFirstInstallmentDate').value;
+    const saleDateVal = document.getElementById('niSaleDateInput').value; // yyyy-mm-dd
+    const saleDateObj = saleDateVal ? new Date(saleDateVal+'T00:00:00') : new Date();
 
     const planFields = {
       productName, salePrice, downPayment, purchasePrice,
@@ -4146,12 +4178,14 @@
       const tx = currentCustomer.transactions[editingTxIndex];
       tx.give = remaining;
       tx.note = note;
+      tx.date = `${saleDateObj.getDate()}/${saleDateObj.getMonth()+1}/${saleDateObj.getFullYear()}`;
       if(firstDateVal) tx.dueDate = firstDateVal;
       Object.assign(tx, planFields);
       showToast("এন্ট্রি আপডেট হয়েছে");
     }else{
-      const { date: __d, time: __t } = nowDateTimeStrings();
-      const receiptNumber = generateReceiptNumber();
+      const { time: __t } = nowDateTimeStrings();
+      const __d = `${saleDateObj.getDate()}/${saleDateObj.getMonth()+1}/${saleDateObj.getFullYear()}`;
+      const receiptNumber = generateReceiptNumber(saleDateObj);
       meta.nextReceiptSerial = (meta.nextReceiptSerial || 1) + 1;
       const newTx = {
         date: __d,
@@ -4477,7 +4511,7 @@
     });
   }
   registerDockedSubmitBar(ndSubmitBar, ['ndAmountInput','ndNoteInput']);
-  registerDockedSubmitBar(niSubmitBar, ['niProductNameInput','niSalePriceInput','niPurchasePriceInput','niDownPayment','niInstallmentCount','niLateFee','niNoteInput','niFirstInstallmentDate']);
+  registerDockedSubmitBar(niSubmitBar, ['niSaleDateInput','niProductNameInput','niSalePriceInput','niPurchasePriceInput','niDownPayment','niInstallmentCount','niLateFee','niNoteInput','niFirstInstallmentDate']);
   registerDockedSubmitBar(ciSubmitBar, ['ciAmountReceived','ciDiscount','ciDescription']);
   if(window.visualViewport){
     window.visualViewport.addEventListener('resize', repositionDockedBars);
