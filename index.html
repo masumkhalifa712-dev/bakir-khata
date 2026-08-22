@@ -1797,15 +1797,16 @@
         <div class="ni-calc-row">
           <div class="ni-calc-row-label">ক্রয় মূল্য যদি থাকে</div>
           <div style="display:flex; align-items:center; gap:8px;">
-            <input type="number" inputmode="decimal" class="ni-calc-input" id="niPurchasePriceInput" placeholder="০" style="width:64px; display:none;" />
+            <input type="number" inputmode="decimal" class="ni-calc-input" id="niPurchasePriceInput" placeholder="০" style="width:110px; display:none;" />
             <button class="toggle-switch" id="niPurchaseToggle" aria-label="ক্রয় মূল্য টগল"><span class="knob"></span></button>
           </div>
         </div>
         <div class="ni-calc-row">
           <div class="ni-calc-row-label">বিক্রয়ের তারিখ</div>
-          <div class="wdp-trigger">
-            <input type="date" class="ni-calc-input wdp-input" id="niSaleDateInput" />
-          </div>
+          <button class="ni-calc-input" id="niSaleDateBtn" style="text-align:left; background:var(--clr-card); cursor:pointer;">
+            <span id="niSaleDateLabel"></span>
+          </button>
+          <input type="date" id="niSaleDateInput" style="position:absolute; opacity:0; pointer-events:none; width:1px; height:1px;" />
         </div>
         <div class="ni-calc-row">
           <div class="ni-calc-row-label">পণ্যের নাম</div>
@@ -2435,16 +2436,21 @@
     const validD = isNaN(d) ? new Date() : d;
     const days = Array.from({length:31}, (_,i)=> String(i+1));
     // Centered on the target year (not always today's year) so it's always
-    // present in the list — this was the actual cause of the picker landing
-    // on 2021: if the shown date's year fell outside a fixed range, the
-    // lookup silently fell back to index 0.
+    // present in the list.
     const years = Array.from({length:16}, (_,i)=> String(validD.getFullYear()-5+i));
-    wdpBuildColumn(document.getElementById('wdpDayCol'), days, validD.getDate()-1);
-    wdpBuildColumn(document.getElementById('wdpMonthCol'), WDP_MONTHS, validD.getMonth());
-    wdpBuildColumn(document.getElementById('wdpYearCol'), years, years.indexOf(String(validD.getFullYear())));
-    setTimeout(()=> ['wdpDayCol','wdpMonthCol','wdpYearCol'].forEach(id=> wdpUpdateCenter(document.getElementById(id))), 60);
     wdpOnDone = onDone;
     document.getElementById('wdpOverlay').classList.add('show');
+    // Build + scroll only AFTER the overlay is actually visible — setting
+    // scrollTop while the columns are still display:none has no effect (the
+    // browser silently ignores it), which was the real reason the picker
+    // always landed on the very first row (day 1 / month 01 / earliest year)
+    // no matter what date was passed in.
+    requestAnimationFrame(()=>{
+      wdpBuildColumn(document.getElementById('wdpDayCol'), days, validD.getDate()-1);
+      wdpBuildColumn(document.getElementById('wdpMonthCol'), WDP_MONTHS, validD.getMonth());
+      wdpBuildColumn(document.getElementById('wdpYearCol'), years, years.indexOf(String(validD.getFullYear())));
+      setTimeout(()=> ['wdpDayCol','wdpMonthCol','wdpYearCol'].forEach(id=> wdpUpdateCenter(document.getElementById(id))), 60);
+    });
   }
   document.getElementById('wdpCancelBtn').addEventListener('click', ()=>{
     document.getElementById('wdpOverlay').classList.remove('show');
@@ -3849,7 +3855,9 @@
     if(tx.give && tx.category === 'installment'){
       sheetMode = 'give';
       goToNewInstallment();
-      document.getElementById('niSaleDateInput').value = dmyToIsoDate(tx.date) || new Date().toISOString().slice(0,10);
+      { const __saleIso = dmyToIsoDate(tx.date) || new Date().toISOString().slice(0,10);
+        document.getElementById('niSaleDateInput').value = __saleIso;
+        updateNiSaleDateLabel(__saleIso); }
       document.getElementById('niProductNameInput').value = tx.productName || '';
       document.getElementById('niSalePriceInput').value = (tx.salePrice != null ? tx.salePrice : tx.give) || '';
       document.getElementById('niDownPayment').value = tx.downPayment || 0;
@@ -4125,7 +4133,9 @@
     niSubmitBar.style.transform = 'translate(-50%, 0px)';
 
     if(editingTxIndex === null){
-      document.getElementById('niSaleDateInput').value = new Date().toISOString().slice(0,10);
+      const todayIso = new Date().toISOString().slice(0,10);
+      document.getElementById('niSaleDateInput').value = todayIso;
+      updateNiSaleDateLabel(todayIso);
       document.getElementById('niPurchasePriceInput').value = '';
       document.getElementById('niPurchaseToggle').classList.remove('on');
       document.getElementById('niPurchasePriceInput').style.display = 'none';
@@ -4315,6 +4325,22 @@
     const mm = String(d.getMonth()+1).padStart(2,'0');
     return `${dd}-${mm}-${d.getFullYear()}`;
   }
+  // বিক্রয়ের তারিখ: the real <input type="date"> stays fully hidden (its own
+  // native rendering follows the browser/OS locale, e.g. MM/DD, which
+  // doesn't match the app's D-M-Y convention) — this label is what's
+  // actually shown, always formatted the app's way.
+  function updateNiSaleDateLabel(isoDate){
+    const label = document.getElementById('niSaleDateLabel');
+    if(!isoDate){ label.textContent = ''; return; }
+    label.textContent = formatDMYDash(new Date(isoDate+'T00:00:00'));
+  }
+  document.getElementById('niSaleDateBtn').addEventListener('click', ()=>{
+    const input = document.getElementById('niSaleDateInput');
+    openWheelDatePicker(input.value, (iso)=>{
+      input.value = iso;
+      updateNiSaleDateLabel(iso);
+    });
+  });
 
   // One entry per সহজ কিস্তি sale that still has money owed on it — used to
   // populate the রশিদ নাম্বার dropdown and to know which specific product a
