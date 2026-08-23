@@ -158,6 +158,8 @@
   #app.show-groupreminder #screen-groupReminder{ transform:translateX(0); }
   #screen-installmentSummary{ transform:translateX(100%); z-index:4; }
   #app.show-installmentsummary #screen-installmentSummary{ transform:translateX(0); }
+  #screen-expenses{ transform:translateX(100%); z-index:2; }
+  #app.show-expenses #screen-expenses{ transform:translateX(0); }
   #screen-installmentDetail{ transform:translateX(100%); z-index:5; }
   #app.show-installmentdetail #screen-installmentDetail{ transform:translateX(0); }
   #screen-purchaseHistory{ transform:translateX(100%); z-index:2; }
@@ -213,6 +215,7 @@
   #app.show-purchasehistory .fab, #app.show-purchasehistory .bottom-nav,
   #app.show-groupreminder .fab, #app.show-groupreminder .bottom-nav,
   #app.show-installmentsummary .fab, #app.show-installmentsummary .bottom-nav,
+  #app.show-expenses .fab, #app.show-expenses .bottom-nav,
   #app.show-installmentdetail .fab, #app.show-installmentdetail .bottom-nav
   { display:none; }
 
@@ -479,6 +482,13 @@
 
   /* ================= CATEGORY: Floating Action Button ================= */
   .fab{ position:fixed; right:calc((100vw - min(100vw,480px))/2 + 20px); bottom:calc(84px + var(--safe-bottom)); width:56px;height:56px; border-radius:50%; background:linear-gradient(160deg, var(--clr-fab), var(--clr-primary-dark)); border:none; display:flex;align-items:center;justify-content:center; color:#fff; box-shadow:0 8px 20px rgba(198,16,46,.35); cursor:pointer; z-index:40; transition:transform .15s ease; }
+  .exp-fab{ position:fixed; right:calc((100vw - min(100vw,480px))/2 + 20px); bottom:calc(24px + var(--safe-bottom)); width:56px;height:56px; border-radius:50%; background:linear-gradient(160deg, var(--clr-fab), var(--clr-primary-dark)); border:none; display:flex;align-items:center;justify-content:center; color:#fff; box-shadow:0 8px 20px rgba(198,16,46,.35); cursor:pointer; z-index:6; transition:transform .15s ease; }
+  .exp-fab:active{ transform:scale(.92); }
+  .exp-row{ display:flex; align-items:center; justify-content:space-between; width:calc(100% - 32px); margin:0 auto 8px; padding:13px 15px; background:var(--clr-card); border-radius:12px; box-shadow:0 1px 3px rgba(0,0,0,.04); cursor:pointer; border:none; text-align:left; font-family:inherit; }
+  .exp-row-cat{ font-size:13.5px; font-weight:700; color:var(--clr-ink); }
+  .exp-row-note{ font-size:11.5px; color:var(--clr-ink-soft); font-weight:600; margin-top:2px; }
+  .exp-row-date{ font-size:11px; color:var(--clr-ink-soft); font-weight:600; margin-top:2px; }
+  .exp-row-amount{ font-size:14px; font-weight:800; color:var(--clr-primary); flex-shrink:0; margin-left:10px; }
   .fab:active{transform:scale(.9);}
   .fab svg{width:24px;height:24px;}
 
@@ -1321,6 +1331,49 @@
       <button class="ss-save-btn" id="idCollectBtn" style="margin-top:10px;">এই রশিদে কিস্তি আদায় করুন</button>
     </div>
   </section>
+
+  <section class="screen" id="screen-expenses">
+    <div class="cd-topbar">
+      <button class="cd-back" id="expBackBtn" aria-label="ফিরে যান">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      </button>
+      <div class="cd-title">খরচ ব্যবস্থাপনা</div>
+    </div>
+    <div style="padding:14px 16px 90px;">
+      <div class="gr-summary-row" style="padding:0;">
+        <div class="gr-summary-box"><div class="gr-summary-label">এই মাসের মোট খরচ</div><div class="gr-summary-amount" id="expMonthTotal">০ টাকা</div></div>
+      </div>
+      <div class="gr-section-title" style="margin-top:16px;">সব খরচের তালিকা</div>
+      <div id="expList"></div>
+    </div>
+    <button class="exp-fab" id="expAddBtn" aria-label="নতুন খরচ যোগ করুন">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </button>
+  </section>
+
+  <div class="sheet-overlay" id="expAddSheetOverlay">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title" id="expSheetTitle">নতুন খরচ যোগ করুন</div>
+      <select class="rf-select" id="expCategorySelect" style="margin-bottom:14px;">
+        <option value="দোকান ভাড়া">দোকান ভাড়া</option>
+        <option value="বিদ্যুৎ বিল">বিদ্যুৎ বিল</option>
+        <option value="বেতন">বেতন</option>
+        <option value="পরিবহন">পরিবহন</option>
+        <option value="মেরামত">মেরামত</option>
+        <option value="অন্যান্য" selected>অন্যান্য</option>
+      </select>
+      <input type="number" inputmode="decimal" class="ni-calc-input" id="expAmountInput" placeholder="টাকার পরিমাণ" style="width:100%; margin-bottom:14px;" />
+      <button class="ni-calc-input" id="expDateBtn" style="width:100%; text-align:left; background:var(--clr-card); cursor:pointer; margin-bottom:14px;">
+        <span id="expDateLabel"></span>
+      </button>
+      <input type="date" id="expDateInput" style="position:absolute; opacity:0; pointer-events:none; width:1px; height:1px;" />
+      <textarea class="nd-note-textarea" id="expNoteInput" placeholder="নোট (ঐচ্ছিক)" style="margin-bottom:16px;"></textarea>
+      <button class="ss-save-btn" id="expSaveBtn">সংরক্ষণ করুন</button>
+      <button class="ss-save-btn" id="expDeleteBtn" style="display:none; background:transparent; color:var(--clr-primary); border:1.4px solid var(--clr-primary); margin-top:8px;">মুছে ফেলুন</button>
+      <button class="sheet-cancel" id="expCancelBtn">বাতিল</button>
+    </div>
+  </div>
 
   <section class="screen" id="screen-purchaseHistory">
     <div class="cd-topbar">
@@ -2252,6 +2305,10 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
         <span>ক্রয়-বিক্রয় লাভ-ক্ষতি</span>
       </button>
+      <button class="menu-drawer-item" id="menuExpensesBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        <span>খরচ ব্যবস্থাপনা</span>
+      </button>
       <button class="menu-drawer-item logout" id="menuLogoutBtn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         <span>লগ আউট</span>
@@ -2402,6 +2459,7 @@
   const DEFAULT_CUSTOMERS = [];
 
   let shopInfo = { name: '', ownerName: '', shopType: '', address: '', businessMode: 'both' };
+  let expenses = [];
   // ========================================
   // Supabase/RPC ডেটা লোড ও সেভ
   // ========================================
@@ -2425,6 +2483,7 @@
         meta = row.meta || { nextSerial: 1 };
         shopInfo = row.shop_info || { name: '', ownerName: '', shopType: '', address: '', businessMode: 'both' };
         if(!shopInfo.businessMode) shopInfo.businessMode = 'both';
+        expenses = row.expenses || [];
       }else{
         customers = DEFAULT_CUSTOMERS;
         meta = { nextSerial: 1 };
@@ -2485,6 +2544,7 @@
         p_customers: fields.customers !== undefined ? fields.customers : null,
         p_meta: fields.meta !== undefined ? fields.meta : null,
         p_shop_info: fields.shop_info !== undefined ? fields.shop_info : null,
+        p_expenses: fields.expenses !== undefined ? fields.expenses : null,
       });
       if(error) throw error;
       if(fields.customers !== undefined) updateGroupReminderBadge();
@@ -2493,6 +2553,7 @@
       showToast("সেভ করা যায়নি — ইন্টারনেট কানেকশন চেক করো", 'danger');
     }
   }
+  async function persistExpenses(){ await saveUserDataRpc({ expenses }); }
   async function persistShopInfo(){ await saveUserDataRpc({ shop_info: shopInfo }); }
   async function persistCustomers(){ await saveUserDataRpc({ customers }); }
   async function persistMeta(){ await saveUserDataRpc({ meta }); }
@@ -2920,7 +2981,7 @@
     try{ sessionStorage.setItem('lastScreen', JSON.stringify({ screen: name, customerId: currentCustomer ? currentCustomer.id : null })); }catch(e){}
   }
   function goToAddCustomer(){ appEl.classList.add('show-add'); pushAppState('add'); }
-  function goHome(){ appEl.classList.remove('show-add'); appEl.classList.remove('show-detail'); appEl.classList.remove('show-newdue'); appEl.classList.remove('show-txdetail'); appEl.classList.remove('show-customeredit'); appEl.classList.remove('show-newinstallment'); appEl.classList.remove('show-collectinstallment'); appEl.classList.remove('show-report'); appEl.classList.remove('show-shopsettings'); appEl.classList.remove('show-appsettings'); appEl.classList.remove('show-purchasehistory'); appEl.classList.remove('show-groupreminder'); appEl.classList.remove('show-installmentsummary'); appEl.classList.remove('show-installmentdetail'); resetAddForm(); try{ sessionStorage.removeItem('lastScreen'); }catch(e){} }
+  function goHome(){ appEl.classList.remove('show-add'); appEl.classList.remove('show-detail'); appEl.classList.remove('show-newdue'); appEl.classList.remove('show-txdetail'); appEl.classList.remove('show-customeredit'); appEl.classList.remove('show-newinstallment'); appEl.classList.remove('show-collectinstallment'); appEl.classList.remove('show-report'); appEl.classList.remove('show-shopsettings'); appEl.classList.remove('show-appsettings'); appEl.classList.remove('show-purchasehistory'); appEl.classList.remove('show-groupreminder'); appEl.classList.remove('show-installmentsummary'); appEl.classList.remove('show-installmentdetail'); appEl.classList.remove('show-expenses'); resetAddForm(); try{ sessionStorage.removeItem('lastScreen'); }catch(e){} }
 
   /* ================================================================ */
   /* ================= CATEGORY: Side Menu Drawer ===================== */
@@ -3331,6 +3392,112 @@
   document.getElementById('grTabInstallment').addEventListener('click', ()=> switchGroupReminderTab('installment'));
   document.getElementById('grGeneralPeriodSelect').addEventListener('change', renderGeneralReminderTab);
   document.getElementById('grInstallmentPeriodSelect').addEventListener('change', renderInstallmentReminderTab);
+
+  /* ================================================================ */
+  /* ================= CATEGORY: খরচ ব্যবস্থাপনা ======================= */
+  /* ================================================================ */
+  let editingExpenseIndex = null;
+  function goToExpenses(){
+    closeMenuDrawer();
+    renderExpenseList();
+    appEl.classList.add('show-expenses');
+    pushAppState('expenses');
+  }
+  function closeExpenses(){ appEl.classList.remove('show-expenses'); }
+  document.getElementById('menuExpensesBtn').addEventListener('click', goToExpenses);
+  document.getElementById('expBackBtn').addEventListener('click', ()=> history.back());
+
+  function renderExpenseList(){
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    let monthTotal = 0;
+    const sorted = expenses.map((e,i)=>({...e, idx:i})).sort((a,b)=> parseTxDate(b.date) - parseTxDate(a.date));
+    sorted.forEach(e=>{
+      const d = parseTxDate(e.date);
+      if(!isNaN(d) && d >= monthStart) monthTotal += e.amount;
+    });
+    document.getElementById('expMonthTotal').textContent = bn(Math.round(monthTotal)) + ' টাকা';
+
+    const container = document.getElementById('expList');
+    container.innerHTML = sorted.map(e => `
+      <button class="exp-row" data-idx="${e.idx}">
+        <div>
+          <div class="exp-row-cat">${escapeHtml(e.category)}</div>
+          ${e.note ? `<div class="exp-row-note">${escapeHtml(e.note)}</div>` : ''}
+          <div class="exp-row-date">${e.date || '—'}</div>
+        </div>
+        <div class="exp-row-amount">${bn(Math.round(e.amount))} টাকা</div>
+      </button>`).join('') || '<div class="gr-empty">এখনো কোনো খরচ যোগ করা হয়নি</div>';
+    container.querySelectorAll('.exp-row').forEach(row=>{
+      row.addEventListener('click', ()=> openExpenseSheet(Number(row.dataset.idx)));
+    });
+  }
+
+  function openExpenseSheet(editIdx){
+    editingExpenseIndex = (editIdx !== undefined && editIdx !== null) ? editIdx : null;
+    const isEdit = editingExpenseIndex !== null;
+    document.getElementById('expSheetTitle').textContent = isEdit ? 'খরচ এডিট করুন' : 'নতুন খরচ যোগ করুন';
+    document.getElementById('expDeleteBtn').style.display = isEdit ? '' : 'none';
+    if(isEdit){
+      const e = expenses[editingExpenseIndex];
+      document.getElementById('expCategorySelect').value = e.category;
+      document.getElementById('expAmountInput').value = e.amount;
+      const iso = dmyToIsoDate(e.date) || new Date().toISOString().slice(0,10);
+      document.getElementById('expDateInput').value = iso;
+      updateExpDateLabel(iso);
+      document.getElementById('expNoteInput').value = e.note || '';
+    }else{
+      document.getElementById('expCategorySelect').value = 'অন্যান্য';
+      document.getElementById('expAmountInput').value = '';
+      const todayIso = new Date().toISOString().slice(0,10);
+      document.getElementById('expDateInput').value = todayIso;
+      updateExpDateLabel(todayIso);
+      document.getElementById('expNoteInput').value = '';
+    }
+    document.getElementById('expAddSheetOverlay').classList.add('show');
+  }
+  function closeExpenseSheet(){ document.getElementById('expAddSheetOverlay').classList.remove('show'); }
+  document.getElementById('expAddBtn').addEventListener('click', ()=> openExpenseSheet(null));
+  document.getElementById('expCancelBtn').addEventListener('click', closeExpenseSheet);
+  document.getElementById('expAddSheetOverlay').addEventListener('click', (e)=>{
+    if(e.target.id === 'expAddSheetOverlay') closeExpenseSheet();
+  });
+  function updateExpDateLabel(isoDate){
+    const label = document.getElementById('expDateLabel');
+    if(!isoDate){ label.textContent = ''; return; }
+    label.textContent = formatDMYDash(new Date(isoDate+'T00:00:00'));
+  }
+  document.getElementById('expDateBtn').addEventListener('click', ()=>{
+    const input = document.getElementById('expDateInput');
+    openWheelDatePicker(input.value, (iso)=>{
+      input.value = iso;
+      updateExpDateLabel(iso);
+    });
+  });
+  document.getElementById('expDeleteBtn').addEventListener('click', async ()=>{
+    if(editingExpenseIndex === null) return;
+    if(!confirm('এই খরচের এন্ট্রিটা মুছে ফেলতে চাও?')) return;
+    expenses.splice(editingExpenseIndex, 1);
+    await persistExpenses();
+    closeExpenseSheet();
+    renderExpenseList();
+    showToast('মুছে ফেলা হয়েছে');
+  });
+  document.getElementById('expSaveBtn').addEventListener('click', async ()=>{
+    const category = document.getElementById('expCategorySelect').value;
+    const amount = Number(document.getElementById('expAmountInput').value) || 0;
+    const dateIso = document.getElementById('expDateInput').value;
+    const note = document.getElementById('expNoteInput').value.trim();
+    if(amount <= 0){ showToast('টাকার পরিমাণ দিতে হবে', 'danger'); return; }
+    const d = dateIso ? new Date(dateIso+'T00:00:00') : new Date();
+    const entry = { category, amount, note, date: `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}` };
+    if(editingExpenseIndex !== null) expenses[editingExpenseIndex] = entry;
+    else expenses.push(entry);
+    await persistExpenses();
+    closeExpenseSheet();
+    renderExpenseList();
+    showToast('সংরক্ষণ হয়েছে');
+  });
 
   function goToPurchaseHistory(){
     closeMenuDrawer();
@@ -5296,6 +5463,7 @@
       case 'appsettings': goToAppSettings(); break;
       case 'purchasehistory': goToPurchaseHistory(); break;
       case 'groupreminder': goToGroupReminder(); break;
+      case 'expenses': goToExpenses(); break;
       case 'detail':
       case 'newdue':
       case 'txdetail':
@@ -5645,6 +5813,7 @@
   function closeTopmostAppScreen(){
     if(appEl.classList.contains('show-installmentdetail')){ closeInstallmentDetail(); return; }
     if(appEl.classList.contains('show-installmentsummary')){ closeInstallmentSummary(); return; }
+    if(appEl.classList.contains('show-expenses')){ closeExpenses(); return; }
     if(appEl.classList.contains('show-newinstallment')){ closeNewInstallment(); return; }
     if(appEl.classList.contains('show-collectinstallment')){ closeCollectInstallment(); return; }
     if(appEl.classList.contains('show-newdue')){ closeNewDue(); return; }
