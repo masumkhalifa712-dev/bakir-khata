@@ -1315,9 +1315,8 @@
         </div>
         <div class="id-stat-row" id="idStatRow"></div>
         <div class="id-late-fee-line" id="idLateFeeLine" style="display:none;"></div>
-        <div class="id-finish-line" id="idFinishLine"></div>
       </div>
-      <div class="id-section-title">কিস্তির সময়সূচি</div>
+      <div class="id-section-title">পেমেন্টের ইতিহাস</div>
       <div id="idScheduleList"></div>
       <button class="ss-save-btn" id="idCollectBtn" style="margin-top:10px;">এই রশিদে কিস্তি আদায় করুন</button>
     </div>
@@ -4747,24 +4746,31 @@
     document.getElementById('idReceiptLine').textContent = `${r.receiptNumber} · ${currentCustomer.name}${currentCustomer.id ? ' · '+currentCustomer.id : ''}`;
     document.getElementById('idInstallmentCount').textContent = `${bn(r.totalCount)} কিস্তিতে পরিশোধ`;
 
-    // প্রগ্রেস এখন কিস্তি-সংখ্যা না, টাকার অংক দিয়ে মাপা হয় — ডাউন পেমেন্ট +
-    // এ পর্যন্ত পরিশোধিত কিস্তি, পুরো বিক্রয় মূল্যের কত অংশ সেটাই দেখায়।
+    // প্রগ্রেস টাকার অংক দিয়ে মাপা হয় — ডাউন পেমেন্ট + এ পর্যন্ত পরিশোধিত
+    // কিস্তি, পুরো বিক্রয় মূল্যের কত অংশ সেটাই দেখায়। ডাউন পেমেন্ট আলাদা
+    // কোনো "স্ট্যাট" না — এটা "পরিশোধিত"-এরই একটা অংশ হিসেবে গণ্য হয়।
     const salePrice = saleTx.salePrice || r.totalValue;
-    const paidSoFar = (saleTx.downPayment || 0) + r.paid;
-    const pct = salePrice ? Math.min(100, Math.round((paidSoFar / salePrice) * 100)) : 0;
+    const paidTotal = (saleTx.downPayment || 0) + r.paid;
+    const pct = salePrice ? Math.min(100, Math.round((paidTotal / salePrice) * 100)) : 0;
     document.getElementById('idProgressFill').style.width = pct + '%';
-    document.getElementById('idProgressLabel').textContent = `${bn(Math.round(paidSoFar))}/${bn(Math.round(salePrice))} টাকা পরিশোধিত`;
+    document.getElementById('idProgressLabel').textContent = `${bn(Math.round(paidTotal))}/${bn(Math.round(salePrice))} টাকা পরিশোধিত`;
 
+    const schedule = getScheduleStatus(currentCustomer, saleTx);
+    const lastSlot = schedule[schedule.length-1];
+    const allPaid = schedule.length>0 && schedule.every(s=>s.status==='paid');
+    const finishText = !lastSlot ? '—' : allPaid ? 'সব পরিশোধিত' : formatGrDate(new Date(lastSlot.date+'T00:00:00'));
+
+    // ৩টা করে দুই সারিতে — চারটা টাকার হিসাব + দুইটা তারিখ, মোট ৬টা ঘর।
     const stats = [
-      { label: 'পণ্য বিক্রয় মূল্য', value: salePrice },
-      { label: 'ডাউন পেমেন্ট', value: saleTx.downPayment || 0 },
-      { label: 'প্রতি কিস্তি', value: saleTx.perInstallment || 0 },
-      { label: 'পরিশোধিত', value: r.paid },
-      { label: 'বর্তমান বাকি', value: r.remaining },
+      { label: 'পণ্য বিক্রয় মূল্য', value: bn(Math.round(salePrice)) + ' টাকা' },
+      { label: 'প্রতি কিস্তি', value: bn(Math.round(saleTx.perInstallment || 0)) + ' টাকা' },
+      { label: 'পরিশোধিত', value: bn(Math.round(paidTotal)) + ' টাকা' },
+      { label: 'বর্তমান বাকি', value: bn(Math.round(r.remaining)) + ' টাকা' },
+      { label: 'কিস্তিতে পণ্য নেওয়ার তারিখ', value: r.saleDate || '—' },
+      { label: 'আনুমানিক শেষ হবে', value: finishText },
     ];
-    if(saleTx.purchasePrice) stats.splice(1, 0, { label: 'পণ্য ক্রয় মূল্য', value: saleTx.purchasePrice });
     document.getElementById('idStatRow').innerHTML = stats.map(s => `
-      <div class="id-stat"><div class="id-stat-label">${s.label}</div><div class="id-stat-value">${bn(Math.round(s.value))} টাকা</div></div>
+      <div class="id-stat"><div class="id-stat-label">${s.label}</div><div class="id-stat-value">${s.value}</div></div>
     `).join('');
 
     const lateFeeLine = document.getElementById('idLateFeeLine');
@@ -4775,40 +4781,30 @@
       lateFeeLine.style.display = 'none';
     }
 
-    const schedule = getScheduleStatus(currentCustomer, saleTx);
-    const lastSlot = schedule[schedule.length-1];
-    const finishLine = document.getElementById('idFinishLine');
-    if(lastSlot){
-      const allPaid = schedule.every(s=>s.status==='paid');
-      finishLine.textContent = allPaid ? 'সব কিস্তি পরিশোধিত' : `আনুমানিক শেষ হবে: ${formatGrDate(new Date(lastSlot.date+'T00:00:00'))}`;
-    }else{
-      finishLine.textContent = '';
+    // এখন এটা আর নির্ধারিত সময়সূচি (আগে থেকে বানানো তারিখ) দেখায় না —
+    // শুধু সত্যিকারের ঘটে যাওয়া পেমেন্টের ইতিহাস, যে তারিখে যা টাকা আসলেই
+    // দেওয়া হয়েছে ঠিক সেটাই। ভবিষ্যতের/এখনো-না-হওয়া কিস্তির কোনো সারি
+    // এখানে দেখানো হয় না — সেই তথ্য উপরের "বর্তমান বাকি"/"আনুমানিক শেষ হবে"
+    // দিয়েই বোঝা যায়।
+    const rows = [];
+    if(saleTx.downPayment){
+      rows.push({ label: 'ডাউন পেমেন্ট', date: r.saleDate || '—', amount: saleTx.downPayment });
     }
-
-    const statusLabels = { paid:'পরিশোধিত', due:'বাকি', upcoming:'এখনো আসেনি' };
-    const statusIcons = { paid:'✓', due:'!', upcoming:'—' };
-    // ডাউন পেমেন্ট বিক্রির সময়ই নেওয়া হয়ে যায়, তাই সবসময় "পরিশোধিত" হিসেবে
-    // তালিকার একদম উপরে দেখানো হয় — না থাকলেও ০ টাকা হিসেবে দেখাবে, যাতে
-    // পুরো হিসাবটা এই এক পেজেই পাওয়া যায়।
-    const downPaymentRow = `
+    const payments = (currentCustomer.transactions||[])
+      .filter(tx => tx.category==='installment' && tx.take && tx.receiptNumber === receiptNumber)
+      .sort((a,b) => parseTxDate(a.date,a.time) - parseTxDate(b.date,b.time));
+    payments.forEach((tx, i) => {
+      rows.push({ label: `${bn(i+1)}ম কিস্তি`, date: tx.date || '—', amount: tx.take });
+    });
+    document.getElementById('idScheduleList').innerHTML = rows.map(row => `
       <div class="id-slot-row">
         <div class="id-slot-badge paid">✓</div>
         <div class="id-slot-main">
-          <div class="id-slot-date">ডাউন পেমেন্ট</div>
-          <div class="id-slot-status paid">পরিশোধিত</div>
+          <div class="id-slot-date">${row.label}</div>
+          <div class="id-slot-status paid">${row.date}</div>
         </div>
-        <div class="id-slot-amount">${bn(Math.round(saleTx.downPayment || 0))} টাকা</div>
-      </div>`;
-    const scheduleRows = schedule.map(s => `
-      <div class="id-slot-row">
-        <div class="id-slot-badge ${s.status}">${statusIcons[s.status]}</div>
-        <div class="id-slot-main">
-          <div class="id-slot-date">${bn(s.index)}ম কিস্তি — ${formatGrDate(new Date(s.date+'T00:00:00'))}</div>
-          <div class="id-slot-status ${s.status}">${statusLabels[s.status]}</div>
-        </div>
-        <div class="id-slot-amount">${bn(Math.round(s.status==='paid' ? s.actualAmount : s.amount))} টাকা</div>
-      </div>`).join('');
-    document.getElementById('idScheduleList').innerHTML = downPaymentRow + scheduleRows;
+        <div class="id-slot-amount">${bn(Math.round(row.amount))} টাকা</div>
+      </div>`).join('') || '<div class="gr-empty">এখনো কোনো পেমেন্ট হয়নি</div>';
 
     appEl.classList.add('show-installmentdetail');
     pushAppState('installmentdetail');
