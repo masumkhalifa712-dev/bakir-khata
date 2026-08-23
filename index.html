@@ -160,6 +160,10 @@
   #app.show-installmentsummary #screen-installmentSummary{ transform:translateX(0); }
   #screen-expenses{ transform:translateX(100%); z-index:2; }
   #app.show-expenses #screen-expenses{ transform:translateX(0); }
+  #screen-reportsHub{ transform:translateX(100%); z-index:2; }
+  #app.show-reportshub #screen-reportsHub{ transform:translateX(0); }
+  #screen-collectionReport{ transform:translateX(100%); z-index:3; }
+  #app.show-collectionreport #screen-collectionReport{ transform:translateX(0); }
   #screen-installmentDetail{ transform:translateX(100%); z-index:5; }
   #app.show-installmentdetail #screen-installmentDetail{ transform:translateX(0); }
   #screen-purchaseHistory{ transform:translateX(100%); z-index:2; }
@@ -216,6 +220,8 @@
   #app.show-groupreminder .fab, #app.show-groupreminder .bottom-nav,
   #app.show-installmentsummary .fab, #app.show-installmentsummary .bottom-nav,
   #app.show-expenses .fab, #app.show-expenses .bottom-nav,
+  #app.show-reportshub .fab, #app.show-reportshub .bottom-nav,
+  #app.show-collectionreport .fab, #app.show-collectionreport .bottom-nav,
   #app.show-installmentdetail .fab, #app.show-installmentdetail .bottom-nav
   { display:none; }
 
@@ -482,13 +488,20 @@
 
   /* ================= CATEGORY: Floating Action Button ================= */
   .fab{ position:fixed; right:calc((100vw - min(100vw,480px))/2 + 20px); bottom:calc(84px + var(--safe-bottom)); width:56px;height:56px; border-radius:50%; background:linear-gradient(160deg, var(--clr-fab), var(--clr-primary-dark)); border:none; display:flex;align-items:center;justify-content:center; color:#fff; box-shadow:0 8px 20px rgba(198,16,46,.35); cursor:pointer; z-index:40; transition:transform .15s ease; }
-  .exp-fab{ position:fixed; right:calc((100vw - min(100vw,480px))/2 + 20px); bottom:calc(24px + var(--safe-bottom)); width:56px;height:56px; border-radius:50%; background:linear-gradient(160deg, var(--clr-fab), var(--clr-primary-dark)); border:none; display:flex;align-items:center;justify-content:center; color:#fff; box-shadow:0 8px 20px rgba(198,16,46,.35); cursor:pointer; z-index:6; transition:transform .15s ease; }
+  .exp-fab{ position:fixed; right:calc((100vw - min(100vw,480px))/2 + 20px); bottom:calc(84px + var(--safe-bottom)); width:56px;height:56px; border-radius:50%; background:linear-gradient(160deg, var(--clr-fab), var(--clr-primary-dark)); border:none; display:flex;align-items:center;justify-content:center; color:#fff; box-shadow:0 8px 20px rgba(198,16,46,.35); cursor:pointer; z-index:6; transition:transform .15s ease; }
   .exp-fab:active{ transform:scale(.92); }
   .exp-row{ display:flex; align-items:center; justify-content:space-between; width:calc(100% - 32px); margin:0 auto 8px; padding:13px 15px; background:var(--clr-card); border-radius:12px; box-shadow:0 1px 3px rgba(0,0,0,.04); cursor:pointer; border:none; text-align:left; font-family:inherit; }
   .exp-row-cat{ font-size:13.5px; font-weight:700; color:var(--clr-ink); }
   .exp-row-note{ font-size:11.5px; color:var(--clr-ink-soft); font-weight:600; margin-top:2px; }
   .exp-row-date{ font-size:11px; color:var(--clr-ink-soft); font-weight:600; margin-top:2px; }
   .exp-row-amount{ font-size:14px; font-weight:800; color:var(--clr-primary); flex-shrink:0; margin-left:10px; }
+
+  /* ================= CATEGORY: রিপোর্ট ব্যবস্থাপনা (হাব পেজ) ================= */
+  .rh-card{ display:flex; align-items:center; gap:14px; width:100%; background:var(--clr-card); border:none; border-radius:14px; padding:15px 16px; margin-bottom:10px; box-shadow:0 1px 4px rgba(0,0,0,.05); cursor:pointer; font-family:inherit; text-align:left; }
+  .rh-card-icon{ width:42px; height:42px; border-radius:12px; background:#FFF0EE; color:var(--clr-primary); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .rh-card-icon svg{ width:21px; height:21px; }
+  .rh-card-title{ flex:1; font-size:14px; font-weight:700; color:var(--clr-ink); }
+  .rh-card-arrow{ width:18px; height:18px; color:var(--clr-ink-soft); flex-shrink:0; }
   .fab:active{transform:scale(.9);}
   .fab svg{width:24px;height:24px;}
 
@@ -1374,6 +1387,74 @@
       <button class="sheet-cancel" id="expCancelBtn">বাতিল</button>
     </div>
   </div>
+
+  <section class="screen" id="screen-collectionReport">
+    <div class="cd-topbar">
+      <button class="cd-back" id="crBackBtn" aria-label="ফিরে যান">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      </button>
+      <div class="cd-title" id="crTitle">কালেকশন রিপোর্ট</div>
+    </div>
+    <div class="ss-body" style="padding-bottom:0;">
+      <select class="rf-select" id="crPeriodSelect" style="margin-bottom:14px;">
+        <option value="all">শুরু থেকে এখন পর্যন্ত</option>
+        <option value="today">আজকের দিন</option>
+        <option value="month" selected>এই মাস</option>
+      </select>
+    </div>
+    <div class="gr-summary-row">
+      <div class="gr-summary-box"><div class="gr-summary-label" id="crTotalLabel">মোট আদায়</div><div class="gr-summary-amount" id="crTotalAmount">০ টাকা</div></div>
+      <div class="gr-summary-box"><div class="gr-summary-label">মোট এন্ট্রি</div><div class="gr-summary-amount" id="crTotalCount">০</div></div>
+    </div>
+    <div class="gr-section-title">আদায়ের তালিকা</div>
+    <div id="crList" style="padding-bottom:20px;"></div>
+  </section>
+
+  <section class="screen" id="screen-reportsHub">
+    <div class="cd-topbar">
+      <button class="cd-back" id="rhBackBtn" aria-label="ফিরে যান">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      </button>
+      <div class="cd-title">রিপোর্ট ব্যবস্থাপনা</div>
+    </div>
+    <div style="padding:14px 16px;">
+      <button class="rh-card" id="rhCashBtn" data-title="ক্যাশ রিপোর্ট">
+        <span class="rh-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg></span>
+        <span class="rh-card-title">ক্যাশ রিপোর্ট</span>
+        <svg class="rh-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+      <button class="rh-card" id="rhPurchaseBtn" data-title="পণ্য ক্রয়-বিক্রয় রিপোর্ট">
+        <span class="rh-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></span>
+        <span class="rh-card-title">পণ্য ক্রয়-বিক্রয় রিপোর্ট</span>
+        <svg class="rh-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+      <button class="rh-card" id="rhDailyBtn" data-title="দৈনিক হিসাব রিপোর্ট">
+        <span class="rh-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+        <span class="rh-card-title">দৈনিক হিসাব রিপোর্ট</span>
+        <svg class="rh-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+      <button class="rh-card" id="rhDueCollectionBtn" data-title="বাকি কালেকশন রিপোর্ট">
+        <span class="rh-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg></span>
+        <span class="rh-card-title">বাকি কালেকশন রিপোর্ট</span>
+        <svg class="rh-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+      <button class="rh-card" id="rhInstallmentCollectionBtn" data-title="কিস্তি কালেকশন রিপোর্ট">
+        <span class="rh-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+        <span class="rh-card-title">কিস্তি কালেকশন রিপোর্ট</span>
+        <svg class="rh-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+      <button class="rh-card" id="rhNetProfitBtn" data-title="নেট প্রফিট">
+        <span class="rh-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 6l-9.5 9.5-5-5L1 18"/><path d="M17 6h6v6"/></svg></span>
+        <span class="rh-card-title">নেট প্রফিট</span>
+        <svg class="rh-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+      <button class="rh-card" id="rhGrossBtn" data-title="গ্রস রিপোর্ট">
+        <span class="rh-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+        <span class="rh-card-title">গ্রস রিপোর্ট</span>
+        <svg class="rh-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>
+  </section>
 
   <section class="screen" id="screen-purchaseHistory">
     <div class="cd-topbar">
@@ -2309,6 +2390,10 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
         <span>খরচ ব্যবস্থাপনা</span>
       </button>
+      <button class="menu-drawer-item" id="menuReportsHubBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+        <span>রিপোর্ট ব্যবস্থাপনা</span>
+      </button>
       <button class="menu-drawer-item logout" id="menuLogoutBtn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         <span>লগ আউট</span>
@@ -2981,7 +3066,7 @@
     try{ sessionStorage.setItem('lastScreen', JSON.stringify({ screen: name, customerId: currentCustomer ? currentCustomer.id : null })); }catch(e){}
   }
   function goToAddCustomer(){ appEl.classList.add('show-add'); pushAppState('add'); }
-  function goHome(){ appEl.classList.remove('show-add'); appEl.classList.remove('show-detail'); appEl.classList.remove('show-newdue'); appEl.classList.remove('show-txdetail'); appEl.classList.remove('show-customeredit'); appEl.classList.remove('show-newinstallment'); appEl.classList.remove('show-collectinstallment'); appEl.classList.remove('show-report'); appEl.classList.remove('show-shopsettings'); appEl.classList.remove('show-appsettings'); appEl.classList.remove('show-purchasehistory'); appEl.classList.remove('show-groupreminder'); appEl.classList.remove('show-installmentsummary'); appEl.classList.remove('show-installmentdetail'); appEl.classList.remove('show-expenses'); resetAddForm(); try{ sessionStorage.removeItem('lastScreen'); }catch(e){} }
+  function goHome(){ appEl.classList.remove('show-add'); appEl.classList.remove('show-detail'); appEl.classList.remove('show-newdue'); appEl.classList.remove('show-txdetail'); appEl.classList.remove('show-customeredit'); appEl.classList.remove('show-newinstallment'); appEl.classList.remove('show-collectinstallment'); appEl.classList.remove('show-report'); appEl.classList.remove('show-shopsettings'); appEl.classList.remove('show-appsettings'); appEl.classList.remove('show-purchasehistory'); appEl.classList.remove('show-groupreminder'); appEl.classList.remove('show-installmentsummary'); appEl.classList.remove('show-installmentdetail'); appEl.classList.remove('show-expenses'); appEl.classList.remove('show-reportshub'); appEl.classList.remove('show-collectionreport'); resetAddForm(); try{ sessionStorage.removeItem('lastScreen'); }catch(e){} }
 
   /* ================================================================ */
   /* ================= CATEGORY: Side Menu Drawer ===================== */
@@ -3405,6 +3490,97 @@
   }
   function closeExpenses(){ appEl.classList.remove('show-expenses'); }
   document.getElementById('menuExpensesBtn').addEventListener('click', goToExpenses);
+
+  /* ================================================================ */
+  /* ================= CATEGORY: রিপোর্ট ব্যবস্থাপনা (হাব) ============== */
+  /* ================================================================ */
+  function goToReportsHub(){
+    closeMenuDrawer();
+    appEl.classList.add('show-reportshub');
+    pushAppState('reportshub');
+  }
+  function closeReportsHub(){ appEl.classList.remove('show-reportshub'); }
+  document.getElementById('menuReportsHubBtn').addEventListener('click', goToReportsHub);
+  document.getElementById('rhBackBtn').addEventListener('click', ()=> history.back());
+  // পণ্য ক্রয়-বিক্রয় রিপোর্ট আগে থেকেই তৈরি আছে (মেনুর "ক্রয়-বিক্রয়
+  // লাভ-ক্ষতি") — এখানে শুধু সেই পেজেই নিয়ে যাওয়া, নতুন কিছু বানাতে হয়নি।
+  document.getElementById('rhPurchaseBtn').addEventListener('click', ()=>{
+    closeReportsHub();
+    goToPurchaseHistory();
+  });
+  document.getElementById('rhDueCollectionBtn').addEventListener('click', ()=>{
+    closeReportsHub();
+    goToCollectionReport('general');
+  });
+  document.getElementById('rhInstallmentCollectionBtn').addEventListener('click', ()=>{
+    closeReportsHub();
+    goToCollectionReport('installment');
+  });
+  // বাকি রিপোর্টগুলো এখনো বানানো হয়নি — পরের ধাপগুলোতে একে একে তৈরি হবে।
+  ['rhCashBtn','rhDailyBtn','rhNetProfitBtn','rhGrossBtn'].forEach(id=>{
+    document.getElementById(id).addEventListener('click', (e)=>{
+      const title = e.currentTarget.dataset.title;
+      showToast(`${title} (শীঘ্রই আসছে)`);
+    });
+  });
+
+  /* ================================================================ */
+  /* ================= CATEGORY: বাকি/কিস্তি কালেকশন রিপোর্ট =========== */
+  /* ================================================================ */
+  // একই স্ক্রিন দুটো রিপোর্টের জন্যই ব্যবহার হয় — শুধু ফিল্টারের শর্ত আর
+  // শিরোনাম বদলায়, বাকি কাঠামো সম্পূর্ণ একই।
+  let currentCollectionReportType = 'general';
+  function goToCollectionReport(type){
+    currentCollectionReportType = type;
+    document.getElementById('crTitle').textContent = type==='installment' ? 'কিস্তি কালেকশন রিপোর্ট' : 'বাকি কালেকশন রিপোর্ট';
+    document.getElementById('crTotalLabel').textContent = type==='installment' ? 'মোট কিস্তি আদায়' : 'মোট বাকি আদায়';
+    document.getElementById('crPeriodSelect').value = 'month';
+    renderCollectionReport();
+    appEl.classList.add('show-collectionreport');
+    pushAppState('collectionreport');
+  }
+  function closeCollectionReport(){ appEl.classList.remove('show-collectionreport'); }
+  document.getElementById('crBackBtn').addEventListener('click', ()=> history.back());
+  document.getElementById('crPeriodSelect').addEventListener('change', renderCollectionReport);
+  function renderCollectionReport(){
+    const type = currentCollectionReportType;
+    const periodVal = document.getElementById('crPeriodSelect').value;
+    const start = periodVal==='today' ? (()=>{ const d=new Date(); d.setHours(0,0,0,0); return d; })()
+      : periodVal==='month' ? new Date(new Date().getFullYear(), new Date().getMonth(), 1)
+      : new Date(0);
+    const rows = [];
+    let total = 0;
+    customers.forEach(c=>{
+      (c.transactions||[]).forEach(tx=>{
+        const isInstallment = tx.category==='installment';
+        if(type==='installment' && !isInstallment) return;
+        if(type==='general' && isInstallment) return;
+        if(!tx.take) return;
+        const d = parseTxDate(tx.date, tx.time);
+        if(isNaN(d) || d < start) return;
+        total += tx.take;
+        rows.push({ customer:c, date:tx.date, time:tx.time, amount:tx.take, sortKey:d });
+      });
+    });
+    rows.sort((a,b)=> b.sortKey - a.sortKey);
+    document.getElementById('crTotalAmount').textContent = bn(Math.round(total)) + ' টাকা';
+    document.getElementById('crTotalCount').textContent = bn(rows.length);
+    document.getElementById('crList').innerHTML = rows.map(r => `
+      <button class="gr-cust-row" style="grid-template-columns:1.6fr 0.9fr;" data-id="${r.customer.id}">
+        <div>
+          <div class="gr-cust-name">${escapeHtml(r.customer.name)}${r.customer.id?' · '+r.customer.id:''}</div>
+          <div class="gr-cust-taken-date">${r.date || '—'}</div>
+        </div>
+        <div class="gr-cust-amount">${bn(Math.round(r.amount))} টাকা</div>
+      </button>`).join('') || '<div class="gr-empty">এই সময়ে কোনো আদায় নেই</div>';
+    document.getElementById('crList').querySelectorAll('.gr-cust-row').forEach(row=>{
+      row.addEventListener('click', ()=>{
+        const cust = customers.find(c=>c.id === row.dataset.id);
+        if(cust){ closeCollectionReport(); goToCustomerDetail(cust); }
+      });
+    });
+  }
+
   document.getElementById('expBackBtn').addEventListener('click', ()=> history.back());
 
   function renderExpenseList(){
@@ -5464,6 +5640,8 @@
       case 'purchasehistory': goToPurchaseHistory(); break;
       case 'groupreminder': goToGroupReminder(); break;
       case 'expenses': goToExpenses(); break;
+      case 'reportshub': goToReportsHub(); break;
+      case 'collectionreport': goToReportsHub(); break;
       case 'detail':
       case 'newdue':
       case 'txdetail':
@@ -5814,6 +5992,8 @@
     if(appEl.classList.contains('show-installmentdetail')){ closeInstallmentDetail(); return; }
     if(appEl.classList.contains('show-installmentsummary')){ closeInstallmentSummary(); return; }
     if(appEl.classList.contains('show-expenses')){ closeExpenses(); return; }
+    if(appEl.classList.contains('show-collectionreport')){ closeCollectionReport(); return; }
+    if(appEl.classList.contains('show-reportshub')){ closeReportsHub(); return; }
     if(appEl.classList.contains('show-newinstallment')){ closeNewInstallment(); return; }
     if(appEl.classList.contains('show-collectinstallment')){ closeCollectInstallment(); return; }
     if(appEl.classList.contains('show-newdue')){ closeNewDue(); return; }
