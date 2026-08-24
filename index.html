@@ -261,6 +261,12 @@
   .icon-btn .dot{ position:absolute; width:8px;height:8px; border-radius:50%; background:#FFD23F; border:1.5px solid var(--clr-primary-dark); top:2px; right:2px; }
 
   /* ================= CATEGORY: Banner Ad Section ================= */
+  .push-prompt-banner{ margin:16px 18px 0; background:linear-gradient(135deg, #FFF0EE, #FFE1DE); border-radius:var(--radius-lg); padding:12px 12px 12px 14px; display:flex; align-items:center; gap:10px; box-shadow:0 1px 4px rgba(0,0,0,.05); }
+  .push-prompt-icon{ font-size:22px; flex-shrink:0; }
+  .push-prompt-text{ flex:1; font-size:12.5px; font-weight:700; color:var(--clr-ink); line-height:1.4; }
+  .push-prompt-btn{ flex-shrink:0; background:var(--clr-primary); color:#fff; border:none; border-radius:999px; padding:8px 14px; font-size:12px; font-weight:700; font-family:inherit; cursor:pointer; white-space:nowrap; }
+  .push-prompt-close{ flex-shrink:0; width:26px; height:26px; border-radius:50%; border:none; background:rgba(0,0,0,.06); color:var(--clr-ink-soft); display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0; }
+  .push-prompt-close svg{ width:13px; height:13px; }
   .banner-ad{ margin:16px 18px 0; background:#17181B; border-radius:var(--radius-lg); min-height:110px; display:flex;align-items:center;justify-content:center; color:#fff; font-family:var(--font-display); font-weight:700; font-size:22px; letter-spacing:.5px; text-align:center; padding:12px; cursor:pointer; background-image:radial-gradient(circle at 85% 20%, rgba(198,16,46,.35), transparent 55%); }
   .banner-ad small{display:block; font-family:var(--font-body); font-weight:500; font-size:11px; opacity:.55; margin-top:6px;}
 
@@ -1073,6 +1079,15 @@
         </div>
       </div>
     </header>
+
+    <div class="push-prompt-banner" id="pushPromptBanner" style="display:none;">
+      <div class="push-prompt-icon">🔔</div>
+      <div class="push-prompt-text">কিস্তির তাগাদা মিস করবেন না — নোটিফিকেশন চালু করুন</div>
+      <button class="push-prompt-btn" id="pushPromptEnableBtn">চালু করুন</button>
+      <button class="push-prompt-close" id="pushPromptCloseBtn" aria-label="বন্ধ করুন">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
 
     <div class="banner-ad" id="bannerAd">
       ব্যানার এড
@@ -3664,8 +3679,9 @@
       label.textContent = sub ? 'নোটিফিকেশন চালু আছে ✓' : 'নোটিফিকেশন চালু করুন';
     }catch(e){ label.textContent = 'নোটিফিকেশন চালু করুন'; }
   }
-  document.getElementById('menuPushNotifyBtn').addEventListener('click', async ()=>{
-    closeMenuDrawer();
+  // মেনুর বাটন আর হোমপেজের ব্যানার — দুটোই এই একই ফাংশন ব্যবহার করে, যাতে
+  // দুই জায়গায় একই লজিক দুইবার লেখা না লাগে।
+  async function subscribeToPushNotifications(){
     if(!pushNotificationsSupported()){
       showToast('এই ব্রাউজার/ফোনে নোটিফিকেশন সমর্থিত না', 'danger');
       return;
@@ -3697,7 +3713,34 @@
     }catch(e){
       showToast('নোটিফিকেশন চালু করা যায়নি, আবার চেষ্টা করো', 'danger');
     }
+  }
+  document.getElementById('menuPushNotifyBtn').addEventListener('click', ()=>{
+    closeMenuDrawer();
+    subscribeToPushNotifications();
   });
+
+  // হোমপেজের ব্যানার — মেনুর বাটনের মতোই কাজ করে, শুধু আগে থেকেই চোখের
+  // সামনে থাকে বলে বেশি মানুষ খুঁজে বের না করেই চালু করে নিতে পারবে।
+  // ✕ চাপলে শুধু এই মুহূর্তের জন্য সরে যায় — সত্যিই চালু না করা পর্যন্ত
+  // পরের বার অ্যাপে ঢুকলে আবার দেখাবে (কোনো "আর দেখিয়ো না" মনে রাখা হয় না)।
+  async function maybeShowPushPrompt(){
+    if(!pushNotificationsSupported()) return;
+    try{
+      const reg = await navigator.serviceWorker.ready;
+      const sub = await reg.pushManager.getSubscription();
+      if(sub) return; // আগে থেকেই চালু আছে
+      document.getElementById('pushPromptBanner').style.display = 'flex';
+    }catch(e){ /* সাইলেন্টলি বাদ — এটা শুধু একটা সহায়ক আমন্ত্রণ, ব্যর্থ হলে সমস্যা নেই */ }
+  }
+  function dismissPushPrompt(){
+    document.getElementById('pushPromptBanner').style.display = 'none';
+  }
+  document.getElementById('pushPromptCloseBtn').addEventListener('click', dismissPushPrompt);
+  document.getElementById('pushPromptEnableBtn').addEventListener('click', async ()=>{
+    dismissPushPrompt();
+    await subscribeToPushNotifications();
+  });
+
   document.getElementById('rhBackBtn').addEventListener('click', ()=> history.back());
   // পণ্য ক্রয়-বিক্রয় রিপোর্ট আগে থেকেই তৈরি আছে (মেনুর "ক্রয়-বিক্রয়
   // লাভ-ক্ষতি") — এখানে শুধু সেই পেজেই নিয়ে যাওয়া, নতুন কিছু বানাতে হয়নি।
@@ -6034,7 +6077,7 @@
     currentUserPin = pin;
     // Best-effort — lets the admin panel show who's actively using the app
     sb.rpc('rpc_touch_last_login', { p_mobile: mobile }).then(()=>{}, ()=>{});
-    if(pushNotificationsSupported()) updatePushMenuLabel();
+    if(pushNotificationsSupported()){ updatePushMenuLabel(); maybeShowPushPrompt(); }
     await loadCustomers();
     checkBroadcastNotice();
     // Applied WHILE still hidden behind the logo screen, so whatever page
