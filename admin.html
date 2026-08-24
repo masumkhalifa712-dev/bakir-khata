@@ -130,6 +130,16 @@
     </div>
 
     <div class="panel-card">
+      <div class="panel-title">🔔 পুশ নোটিফিকেশন পাঠান <small>যারা অনুমতি দিয়েছে তাদের ফোনে সাথে সাথেই দেখাবে</small></div>
+      <input type="text" id="pushTitleInput" placeholder="শিরোনাম (যেমনঃ নতুন আপডেট এসেছে)" style="width:100%; box-sizing:border-box; border:1.6px solid var(--clr-line); border-radius:10px; padding:10px 13px; font-size:13px; font-family:inherit; outline:none; margin-bottom:10px;" />
+      <textarea class="panel-textarea" id="pushBodyInput" placeholder="বার্তার বিস্তারিত লেখো..."></textarea>
+      <div class="panel-row">
+        <span id="pushStatusText" style="font-size:12.5px; color:var(--clr-ink-soft);"></span>
+        <button class="btn-primary" id="sendPushBtn">সবাইকে পাঠান</button>
+      </div>
+    </div>
+
+    <div class="panel-card">
       <div class="panel-title">🗒️ পরিবর্তনের নোট <small>নিজের রেকর্ডের জন্য, শুধু তুমি দেখবে</small></div>
       <div class="panel-row">
         <input type="text" id="changelogInput" placeholder="যেমনঃ SMS ফিচার যোগ হয়েছে" style="flex:1; min-width:200px; border:1.6px solid var(--clr-line); border-radius:10px; padding:10px 13px; font-size:13px; font-family:inherit; outline:none;" />
@@ -475,6 +485,41 @@
     const { error } = await sb.rpc('rpc_admin_save_config', { p_secret: adminSecret, p_broadcast_message: message, p_broadcast_active: active, p_changelog: null });
     if(error){ alert('সংরক্ষণ করা যায়নি: ' + error.message); return; }
     alert('ঘোষণা সংরক্ষণ হয়েছে');
+  });
+
+  document.getElementById('sendPushBtn').addEventListener('click', async ()=>{
+    const title = document.getElementById('pushTitleInput').value.trim();
+    const body = document.getElementById('pushBodyInput').value.trim();
+    const statusText = document.getElementById('pushStatusText');
+    if(!title || !body){ alert('শিরোনাম ও বার্তা দুটোই দিতে হবে'); return; }
+    const btn = document.getElementById('sendPushBtn');
+    btn.disabled = true;
+    statusText.textContent = 'পাঠানো হচ্ছে...';
+    try{
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/send-push-notification`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'apikey': SUPABASE_ANON_KEY,
+        },
+        body: JSON.stringify({ p_admin_secret: adminSecret, title, body }),
+      });
+      const data = await res.json().catch(()=>({}));
+      if(!res.ok || data.error){
+        statusText.textContent = '';
+        alert('পাঠানো যায়নি: ' + (data.error || 'অজানা সমস্যা'));
+        return;
+      }
+      statusText.textContent = `${data.sent} জনকে পাঠানো হয়েছে (মোট ${data.total} জনের মধ্যে)`;
+      document.getElementById('pushTitleInput').value = '';
+      document.getElementById('pushBodyInput').value = '';
+    }catch(e){
+      statusText.textContent = '';
+      alert('ইন্টারনেট কানেকশন সমস্যা — আবার চেষ্টা করো');
+    }finally{
+      btn.disabled = false;
+    }
   });
 
   function renderChangelog(){
