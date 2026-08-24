@@ -36,3 +36,34 @@ self.addEventListener("fetch", (event) => {
       .catch(() => caches.match(event.request))
   );
 });
+
+// পুশ নোটিফিকেশন গ্রহণ করা — সার্ভার (Edge Function) থেকে যা পাঠানো হবে তা
+// দেখানোর কাজ এখানেই হয়। title/body/icon না পাঠানো হলে যুক্তিসঙ্গত ডিফল্ট
+// ব্যবহার হয়, যাতে খালি নোটিফিকেশন কখনো না দেখায়।
+self.addEventListener("push", (event) => {
+  let data = {};
+  try { data = event.data ? event.data.json() : {}; } catch (e) {}
+  const title = data.title || "আমার বাকির খাতা";
+  const options = {
+    body: data.body || "",
+    icon: data.icon || "./icon-192.png",
+    badge: "./icon-192.png",
+    data: { url: data.url || "./" },
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+// নোটিফিকেশনে ট্যাপ করলে অ্যাপটা খুলে যাবে — আগে থেকে খোলা কোনো ট্যাব
+// থাকলে সেটাতেই ফোকাস করবে, নাহলে নতুন একটা খুলবে।
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const targetUrl = (event.notification.data && event.notification.data.url) || "./";
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clients) => {
+      for (const client of clients) {
+        if ("focus" in client) return client.focus();
+      }
+      if (self.clients.openWindow) return self.clients.openWindow(targetUrl);
+    })
+  );
+});
