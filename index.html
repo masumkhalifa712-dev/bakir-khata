@@ -164,6 +164,12 @@
   #app.show-reportshub #screen-reportsHub{ transform:translateX(0); }
   #screen-collectionReport{ transform:translateX(100%); z-index:3; }
   #app.show-collectionreport #screen-collectionReport{ transform:translateX(0); }
+  #screen-dailyReport{ transform:translateX(100%); z-index:3; }
+  #app.show-dailyreport #screen-dailyReport{ transform:translateX(0); }
+  #screen-netProfitReport{ transform:translateX(100%); z-index:3; }
+  #app.show-netprofitreport #screen-netProfitReport{ transform:translateX(0); }
+  #screen-cashReport{ transform:translateX(100%); z-index:3; }
+  #app.show-cashreport #screen-cashReport{ transform:translateX(0); }
   #screen-installmentDetail{ transform:translateX(100%); z-index:5; }
   #app.show-installmentdetail #screen-installmentDetail{ transform:translateX(0); }
   #screen-purchaseHistory{ transform:translateX(100%); z-index:2; }
@@ -222,6 +228,9 @@
   #app.show-expenses .fab, #app.show-expenses .bottom-nav,
   #app.show-reportshub .fab, #app.show-reportshub .bottom-nav,
   #app.show-collectionreport .fab, #app.show-collectionreport .bottom-nav,
+  #app.show-dailyreport .fab, #app.show-dailyreport .bottom-nav,
+  #app.show-netprofitreport .fab, #app.show-netprofitreport .bottom-nav,
+  #app.show-cashreport .fab, #app.show-cashreport .bottom-nav,
   #app.show-installmentdetail .fab, #app.show-installmentdetail .bottom-nav
   { display:none; }
 
@@ -502,6 +511,17 @@
   .rh-card-icon svg{ width:21px; height:21px; }
   .rh-card-title{ flex:1; font-size:14px; font-weight:700; color:var(--clr-ink); }
   .rh-card-arrow{ width:18px; height:18px; color:var(--clr-ink-soft); flex-shrink:0; }
+
+  /* ================= CATEGORY: দৈনিক হিসাব রিপোর্ট ================= */
+  .dr-section{ background:var(--clr-card); border-radius:14px; padding:14px 16px; margin-bottom:12px; box-shadow:0 1px 4px rgba(0,0,0,.04); }
+  .dr-section-title{ font-size:12.5px; font-weight:700; color:var(--clr-ink-soft); margin-bottom:10px; }
+  .dr-row{ display:flex; justify-content:space-between; align-items:center; padding:6px 0; font-size:13.5px; }
+  .dr-row span:first-child{ color:var(--clr-ink-soft); font-weight:600; }
+  .dr-row span:last-child{ color:var(--clr-ink); font-weight:800; font-family:var(--font-display); }
+  .dr-net-card{ background:linear-gradient(160deg, #1B2E4A, #0F1B2E); border-radius:16px; padding:20px 16px; text-align:center; margin-bottom:20px; }
+  .dr-net-label{ font-size:12.5px; font-weight:700; color:rgba(255,255,255,.75); }
+  .dr-net-amount{ font-size:24px; font-weight:800; color:#fff; font-family:var(--font-display); margin-top:6px; }
+  .dr-net-note{ font-size:10.5px; color:rgba(255,255,255,.55); margin-top:6px; }
   .fab:active{transform:scale(.9);}
   .fab svg{width:24px;height:24px;}
 
@@ -1387,6 +1407,111 @@
       <button class="sheet-cancel" id="expCancelBtn">বাতিল</button>
     </div>
   </div>
+
+  <section class="screen" id="screen-cashReport">
+    <div class="cd-topbar">
+      <button class="cd-back" id="crpBackBtn" aria-label="ফিরে যান">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      </button>
+      <div class="cd-title">ক্যাশ রিপোর্ট</div>
+    </div>
+    <div class="ss-body" style="padding-bottom:0;">
+      <button class="ni-calc-input" id="crpDateBtn" style="width:100%; text-align:left; background:var(--clr-card); cursor:pointer; margin-bottom:16px; display:flex; align-items:center; gap:10px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span id="crpDateLabel"></span>
+      </button>
+      <input type="date" id="crpDateInput" style="position:absolute; opacity:0; pointer-events:none; width:1px; height:1px;" />
+    </div>
+    <div style="padding:0 16px;">
+      <div class="dr-section">
+        <div class="dr-row"><span>অ্যাপ অনুযায়ী মোট নগদ</span><span id="crpAppAmount">০ টাকা</span></div>
+      </div>
+      <div class="dr-section">
+        <div class="dr-section-title">হাতে গোনা আসল ক্যাশ</div>
+        <input type="number" inputmode="decimal" class="ni-calc-input" id="crpActualInput" placeholder="টাকার পরিমাণ" style="width:100%; margin-bottom:12px;" />
+        <textarea class="nd-note-textarea" id="crpNoteInput" placeholder="গরমিলের কারণ (ঐচ্ছিক)"></textarea>
+      </div>
+      <div class="dr-net-card" id="crpResultCard" style="display:none;">
+        <div class="dr-net-label" id="crpResultLabel">মিলে গেছে</div>
+        <div class="dr-net-amount" id="crpResultAmount">০ টাকা</div>
+      </div>
+      <button class="ss-save-btn" id="crpSaveBtn" style="margin-bottom:20px;">মিলিয়ে দেখুন ও সংরক্ষণ করুন</button>
+      <div class="gr-section-title">আগের দিনগুলোর ইতিহাস</div>
+      <div id="crpHistoryList" style="padding-bottom:20px;"></div>
+    </div>
+  </section>
+
+  <section class="screen" id="screen-netProfitReport">
+    <div class="cd-topbar">
+      <button class="cd-back" id="npBackBtn" aria-label="ফিরে যান">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      </button>
+      <div class="cd-title">নেট প্রফিট রিপোর্ট</div>
+    </div>
+    <div class="ss-body" style="padding-bottom:0;">
+      <select class="rf-select" id="npPeriodSelect" style="margin-bottom:16px;">
+        <option value="all">শুরু থেকে এখন পর্যন্ত</option>
+        <option value="today">আজকের দিন</option>
+        <option value="month" selected>এই মাস</option>
+      </select>
+    </div>
+    <div style="padding:0 16px;">
+      <div class="dr-section">
+        <div class="dr-section-title">গ্রস হিসাব (পণ্য ক্রয়-বিক্রয়)</div>
+        <div class="dr-row"><span>মোট বিক্রয় মূল্য</span><span id="npSaleTotal">০ টাকা</span></div>
+        <div class="dr-row"><span>মোট ক্রয় মূল্য</span><span id="npPurchaseTotal">০ টাকা</span></div>
+        <div class="dr-row"><span>গ্রস লাভ</span><span id="npGrossProfit">০ টাকা</span></div>
+      </div>
+      <div class="dr-section">
+        <div class="dr-section-title">দোকান চালানোর খরচ</div>
+        <div class="dr-row"><span>মোট খরচ</span><span id="npExpenseTotal">০ টাকা</span></div>
+      </div>
+      <div class="dr-net-card">
+        <div class="dr-net-label">নেট প্রফিট</div>
+        <div class="dr-net-amount" id="npNetProfit">০ টাকা</div>
+        <div class="dr-net-note">গ্রস লাভ − দোকান চালানোর খরচ</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen" id="screen-dailyReport">
+    <div class="cd-topbar">
+      <button class="cd-back" id="drBackBtn" aria-label="ফিরে যান">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      </button>
+      <div class="cd-title">দৈনিক হিসাব রিপোর্ট</div>
+    </div>
+    <div class="ss-body" style="padding-bottom:0;">
+      <button class="ni-calc-input" id="drDateBtn" style="width:100%; text-align:left; background:var(--clr-card); cursor:pointer; margin-bottom:16px; display:flex; align-items:center; gap:10px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span id="drDateLabel"></span>
+      </button>
+      <input type="date" id="drDateInput" style="position:absolute; opacity:0; pointer-events:none; width:1px; height:1px;" />
+    </div>
+
+    <div style="padding:0 16px;">
+      <div class="dr-section">
+        <div class="dr-section-title">সাধারণ বাকি</div>
+        <div class="dr-row"><span>নতুন বাকি দেওয়া হয়েছে</span><span id="drGeneralGiven">০ টাকা</span></div>
+        <div class="dr-row"><span>আদায় হয়েছে</span><span id="drGeneralCollected">০ টাকা</span></div>
+      </div>
+      <div class="dr-section">
+        <div class="dr-section-title">সহজ কিস্তি</div>
+        <div class="dr-row"><span>নতুন বিক্রি হয়েছে</span><span id="drInstSold">০ টাকা</span></div>
+        <div class="dr-row"><span>ডাউন পেমেন্ট</span><span id="drInstDownpayment">০ টাকা</span></div>
+        <div class="dr-row"><span>কিস্তি আদায় হয়েছে</span><span id="drInstCollected">০ টাকা</span></div>
+      </div>
+      <div class="dr-section">
+        <div class="dr-section-title">খরচ</div>
+        <div class="dr-row"><span>মোট খরচ</span><span id="drExpenses">০ টাকা</span></div>
+      </div>
+      <div class="dr-net-card">
+        <div class="dr-net-label">দিনের নিট নগদ আদায়</div>
+        <div class="dr-net-amount" id="drNetAmount">০ টাকা</div>
+        <div class="dr-net-note">(বাকি আদায় + কিস্তি আদায় + ডাউন পেমেন্ট) − খরচ</div>
+      </div>
+    </div>
+  </section>
 
   <section class="screen" id="screen-collectionReport">
     <div class="cd-topbar">
@@ -2545,6 +2670,7 @@
 
   let shopInfo = { name: '', ownerName: '', shopType: '', address: '', businessMode: 'both' };
   let expenses = [];
+  let cashChecks = [];
   // ========================================
   // Supabase/RPC ডেটা লোড ও সেভ
   // ========================================
@@ -2569,6 +2695,7 @@
         shopInfo = row.shop_info || { name: '', ownerName: '', shopType: '', address: '', businessMode: 'both' };
         if(!shopInfo.businessMode) shopInfo.businessMode = 'both';
         expenses = row.expenses || [];
+        cashChecks = row.cash_checks || [];
       }else{
         customers = DEFAULT_CUSTOMERS;
         meta = { nextSerial: 1 };
@@ -2630,6 +2757,7 @@
         p_meta: fields.meta !== undefined ? fields.meta : null,
         p_shop_info: fields.shop_info !== undefined ? fields.shop_info : null,
         p_expenses: fields.expenses !== undefined ? fields.expenses : null,
+        p_cash_checks: fields.cash_checks !== undefined ? fields.cash_checks : null,
       });
       if(error) throw error;
       if(fields.customers !== undefined) updateGroupReminderBadge();
@@ -2638,6 +2766,7 @@
       showToast("সেভ করা যায়নি — ইন্টারনেট কানেকশন চেক করো", 'danger');
     }
   }
+  async function persistCashChecks(){ await saveUserDataRpc({ cash_checks: cashChecks }); }
   async function persistExpenses(){ await saveUserDataRpc({ expenses }); }
   async function persistShopInfo(){ await saveUserDataRpc({ shop_info: shopInfo }); }
   async function persistCustomers(){ await saveUserDataRpc({ customers }); }
@@ -3066,7 +3195,7 @@
     try{ sessionStorage.setItem('lastScreen', JSON.stringify({ screen: name, customerId: currentCustomer ? currentCustomer.id : null })); }catch(e){}
   }
   function goToAddCustomer(){ appEl.classList.add('show-add'); pushAppState('add'); }
-  function goHome(){ appEl.classList.remove('show-add'); appEl.classList.remove('show-detail'); appEl.classList.remove('show-newdue'); appEl.classList.remove('show-txdetail'); appEl.classList.remove('show-customeredit'); appEl.classList.remove('show-newinstallment'); appEl.classList.remove('show-collectinstallment'); appEl.classList.remove('show-report'); appEl.classList.remove('show-shopsettings'); appEl.classList.remove('show-appsettings'); appEl.classList.remove('show-purchasehistory'); appEl.classList.remove('show-groupreminder'); appEl.classList.remove('show-installmentsummary'); appEl.classList.remove('show-installmentdetail'); appEl.classList.remove('show-expenses'); appEl.classList.remove('show-reportshub'); appEl.classList.remove('show-collectionreport'); resetAddForm(); try{ sessionStorage.removeItem('lastScreen'); }catch(e){} }
+  function goHome(){ appEl.classList.remove('show-add'); appEl.classList.remove('show-detail'); appEl.classList.remove('show-newdue'); appEl.classList.remove('show-txdetail'); appEl.classList.remove('show-customeredit'); appEl.classList.remove('show-newinstallment'); appEl.classList.remove('show-collectinstallment'); appEl.classList.remove('show-report'); appEl.classList.remove('show-shopsettings'); appEl.classList.remove('show-appsettings'); appEl.classList.remove('show-purchasehistory'); appEl.classList.remove('show-groupreminder'); appEl.classList.remove('show-installmentsummary'); appEl.classList.remove('show-installmentdetail'); appEl.classList.remove('show-expenses'); appEl.classList.remove('show-reportshub'); appEl.classList.remove('show-collectionreport'); appEl.classList.remove('show-dailyreport'); appEl.classList.remove('show-netprofitreport'); appEl.classList.remove('show-cashreport'); resetAddForm(); try{ sessionStorage.removeItem('lastScreen'); }catch(e){} }
 
   /* ================================================================ */
   /* ================= CATEGORY: Side Menu Drawer ===================== */
@@ -3516,12 +3645,22 @@
     closeReportsHub();
     goToCollectionReport('installment');
   });
-  // বাকি রিপোর্টগুলো এখনো বানানো হয়নি — পরের ধাপগুলোতে একে একে তৈরি হবে।
-  ['rhCashBtn','rhDailyBtn','rhNetProfitBtn','rhGrossBtn'].forEach(id=>{
-    document.getElementById(id).addEventListener('click', (e)=>{
-      const title = e.currentTarget.dataset.title;
-      showToast(`${title} (শীঘ্রই আসছে)`);
-    });
+  document.getElementById('rhDailyBtn').addEventListener('click', ()=>{
+    closeReportsHub();
+    goToDailyReport();
+  });
+  document.getElementById('rhNetProfitBtn').addEventListener('click', ()=>{
+    closeReportsHub();
+    goToNetProfitReport();
+  });
+  document.getElementById('rhCashBtn').addEventListener('click', ()=>{
+    closeReportsHub();
+    goToCashReport();
+  });
+  // গ্রস রিপোর্ট এখনো বানানো হয়নি (এটা মূলত ক্রয়-বিক্রয় পেজের সাথে মিলে
+  // যায় বলে এখনো সিদ্ধান্ত হয়নি সেটা কীভাবে বানানো হবে)।
+  document.getElementById('rhGrossBtn').addEventListener('click', (e)=>{
+    showToast(`${e.currentTarget.dataset.title} (শীঘ্রই আসছে)`);
   });
 
   /* ================================================================ */
@@ -3530,6 +3669,221 @@
   // একই স্ক্রিন দুটো রিপোর্টের জন্যই ব্যবহার হয় — শুধু ফিল্টারের শর্ত আর
   // শিরোনাম বদলায়, বাকি কাঠামো সম্পূর্ণ একই।
   let currentCollectionReportType = 'general';
+  /* ================================================================ */
+  /* ================= CATEGORY: দৈনিক হিসাব রিপোর্ট =================== */
+  /* ================================================================ */
+  function isSameDay(d1, d2){
+    return d1.getFullYear()===d2.getFullYear() && d1.getMonth()===d2.getMonth() && d1.getDate()===d2.getDate();
+  }
+  function updateDrDateLabel(iso){
+    document.getElementById('drDateLabel').textContent = formatDMYDash(new Date(iso+'T00:00:00'));
+  }
+  /* ================================================================ */
+  /* ================= CATEGORY: নেট প্রফিট রিপোর্ট ===================== */
+  /* ================================================================ */
+  /* ================================================================ */
+  /* ================= CATEGORY: ক্যাশ রিপোর্ট ========================= */
+  /* ================================================================ */
+  function updateCrpDateLabel(iso){
+    document.getElementById('crpDateLabel').textContent = formatDMYDash(new Date(iso+'T00:00:00'));
+  }
+  function goToCashReport(){
+    const todayIso = new Date().toISOString().slice(0,10);
+    document.getElementById('crpDateInput').value = todayIso;
+    updateCrpDateLabel(todayIso);
+    document.getElementById('crpActualInput').value = '';
+    document.getElementById('crpNoteInput').value = '';
+    document.getElementById('crpResultCard').style.display = 'none';
+    computeCrpAppAmount();
+    renderCashCheckHistory();
+    appEl.classList.add('show-cashreport');
+    pushAppState('cashreport');
+  }
+  function closeCashReport(){ appEl.classList.remove('show-cashreport'); }
+  document.getElementById('crpBackBtn').addEventListener('click', ()=> history.back());
+  document.getElementById('crpDateBtn').addEventListener('click', ()=>{
+    const input = document.getElementById('crpDateInput');
+    openWheelDatePicker(input.value, (iso)=>{
+      input.value = iso;
+      updateCrpDateLabel(iso);
+      computeCrpAppAmount();
+      document.getElementById('crpResultCard').style.display = 'none';
+      // ওই তারিখের জন্য আগে থেকে মিলানো থাকলে সেটাই আবার দেখাও, নতুন করে
+      // মেলাতে হবে না।
+      const existing = cashChecks.find(cc => cc.date === input.value);
+      if(existing){
+        document.getElementById('crpActualInput').value = existing.actualAmount;
+        document.getElementById('crpNoteInput').value = existing.note || '';
+      }else{
+        document.getElementById('crpActualInput').value = '';
+        document.getElementById('crpNoteInput').value = '';
+      }
+    });
+  });
+  let crpAppAmountValue = 0;
+  // দৈনিক হিসাব রিপোর্টের নিট-নগদ হিসাবটাই এখানে পুনর্ব্যবহার করা হচ্ছে —
+  // "অ্যাপ অনুযায়ী নগদ" মানে একই জিনিস, দুই জায়গায় ভিন্ন উত্তর না আসার জন্য।
+  function computeCrpAppAmount(){
+    const iso = document.getElementById('crpDateInput').value;
+    const target = iso ? new Date(iso+'T00:00:00') : new Date();
+    let generalCollected=0, instDown=0, instCollected=0;
+    customers.forEach(c=>{
+      (c.transactions||[]).forEach(tx=>{
+        const d = parseTxDate(tx.date, tx.time);
+        if(isNaN(d) || !isSameDay(d, target)) return;
+        if(tx.category === 'installment'){
+          if(tx.give) instDown += (tx.downPayment||0);
+          if(tx.take) instCollected += tx.take;
+        }else{
+          if(tx.take) generalCollected += tx.take;
+        }
+      });
+    });
+    let expenseTotal = 0;
+    expenses.forEach(e=>{
+      const d = parseTxDate(e.date);
+      if(!isNaN(d) && isSameDay(d, target)) expenseTotal += e.amount;
+    });
+    crpAppAmountValue = generalCollected + instCollected + instDown - expenseTotal;
+    document.getElementById('crpAppAmount').textContent = bn(Math.round(crpAppAmountValue)) + ' টাকা';
+  }
+  document.getElementById('crpSaveBtn').addEventListener('click', async ()=>{
+    const actual = Number(document.getElementById('crpActualInput').value);
+    if(!document.getElementById('crpActualInput').value || isNaN(actual)){
+      showToast('হাতে গোনা ক্যাশের পরিমাণ দিতে হবে', 'danger');
+      return;
+    }
+    const note = document.getElementById('crpNoteInput').value.trim();
+    const dateIso = document.getElementById('crpDateInput').value;
+    const diff = actual - crpAppAmountValue;
+
+    const resultCard = document.getElementById('crpResultCard');
+    const resultLabel = document.getElementById('crpResultLabel');
+    const resultAmount = document.getElementById('crpResultAmount');
+    resultCard.style.display = '';
+    if(Math.abs(diff) < 1){
+      resultLabel.textContent = '✅ মিলে গেছে';
+      resultAmount.textContent = '০ টাকা পার্থক্য';
+    }else if(diff > 0){
+      resultLabel.textContent = '🟢 বাড়তি আছে';
+      resultAmount.textContent = '+' + bn(Math.round(diff)) + ' টাকা';
+    }else{
+      resultLabel.textContent = '🔴 ঘাটতি আছে';
+      resultAmount.textContent = '-' + bn(Math.round(Math.abs(diff))) + ' টাকা';
+    }
+
+    const existingIdx = cashChecks.findIndex(cc => cc.date === dateIso);
+    const entry = { date: dateIso, appAmount: crpAppAmountValue, actualAmount: actual, diff, note };
+    if(existingIdx >= 0) cashChecks[existingIdx] = entry;
+    else cashChecks.push(entry);
+    await persistCashChecks();
+    renderCashCheckHistory();
+    showToast('সংরক্ষণ হয়েছে');
+  });
+  function renderCashCheckHistory(){
+    const sorted = [...cashChecks].sort((a,b)=> new Date(b.date) - new Date(a.date));
+    document.getElementById('crpHistoryList').innerHTML = sorted.map(cc => {
+      const cls = Math.abs(cc.diff) < 1 ? '' : cc.diff > 0 ? 'urgent-soon' : 'urgent-overdue';
+      const diffText = Math.abs(cc.diff) < 1 ? 'মিলেছে' : (cc.diff > 0 ? '+' : '-') + bn(Math.round(Math.abs(cc.diff))) + ' টাকা';
+      return `
+      <div class="gr-cust-row ${cls}" style="grid-template-columns:1.3fr 1fr 0.8fr; cursor:default;">
+        <div class="gr-cust-name">${formatDMYDash(new Date(cc.date+'T00:00:00'))}</div>
+        <div class="gr-cust-taken-date">অ্যাপ: ${bn(Math.round(cc.appAmount))} · হাতে: ${bn(Math.round(cc.actualAmount))}</div>
+        <div class="gr-cust-amount">${diffText}</div>
+      </div>`;
+    }).join('') || '<div class="gr-empty">এখনো কোনো মিলানো হয়নি</div>';
+  }
+
+  function goToNetProfitReport(){
+    document.getElementById('npPeriodSelect').value = 'month';
+    renderNetProfitReport();
+    appEl.classList.add('show-netprofitreport');
+    pushAppState('netprofitreport');
+  }
+  function closeNetProfitReport(){ appEl.classList.remove('show-netprofitreport'); }
+  document.getElementById('npBackBtn').addEventListener('click', ()=> history.back());
+  document.getElementById('npPeriodSelect').addEventListener('change', renderNetProfitReport);
+  function netProfitPeriodStart(periodVal){
+    if(periodVal === 'today'){ const d = new Date(); d.setHours(0,0,0,0); return d; }
+    if(periodVal === 'month') return new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    return new Date(0);
+  }
+  function renderNetProfitReport(){
+    const start = netProfitPeriodStart(document.getElementById('npPeriodSelect').value);
+    // গ্রস — ক্রয়-বিক্রয় পেজের একই তথ্য পুনর্ব্যবহার করা হচ্ছে, নতুন করে
+    // হিসাব বানানো হয়নি, যাতে দুই জায়গায় ভিন্ন ভিন্ন উত্তর না আসে।
+    let saleTotal = 0, purchaseTotal = 0;
+    getAllPurchaseEntries().forEach(e=>{
+      if(isNaN(e.sortKey) || e.sortKey < start) return;
+      saleTotal += e.saleAmount;
+      purchaseTotal += e.purchasePrice;
+    });
+    const grossProfit = saleTotal - purchaseTotal;
+
+    let expenseTotal = 0;
+    expenses.forEach(e=>{
+      const d = parseTxDate(e.date);
+      if(!isNaN(d) && d >= start) expenseTotal += e.amount;
+    });
+
+    document.getElementById('npSaleTotal').textContent = bn(Math.round(saleTotal)) + ' টাকা';
+    document.getElementById('npPurchaseTotal').textContent = bn(Math.round(purchaseTotal)) + ' টাকা';
+    document.getElementById('npGrossProfit').textContent = bn(Math.round(grossProfit)) + ' টাকা';
+    document.getElementById('npExpenseTotal').textContent = bn(Math.round(expenseTotal)) + ' টাকা';
+    document.getElementById('npNetProfit').textContent = bn(Math.round(grossProfit - expenseTotal)) + ' টাকা';
+  }
+
+  function goToDailyReport(){
+    const todayIso = new Date().toISOString().slice(0,10);
+    document.getElementById('drDateInput').value = todayIso;
+    updateDrDateLabel(todayIso);
+    renderDailyReport();
+    appEl.classList.add('show-dailyreport');
+    pushAppState('dailyreport');
+  }
+  function closeDailyReport(){ appEl.classList.remove('show-dailyreport'); }
+  document.getElementById('drBackBtn').addEventListener('click', ()=> history.back());
+  document.getElementById('drDateBtn').addEventListener('click', ()=>{
+    const input = document.getElementById('drDateInput');
+    openWheelDatePicker(input.value, (iso)=>{
+      input.value = iso;
+      updateDrDateLabel(iso);
+      renderDailyReport();
+    });
+  });
+  function renderDailyReport(){
+    const iso = document.getElementById('drDateInput').value;
+    const target = iso ? new Date(iso+'T00:00:00') : new Date();
+    let generalGiven=0, generalCollected=0, instSold=0, instDown=0, instCollected=0;
+    customers.forEach(c=>{
+      (c.transactions||[]).forEach(tx=>{
+        const d = parseTxDate(tx.date, tx.time);
+        if(isNaN(d) || !isSameDay(d, target)) return;
+        if(tx.category === 'installment'){
+          if(tx.give){ instSold += (tx.salePrice!=null ? tx.salePrice : tx.give); instDown += (tx.downPayment||0); }
+          if(tx.take) instCollected += tx.take;
+        }else{
+          if(tx.give) generalGiven += tx.give;
+          if(tx.take) generalCollected += tx.take;
+        }
+      });
+    });
+    let expenseTotal = 0;
+    expenses.forEach(e=>{
+      const d = parseTxDate(e.date);
+      if(!isNaN(d) && isSameDay(d, target)) expenseTotal += e.amount;
+    });
+    document.getElementById('drGeneralGiven').textContent = bn(Math.round(generalGiven)) + ' টাকা';
+    document.getElementById('drGeneralCollected').textContent = bn(Math.round(generalCollected)) + ' টাকা';
+    document.getElementById('drInstSold').textContent = bn(Math.round(instSold)) + ' টাকা';
+    document.getElementById('drInstDownpayment').textContent = bn(Math.round(instDown)) + ' টাকা';
+    document.getElementById('drInstCollected').textContent = bn(Math.round(instCollected)) + ' টাকা';
+    document.getElementById('drExpenses').textContent = bn(Math.round(expenseTotal)) + ' টাকা';
+    // দিনের নিট নগদ = আদায় হওয়া সব নগদ (বাকি+কিস্তি আদায়+ডাউন পেমেন্ট) বিয়োগ খরচ
+    const net = generalCollected + instCollected + instDown - expenseTotal;
+    document.getElementById('drNetAmount').textContent = bn(Math.round(net)) + ' টাকা';
+  }
+
   function goToCollectionReport(type){
     currentCollectionReportType = type;
     document.getElementById('crTitle').textContent = type==='installment' ? 'কিস্তি কালেকশন রিপোর্ট' : 'বাকি কালেকশন রিপোর্ট';
@@ -5642,6 +5996,9 @@
       case 'expenses': goToExpenses(); break;
       case 'reportshub': goToReportsHub(); break;
       case 'collectionreport': goToReportsHub(); break;
+      case 'dailyreport': goToDailyReport(); break;
+      case 'netprofitreport': goToNetProfitReport(); break;
+      case 'cashreport': goToCashReport(); break;
       case 'detail':
       case 'newdue':
       case 'txdetail':
@@ -5992,6 +6349,9 @@
     if(appEl.classList.contains('show-installmentdetail')){ closeInstallmentDetail(); return; }
     if(appEl.classList.contains('show-installmentsummary')){ closeInstallmentSummary(); return; }
     if(appEl.classList.contains('show-expenses')){ closeExpenses(); return; }
+    if(appEl.classList.contains('show-cashreport')){ closeCashReport(); return; }
+    if(appEl.classList.contains('show-netprofitreport')){ closeNetProfitReport(); return; }
+    if(appEl.classList.contains('show-dailyreport')){ closeDailyReport(); return; }
     if(appEl.classList.contains('show-collectionreport')){ closeCollectionReport(); return; }
     if(appEl.classList.contains('show-reportshub')){ closeReportsHub(); return; }
     if(appEl.classList.contains('show-newinstallment')){ closeNewInstallment(); return; }
