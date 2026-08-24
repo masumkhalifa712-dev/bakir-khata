@@ -2649,6 +2649,10 @@
 
   const SUPABASE_URL = "https://tamzreokpnvqpxvkbpiw.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRhbXpyZW9rcG52cXB4dmticGl3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYwMjU4MTAsImV4cCI6MjEwMTYwMTgxMH0.-ddoBc5pVVLUcrBfxb5RUeSU_wCuQQsLzhfpwDsBsHQ";
+  // পুশ নোটিফিকেশন সাবস্ক্রাইব করার সময় ব্রাউজারকে এই পাবলিক কী-টা দিতে হয়
+  // (এটা প্রকাশ্যে থাকাই স্বাভাবিক, প্রাইভেট কী কখনো ফ্রন্টএন্ডে আসে না —
+  // সেটা শুধু Edge Function-এর secret হিসেবে থাকবে)। ধাপ ২-তে এটা ব্যবহার হবে।
+  const VAPID_PUBLIC_KEY = "BLYC12liHlArQ8d8diBYSJ0x8YKnaVd5otUuciAD-m1OKsp7Y3ksoN5ecp0Ww0VG9lDv0Cja__FiZGlhMTNR234";
   const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   // Per-user data — set once the user is authenticated (see completeAuth below).
