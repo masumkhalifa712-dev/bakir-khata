@@ -120,6 +120,7 @@
       <button class="admin-tab" data-tab="users">👥 ইউজার ব্যবস্থাপনা</button>
       <button class="admin-tab" data-tab="contact">📢 যোগাযোগ</button>
       <button class="admin-tab" data-tab="notes">🗒️ নোট</button>
+      <button class="admin-tab" data-tab="log">📜 লগ</button>
     </div>
 
     <div class="admin-tab-panel active" id="tabPanel-dashboard">
@@ -163,6 +164,13 @@
           <button class="btn-secondary" id="addChangelogBtn">যোগ করুন</button>
         </div>
         <div class="changelog-list" id="changelogList"></div>
+      </div>
+    </div>
+
+    <div class="admin-tab-panel" id="tabPanel-log">
+      <div class="panel-card">
+        <div class="panel-title">📜 অ্যাক্টিভিটি লগ <small>কে/কী কাজ কখন হয়েছে — স্বয়ংক্রিয়ভাবে রেকর্ড হয়</small></div>
+        <div id="activityLogList"></div>
       </div>
     </div>
 
@@ -255,8 +263,39 @@
       const target = tab.dataset.tab;
       document.querySelectorAll('.admin-tab').forEach(t=> t.classList.toggle('active', t===tab));
       document.querySelectorAll('.admin-tab-panel').forEach(p=> p.classList.toggle('active', p.id === 'tabPanel-'+target));
+      if(target === 'log') loadActivityLog();
     });
   });
+
+  // ================= অ্যাক্টিভিটি লগ =================
+  // প্রতিটা অ্যাডমিন-অ্যাকশনের ঠিক পরপরই ডাকা হয় — ব্যর্থ হলেও মূল কাজ
+  // (ব্লক/ডিলিট/ইত্যাদি) আগেই হয়ে গেছে, তাই এখানে alert দেখানো হয় না,
+  // শুধু চুপচাপ console-এ লেখা থাকে।
+  async function logAdminAction(actionType, targetMobile, details){
+    try{
+      await sb.rpc('rpc_admin_log_action', { p_secret: adminSecret, p_action_type: actionType, p_target_mobile: targetMobile, p_details: details });
+    }catch(e){ console.error('লগ করা যায়নি', e); }
+  }
+  async function loadActivityLog(){
+    const list = document.getElementById('activityLogList');
+    list.innerHTML = '<div style="color:var(--clr-ink-soft); font-size:12.5px;">লোড হচ্ছে...</div>';
+    const { data, error } = await sb.rpc('rpc_admin_get_activity_log', { p_secret: adminSecret });
+    if(error){ list.innerHTML = '<div style="color:var(--clr-ink-soft); font-size:12.5px;">লোড করা যায়নি</div>'; return; }
+    const labels = { block:'ব্লক করা হয়েছে', unblock:'আনব্লক করা হয়েছে', delete:'ডিলিট করা হয়েছে', set_plan:'প্ল্যান বদলানো হয়েছে', broadcast:'ঘোষণা', push_notification:'পুশ নোটিফিকেশন' };
+    if(!data || data.length === 0){ list.innerHTML = '<div style="color:var(--clr-ink-soft); font-size:12.5px;">এখনো কোনো লগ নেই</div>'; return; }
+    list.innerHTML = data.map(row=>{
+      const dt = new Date(row.created_at);
+      const dateStr = dt.toLocaleString('bn-BD', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+      const label = labels[row.action_type] || row.action_type;
+      const targetStr = row.target_mobile ? ` — ${row.target_mobile}` : '';
+      const detailsStr = row.details ? ` (${row.details})` : '';
+      return `<div style="padding:10px 0; border-bottom:1px solid var(--clr-line); font-size:12.5px;">
+        <div style="font-weight:700; color:var(--clr-ink);">${label}${targetStr}</div>
+        <div style="color:var(--clr-ink-soft); margin-top:2px;">${dateStr}${detailsStr}</div>
+      </div>`;
+    }).join('');
+  }
+
   document.getElementById('adminPasswordInput').addEventListener('keydown', (e)=>{ if(e.key==='Enter') tryLogin(); });
   function tryLogin(){
     const val = document.getElementById('adminPasswordInput').value;
@@ -409,6 +448,7 @@
         if(error){ alert('আপডেট করা যায়নি: ' + error.message); btn.disabled = false; return; }
         user.blocked = newBlocked;
         renderStats(); applyFiltersAndRender();
+        logAdminAction(newBlocked ? 'block' : 'unblock', mobile, null);
       }
 
       if(action === 'delete'){
@@ -419,6 +459,7 @@
         if(error){ alert('ডিলিট করা যায়নি: ' + error.message); btn.disabled = false; return; }
         allUsers = allUsers.filter(u=>u.mobile!==mobile);
         renderStats(); applyFiltersAndRender();
+        logAdminAction('delete', mobile, null);
       }
 
       if(action === 'mark-paid'){
@@ -433,6 +474,7 @@
         if(error){ alert('আপডেট করা যায়নি: ' + error.message); btn.disabled = false; return; }
         user.plan = plan; user.plan_expiry = expiry;
         renderStats(); applyFiltersAndRender();
+        logAdminAction('set_plan', mobile, n === 0 ? 'ফ্রি করা হয়েছে' : `${n} দিনের জন্য পেইড করা হয়েছে`);
         return;
       }
       return;
@@ -514,6 +556,7 @@
     const { error } = await sb.rpc('rpc_admin_save_config', { p_secret: adminSecret, p_broadcast_message: message, p_broadcast_active: active, p_changelog: null });
     if(error){ alert('সংরক্ষণ করা যায়নি: ' + error.message); return; }
     alert('ঘোষণা সংরক্ষণ হয়েছে');
+    logAdminAction('broadcast', null, active ? 'ঘোষণা সক্রিয় করা হয়েছে' : 'ঘোষণা নিষ্ক্রিয় করা হয়েছে');
   });
 
   document.getElementById('sendPushBtn').addEventListener('click', async ()=>{
@@ -543,6 +586,7 @@
       statusText.textContent = `${data.sent} জনকে পাঠানো হয়েছে (মোট ${data.total} জনের মধ্যে)`;
       document.getElementById('pushTitleInput').value = '';
       document.getElementById('pushBodyInput').value = '';
+      logAdminAction('push_notification', null, `"${title}" — ${data.sent} জনকে পাঠানো হয়েছে`);
     }catch(e){
       statusText.textContent = '';
       alert('ইন্টারনেট কানেকশন সমস্যা — আবার চেষ্টা করো');
