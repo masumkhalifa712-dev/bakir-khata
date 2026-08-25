@@ -47,6 +47,8 @@
   .panel-title{ font-size:15px; font-weight:800; margin-bottom:12px; display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
   .panel-title small{ font-weight:600; font-size:11.5px; color:var(--clr-ink-soft); }
   .panel-textarea{ width:100%; min-height:70px; border:1.6px solid var(--clr-line); border-radius:11px; padding:11px 13px; font-size:13.5px; font-family:inherit; outline:none; resize:vertical; }
+  .ad-field-label{ display:block; font-size:12px; font-weight:700; color:var(--clr-ink-soft); margin:12px 0 5px; }
+  .ad-field-input{ width:100%; box-sizing:border-box; border:1.6px solid var(--clr-line); border-radius:10px; padding:10px 13px; font-size:13px; font-family:inherit; outline:none; }
   .panel-row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:10px; }
   .toggle-mini{ display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600; }
   .btn-primary{ padding:10px 18px; border:none; border-radius:10px; background:linear-gradient(160deg,var(--clr-primary),var(--clr-primary-dark)); color:#fff; font-weight:700; font-size:13px; cursor:pointer; font-family:inherit; }
@@ -121,6 +123,7 @@
       <button class="admin-tab" data-tab="contact">📢 যোগাযোগ</button>
       <button class="admin-tab" data-tab="notes">🗒️ নোট</button>
       <button class="admin-tab" data-tab="log">📜 লগ</button>
+      <button class="admin-tab" data-tab="ads">🖼️ বিজ্ঞাপন</button>
     </div>
 
     <div class="admin-tab-panel active" id="tabPanel-dashboard">
@@ -172,6 +175,40 @@
         <div class="panel-title">📜 অ্যাক্টিভিটি লগ <small>কে/কী কাজ কখন হয়েছে — স্বয়ংক্রিয়ভাবে রেকর্ড হয়</small></div>
         <div id="activityLogList"></div>
       </div>
+    </div>
+
+    <div class="admin-tab-panel" id="tabPanel-ads">
+      <div class="panel-card">
+        <div class="panel-title">🖼️ ব্যানার বিজ্ঞাপন <small>হোমপেজের উপরের দিকে সবসময় দেখাবে</small></div>
+        <label class="ad-field-label">ছবির লিংক (URL)</label>
+        <input type="text" id="bannerImageInput" class="ad-field-input" placeholder="https://..." />
+        <label class="ad-field-label">চাপলে যে লিংকে যাবে</label>
+        <input type="text" id="bannerLinkInput" class="ad-field-input" placeholder="https://..." />
+        <label class="ad-field-label">ছবির নিচের ছোট লাইন (এই লিংকেই যাবে)</label>
+        <input type="text" id="bannerCaptionInput" class="ad-field-input" placeholder="যেমনঃ এখানে ক্লিক করে দেখতে পারো" />
+        <label class="ad-field-label">বিস্তারিত লেখা (কোনো লিংক থাকবে না)</label>
+        <textarea class="panel-textarea" id="bannerDetailsInput" placeholder="বিজ্ঞাপনের বিস্তারিত..."></textarea>
+        <div class="panel-row">
+          <label class="toggle-mini"><input type="checkbox" id="bannerActiveInput" /> সক্রিয় (হোমপেজে দেখাবে)</label>
+        </div>
+      </div>
+
+      <div class="panel-card">
+        <div class="panel-title">🪟 পপ-আপ বিজ্ঞাপন <small>অ্যাপ বন্ধ করে আবার খুললে একবার দেখাবে</small></div>
+        <label class="ad-field-label">ছবির লিংক (URL)</label>
+        <input type="text" id="popupImageInput" class="ad-field-input" placeholder="https://..." />
+        <label class="ad-field-label">চাপলে যে লিংকে যাবে</label>
+        <input type="text" id="popupLinkInput" class="ad-field-input" placeholder="https://..." />
+        <label class="ad-field-label">ছবির নিচের ছোট লাইন (এই লিংকেই যাবে)</label>
+        <input type="text" id="popupCaptionInput" class="ad-field-input" placeholder="যেমনঃ এখানে ক্লিক করে নতুন ভার্সন চেক করুন" />
+        <label class="ad-field-label">বিস্তারিত লেখা (কোনো লিংক থাকবে না)</label>
+        <textarea class="panel-textarea" id="popupDetailsInput" placeholder="বিজ্ঞাপনের বিস্তারিত..."></textarea>
+        <div class="panel-row">
+          <label class="toggle-mini"><input type="checkbox" id="popupActiveInput" /> সক্রিয় (দেখাবে)</label>
+        </div>
+      </div>
+
+      <button class="btn-primary" id="saveAdConfigBtn" style="width:100%;">বিজ্ঞাপন সংরক্ষণ করুন</button>
     </div>
 
     <div class="admin-tab-panel" id="tabPanel-users">
@@ -264,6 +301,7 @@
       document.querySelectorAll('.admin-tab').forEach(t=> t.classList.toggle('active', t===tab));
       document.querySelectorAll('.admin-tab-panel').forEach(p=> p.classList.toggle('active', p.id === 'tabPanel-'+target));
       if(target === 'log') loadActivityLog();
+      if(target === 'ads') loadAdConfigForAdmin();
     });
   });
 
@@ -281,7 +319,7 @@
     list.innerHTML = '<div style="color:var(--clr-ink-soft); font-size:12.5px;">লোড হচ্ছে...</div>';
     const { data, error } = await sb.rpc('rpc_admin_get_activity_log', { p_secret: adminSecret });
     if(error){ list.innerHTML = '<div style="color:var(--clr-ink-soft); font-size:12.5px;">লোড করা যায়নি</div>'; return; }
-    const labels = { block:'ব্লক করা হয়েছে', unblock:'আনব্লক করা হয়েছে', delete:'ডিলিট করা হয়েছে', set_plan:'প্ল্যান বদলানো হয়েছে', broadcast:'ঘোষণা', push_notification:'পুশ নোটিফিকেশন' };
+    const labels = { block:'ব্লক করা হয়েছে', unblock:'আনব্লক করা হয়েছে', delete:'ডিলিট করা হয়েছে', set_plan:'প্ল্যান বদলানো হয়েছে', broadcast:'ঘোষণা', push_notification:'পুশ নোটিফিকেশন', ad_config:'বিজ্ঞাপন আপডেট' };
     if(!data || data.length === 0){ list.innerHTML = '<div style="color:var(--clr-ink-soft); font-size:12.5px;">এখনো কোনো লগ নেই</div>'; return; }
     list.innerHTML = data.map(row=>{
       const dt = new Date(row.created_at);
@@ -295,6 +333,47 @@
       </div>`;
     }).join('');
   }
+
+  let adConfigLoaded = false;
+  async function loadAdConfigForAdmin(){
+    if(adConfigLoaded) return; // একবার লোড হলেই যথেষ্ট — বারবার ট্যাব পাল্টালে ফর্মে যা টাইপ করছে তা মুছে যাবে না
+    const { data, error } = await sb.rpc('rpc_get_ad_config');
+    if(error) return;
+    const row = Array.isArray(data) ? data[0] : data;
+    if(!row) return;
+    document.getElementById('bannerImageInput').value = row.banner_image || '';
+    document.getElementById('bannerLinkInput').value = row.banner_link || '';
+    document.getElementById('bannerCaptionInput').value = row.banner_caption || '';
+    document.getElementById('bannerDetailsInput').value = row.banner_details || '';
+    document.getElementById('bannerActiveInput').checked = !!row.banner_active;
+    document.getElementById('popupImageInput').value = row.popup_image || '';
+    document.getElementById('popupLinkInput').value = row.popup_link || '';
+    document.getElementById('popupCaptionInput').value = row.popup_caption || '';
+    document.getElementById('popupDetailsInput').value = row.popup_details || '';
+    document.getElementById('popupActiveInput').checked = !!row.popup_active;
+    adConfigLoaded = true;
+  }
+  document.getElementById('saveAdConfigBtn').addEventListener('click', async ()=>{
+    const btn = document.getElementById('saveAdConfigBtn');
+    btn.disabled = true;
+    const { error } = await sb.rpc('rpc_admin_save_ad_config', {
+      p_secret: adminSecret,
+      p_banner_image: document.getElementById('bannerImageInput').value.trim() || null,
+      p_banner_link: document.getElementById('bannerLinkInput').value.trim() || null,
+      p_banner_caption: document.getElementById('bannerCaptionInput').value.trim() || null,
+      p_banner_details: document.getElementById('bannerDetailsInput').value.trim() || null,
+      p_banner_active: document.getElementById('bannerActiveInput').checked,
+      p_popup_image: document.getElementById('popupImageInput').value.trim() || null,
+      p_popup_link: document.getElementById('popupLinkInput').value.trim() || null,
+      p_popup_caption: document.getElementById('popupCaptionInput').value.trim() || null,
+      p_popup_details: document.getElementById('popupDetailsInput').value.trim() || null,
+      p_popup_active: document.getElementById('popupActiveInput').checked,
+    });
+    btn.disabled = false;
+    if(error){ alert('সংরক্ষণ করা যায়নি: ' + error.message); return; }
+    alert('বিজ্ঞাপন সংরক্ষণ হয়েছে');
+    logAdminAction('ad_config', null, null);
+  });
 
   document.getElementById('adminPasswordInput').addEventListener('keydown', (e)=>{ if(e.key==='Enter') tryLogin(); });
   function tryLogin(){
