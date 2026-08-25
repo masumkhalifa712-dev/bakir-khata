@@ -267,7 +267,22 @@
   .push-prompt-btn{ flex-shrink:0; background:var(--clr-primary); color:#fff; border:none; border-radius:999px; padding:8px 14px; font-size:12px; font-weight:700; font-family:inherit; cursor:pointer; white-space:nowrap; }
   .push-prompt-close{ flex-shrink:0; width:26px; height:26px; border-radius:50%; border:none; background:rgba(0,0,0,.06); color:var(--clr-ink-soft); display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0; }
   .push-prompt-close svg{ width:13px; height:13px; }
-  .banner-ad{ margin:16px 18px 0; background:#17181B; border-radius:var(--radius-lg); min-height:110px; display:flex;align-items:center;justify-content:center; color:#fff; font-family:var(--font-display); font-weight:700; font-size:22px; letter-spacing:.5px; text-align:center; padding:12px; cursor:pointer; background-image:radial-gradient(circle at 85% 20%, rgba(198,16,46,.35), transparent 55%); }
+  .banner-ad{ margin:16px 18px 0; background:var(--clr-card); border-radius:var(--radius-lg); overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,.05); display:flex; flex-direction:column; }
+  .banner-ad img{ width:100%; display:block; border-radius:var(--radius-lg) var(--radius-lg) 0 0; }
+  .banner-ad-caption{ display:block; font-size:12.5px; font-weight:700; color:var(--clr-primary); text-decoration:none; padding:10px 14px 0; }
+  .banner-ad-details{ font-size:11.5px; color:var(--clr-ink-soft); padding:4px 14px 12px; line-height:1.4; }
+
+  /* ================= CATEGORY: পপ-আপ বিজ্ঞাপন ================= */
+  .popup-ad-overlay{ position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:700; display:none; align-items:center; justify-content:center; padding:24px; }
+  .popup-ad-overlay.show{ display:flex; }
+  .popup-ad-card{ position:relative; width:100%; max-width:360px; background:var(--clr-card); border-radius:18px; box-shadow:0 12px 40px rgba(0,0,0,.3); }
+  .popup-ad-card img{ width:100%; display:block; border-radius:18px 18px 0 0; }
+  .popup-ad-caption{ display:block; font-size:13px; font-weight:700; color:var(--clr-primary); text-decoration:none; padding:12px 16px 0; }
+  .popup-ad-details{ font-size:12px; color:var(--clr-ink-soft); padding:4px 16px 16px; line-height:1.5; border-radius:0 0 18px 18px; }
+  .popup-ad-close-wrap{ position:absolute; top:-14px; right:-8px; display:flex; align-items:center; gap:6px; z-index:2; }
+  .popup-ad-close{ width:30px; height:30px; border-radius:50%; background:#fff; border:none; box-shadow:0 2px 8px rgba(0,0,0,.25); color:var(--clr-ink); display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0; }
+  .popup-ad-close svg{ width:16px; height:16px; }
+  .popup-ad-countdown{ background:rgba(0,0,0,.55); color:#fff; font-size:11px; font-weight:700; padding:4px 8px; border-radius:999px; }
   .banner-ad small{display:block; font-family:var(--font-body); font-weight:500; font-size:11px; opacity:.55; margin-top:6px;}
 
   /* ================= CATEGORY: Quick Actions Row ================= */
@@ -1089,9 +1104,12 @@
       </button>
     </div>
 
-    <div class="banner-ad" id="bannerAd">
-      ব্যানার এড
-      <small>এখানে আপনার নিজের বিজ্ঞাপন/অফার বসবে</small>
+    <div class="banner-ad" id="bannerAd" style="display:none;">
+      <a href="#" id="bannerAdImageLink" target="_blank" rel="noopener">
+        <img id="bannerAdImage" alt="বিজ্ঞাপন" />
+      </a>
+      <a href="#" id="bannerAdCaptionLink" class="banner-ad-caption" target="_blank" rel="noopener"></a>
+      <div class="banner-ad-details" id="bannerAdDetails"></div>
     </div>
 
     <div class="collapsible-header-section" id="collapsibleHeaderSection">
@@ -2576,6 +2594,22 @@
     </div>
   </div>
 
+  <div class="popup-ad-overlay" id="popupAdOverlay">
+    <div class="popup-ad-card">
+      <div class="popup-ad-close-wrap">
+        <button class="popup-ad-close" id="popupAdCloseBtn" aria-label="বন্ধ করুন">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <span class="popup-ad-countdown" id="popupAdCountdown">১০</span>
+      </div>
+      <a href="#" id="popupAdImageLink" target="_blank" rel="noopener">
+        <img id="popupAdImage" alt="বিজ্ঞাপন" />
+      </a>
+      <a href="#" id="popupAdCaptionLink" class="popup-ad-caption" target="_blank" rel="noopener"></a>
+      <div class="popup-ad-details" id="popupAdDetails"></div>
+    </div>
+  </div>
+
   <div class="toast-stack" id="toastStack"></div>
 
 </div>
@@ -3143,7 +3177,6 @@
       showToast('সেটিংস সংরক্ষণ হয়েছে');
     });
   });
-  document.getElementById('bannerAd').addEventListener('click', ()=>showToast("ব্যানার এড ম্যানেজ (শীঘ্রই আসছে)"));
   document.querySelectorAll('.quick-action').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       if(btn.dataset.action === 'reminder'){ goToGroupReminder(); return; }
@@ -6080,6 +6113,7 @@
     if(pushNotificationsSupported()){ updatePushMenuLabel(); maybeShowPushPrompt(); }
     await loadCustomers();
     checkBroadcastNotice();
+    loadAdConfig();
     // Applied WHILE still hidden behind the logo screen, so whatever page
     // reappears is the right one immediately — no flash of the home screen
     // in between (which happened when this ran after the logo was hidden).
@@ -6136,6 +6170,68 @@
       }
     }catch(e){ /* app_config may not exist yet, or offline — skip quietly */ }
   }
+
+  /* ================================================================ */
+  /* ================= CATEGORY: বিজ্ঞাপন (ব্যানার + পপ-আপ) ============= */
+  /* ================================================================ */
+  const POPUP_AD_SHOWN_KEY = 'popupAdShownThisSession';
+  async function loadAdConfig(){
+    try{
+      const { data } = await sb.rpc('rpc_get_ad_config');
+      const row = Array.isArray(data) ? data[0] : data;
+      if(!row) return;
+      renderBannerAd(row);
+      maybeShowPopupAd(row);
+    }catch(e){ /* ad_config হয়তো এখনো তৈরি হয়নি, বা অফলাইন — চুপচাপ বাদ */ }
+  }
+  function renderBannerAd(row){
+    if(!row.banner_active || !row.banner_image) return;
+    document.getElementById('bannerAdImage').src = row.banner_image;
+    document.getElementById('bannerAdImageLink').href = row.banner_link || '#';
+    const captionLink = document.getElementById('bannerAdCaptionLink');
+    if(row.banner_caption){
+      captionLink.textContent = row.banner_caption;
+      captionLink.href = row.banner_link || '#';
+      captionLink.style.display = '';
+    }else{
+      captionLink.style.display = 'none';
+    }
+    document.getElementById('bannerAdDetails').textContent = row.banner_details || '';
+    document.getElementById('bannerAd').style.display = '';
+  }
+  let popupAdCountdownTimer = null;
+  function maybeShowPopupAd(row){
+    if(!row.popup_active || !row.popup_image) return;
+    if(sessionStorage.getItem(POPUP_AD_SHOWN_KEY) === '1') return; // এই সেশনে আগেই দেখানো হয়ে গেছে
+    sessionStorage.setItem(POPUP_AD_SHOWN_KEY, '1');
+
+    document.getElementById('popupAdImage').src = row.popup_image;
+    document.getElementById('popupAdImageLink').href = row.popup_link || '#';
+    const captionLink = document.getElementById('popupAdCaptionLink');
+    if(row.popup_caption){
+      captionLink.textContent = row.popup_caption;
+      captionLink.href = row.popup_link || '#';
+      captionLink.style.display = '';
+    }else{
+      captionLink.style.display = 'none';
+    }
+    document.getElementById('popupAdDetails').textContent = row.popup_details || '';
+    document.getElementById('popupAdOverlay').classList.add('show');
+
+    let secondsLeft = 10;
+    const countdownEl = document.getElementById('popupAdCountdown');
+    countdownEl.textContent = bn(secondsLeft);
+    popupAdCountdownTimer = setInterval(()=>{
+      secondsLeft--;
+      countdownEl.textContent = bn(secondsLeft);
+      if(secondsLeft <= 0) closePopupAd();
+    }, 1000);
+  }
+  function closePopupAd(){
+    document.getElementById('popupAdOverlay').classList.remove('show');
+    if(popupAdCountdownTimer){ clearInterval(popupAdCountdownTimer); popupAdCountdownTimer = null; }
+  }
+  document.getElementById('popupAdCloseBtn').addEventListener('click', closePopupAd);
 
   async function initAuth(){
     const saved = getSavedAuthAccount();
