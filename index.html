@@ -32,6 +32,10 @@
     --clr-fab:#D6304A;
     --clr-danger-bg:#FDEBEC;
     --clr-danger-text:#C21F3A;
+    --clr-primary-tint:#FFF0EE;
+    --clr-primary-tint2:#FFE1DE;
+    --clr-card-tint-a:#FFEFD9;
+    --clr-card-tint-b:#FFE1BC;
 
     --font-display:'Baloo Da 2', 'Hind Siliguri', sans-serif;
     --font-body:'Hind Siliguri', sans-serif;
@@ -135,7 +139,7 @@
   .rf-date-wrap input{ border:none; outline:none; font-size:14px; font-family:var(--font-body); color:var(--clr-ink); width:100%; background:transparent; }
   .rf-date-sep{ font-size:13px; font-weight:600; color:var(--clr-ink-soft); white-space:nowrap; }
   .rf-select{ width:100%; border:1.6px solid var(--clr-line); border-radius:12px; padding:14px 15px; font-size:14.5px; font-family:var(--font-body); color:var(--clr-ink); background:var(--clr-card); outline:none; margin-bottom:26px; }
-  .rf-submit-btn{ width:100%; padding:15px; border:none; border-radius:12px; background:linear-gradient(160deg,#2b76d9,#1a56ad); color:#fff; font-weight:700; font-size:15px; cursor:pointer; box-shadow:0 8px 18px rgba(26,86,173,.28); }
+  .rf-submit-btn{ width:100%; padding:15px; border:none; border-radius:12px; background:linear-gradient(160deg, var(--clr-primary), var(--clr-primary-dark)); color:#fff; font-weight:700; font-size:15px; cursor:pointer; box-shadow:0 8px 18px rgba(0,0,0,.2); }
   .rf-submit-btn:active{ transform:scale(.98); }
 
   /* ================= CATEGORY: Screen Router ================= */
@@ -264,7 +268,7 @@
   .icon-btn .dot{ position:absolute; width:8px;height:8px; border-radius:50%; background:#FFD23F; border:1.5px solid var(--clr-primary-dark); top:2px; right:2px; }
 
   /* ================= CATEGORY: Banner Ad Section ================= */
-  .push-prompt-banner{ margin:16px 18px 0; background:linear-gradient(135deg, #FFF0EE, #FFE1DE); border-radius:var(--radius-lg); padding:12px 12px 12px 14px; display:flex; align-items:center; gap:10px; box-shadow:0 1px 4px rgba(0,0,0,.05); }
+  .push-prompt-banner{ margin:16px 18px 0; background:linear-gradient(135deg, var(--clr-primary-tint), var(--clr-primary-tint2)); border-radius:var(--radius-lg); padding:12px 12px 12px 14px; display:flex; align-items:center; gap:10px; box-shadow:0 1px 4px rgba(0,0,0,.05); }
   .push-prompt-icon{ font-size:22px; flex-shrink:0; }
   .push-prompt-text{ flex:1; font-size:12.5px; font-weight:700; color:var(--clr-ink); line-height:1.4; }
   .push-prompt-btn{ flex-shrink:0; background:var(--clr-primary); color:#fff; border:none; border-radius:999px; padding:8px 14px; font-size:12px; font-weight:700; font-family:inherit; cursor:pointer; white-space:nowrap; }
@@ -396,7 +400,7 @@
   .id-product-name{ font-size:16.5px; font-weight:800; color:var(--clr-ink); }
   .id-receipt-row{ display:flex; justify-content:space-between; align-items:center; margin-top:2px; gap:8px; }
   .id-receipt-line{ font-size:12.5px; color:var(--clr-ink-soft); font-weight:600; }
-  .id-installment-count{ font-size:11.5px; font-weight:700; color:var(--clr-primary); background:#FFF0EE; padding:4px 9px; border-radius:999px; flex-shrink:0; white-space:nowrap; }
+  .id-installment-count{ font-size:11.5px; font-weight:700; color:var(--clr-primary); background:var(--clr-primary-tint); padding:4px 9px; border-radius:999px; flex-shrink:0; white-space:nowrap; }
   .id-progress-wrap{ margin-top:14px; }
   .id-progress-bar{ height:8px; border-radius:999px; background:var(--clr-line); overflow:hidden; }
   .id-progress-fill{ height:100%; background:linear-gradient(90deg, var(--clr-primary), var(--clr-primary-dark)); border-radius:999px; transition:width .3s ease; }
@@ -405,13 +409,13 @@
   .id-stat{ text-align:center; }
   .id-stat-label{ font-size:11px; color:var(--clr-ink-soft); font-weight:600; }
   .id-stat-value{ font-size:14px; font-weight:800; color:var(--clr-ink); margin-top:3px; }
-  .id-late-fee-line{ margin-top:12px; padding:9px 12px; border-radius:10px; background:#FFF0EE; color:var(--clr-primary); font-size:12.5px; font-weight:700; text-align:center; }
+  .id-late-fee-line{ margin-top:12px; padding:9px 12px; border-radius:10px; background:var(--clr-primary-tint); color:var(--clr-primary); font-size:12.5px; font-weight:700; text-align:center; }
   .id-finish-line{ margin-top:10px; font-size:11.5px; color:var(--clr-ink-soft); font-weight:600; text-align:center; }
   .id-section-title{ font-size:12.5px; font-weight:700; color:var(--clr-ink-soft); margin-bottom:8px; }
   .id-slot-row{ display:flex; align-items:center; gap:12px; background:var(--clr-card); border-radius:12px; padding:11px 14px; margin-bottom:6px; box-shadow:0 1px 3px rgba(0,0,0,.04); }
   .id-slot-badge{ width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:12px; font-weight:800; }
   .id-slot-badge.paid{ background:#DFF4E6; color:#1E8A4C; }
-  .id-slot-badge.due{ background:#FFE1DE; color:var(--clr-primary); }
+  .id-slot-badge.due{ background:var(--clr-primary-tint2); color:var(--clr-primary); }
   .id-slot-badge.upcoming{ background:var(--clr-line); color:var(--clr-ink-soft); }
   .id-slot-main{ flex:1; }
   .id-slot-date{ font-size:13px; font-weight:700; color:var(--clr-ink); }
@@ -535,7 +539,7 @@
 
   /* ================= CATEGORY: রিপোর্ট ব্যবস্থাপনা (হাব পেজ) ================= */
   .rh-card{ display:flex; align-items:center; gap:14px; width:100%; background:var(--clr-card); border:none; border-radius:14px; padding:15px 16px; margin-bottom:10px; box-shadow:0 1px 4px rgba(0,0,0,.05); cursor:pointer; font-family:inherit; text-align:left; }
-  .rh-card-icon{ width:42px; height:42px; border-radius:12px; background:#FFF0EE; color:var(--clr-primary); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .rh-card-icon{ width:42px; height:42px; border-radius:12px; background:var(--clr-primary-tint); color:var(--clr-primary); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
   .rh-card-icon svg{ width:21px; height:21px; }
   .rh-card-title{ flex:1; font-size:14px; font-weight:700; color:var(--clr-ink); }
   .rh-card-arrow{ width:18px; height:18px; color:var(--clr-ink-soft); flex-shrink:0; }
@@ -694,7 +698,7 @@
   .cd-topbar-icons button{background:none; border:none; cursor:pointer; color:#241a00; display:flex; padding:2px;}
   .cd-topbar-icons svg{width:21px;height:21px;}
 
-  .cd-profile-card{ position:relative; margin:14px 16px 34px; background:linear-gradient(160deg, #FFEFD9, #FFE1BC); border-radius:var(--radius-lg); display:flex; flex-direction:column; box-shadow:0 1px 4px rgba(0,0,0,.06); padding-bottom:6px; }
+  .cd-profile-card{ position:relative; margin:14px 16px 34px; background:linear-gradient(160deg, var(--clr-card-tint-a), var(--clr-card-tint-b)); border-radius:var(--radius-lg); display:flex; flex-direction:column; box-shadow:0 1px 4px rgba(0,0,0,.06); padding-bottom:6px; }
   .cd-profile-top{ display:flex; gap:12px; align-items:flex-start; padding:16px 16px 14px; }
   .cd-avatar{ width:58px;height:58px; border-radius:14px; flex-shrink:0; overflow:hidden; background:#D9D2BC; display:flex;align-items:center;justify-content:center; font-weight:700; font-size:18px; color:#6B5B2A; }
   .cd-avatar img{width:100%;height:100%;object-fit:cover;}
@@ -792,7 +796,7 @@
 
   .toggle-switch{ width:44px; height:25px; border-radius:999px; background:#DAD9D4; position:relative; cursor:pointer; flex-shrink:0; transition:background .2s ease; border:none; padding:0; }
   .toggle-switch .knob{ position:absolute; top:3px; left:3px; width:19px; height:19px; border-radius:50%; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.2); transition:transform .2s ease, background .2s ease; }
-  .toggle-switch.on{ background:linear-gradient(160deg, #3E86C9, #2563A8); }
+  .toggle-switch.on{ background:linear-gradient(160deg, var(--clr-primary), var(--clr-primary-dark)); }
   .toggle-switch.on .knob{ transform:translateX(19px); background:#F5D061; }
 
   .nd-purchase-price-field{ margin-top:-8px; margin-bottom:14px; display:none; }
@@ -822,7 +826,7 @@
   #app.show-newdue .nd-submit-bar.show{ display:block; }
   #app.show-newinstallment .nd-submit-bar.show{ display:block; }
   #app.show-collectinstallment .nd-submit-bar.show{ display:block; }
-  .nd-submit-btn{ width:100%; padding:16px; border:none; border-radius:var(--radius-full); background:linear-gradient(160deg, #2F6FBF, #1F4F91); color:#fff; font-size:15.5px; font-weight:700; cursor:pointer; box-shadow:0 8px 18px rgba(37,90,160,.28); }
+  .nd-submit-btn{ width:100%; padding:16px; border:none; border-radius:var(--radius-full); background:linear-gradient(160deg, var(--clr-primary), var(--clr-primary-dark)); color:#fff; font-size:15.5px; font-weight:700; cursor:pointer; box-shadow:0 8px 18px rgba(0,0,0,.2); }
   .nd-submit-btn:active{transform:scale(.98);}
 
   /* ================= CATEGORY: New Installment Screen (নতুন সহজ কিস্তি) ================= */
@@ -866,7 +870,7 @@
   .ce-option-row{ display:flex; align-items:center; gap:14px; padding:16px; border-radius:14px; background:var(--clr-card); margin-bottom:12px; cursor:pointer; box-shadow:0 1px 4px rgba(0,0,0,.04); border:none; width:100%; text-align:left; font-family:inherit; }
   .ce-option-row svg{width:20px;height:20px; flex-shrink:0;}
   .ce-option-row.delete{color:var(--clr-owe-to-me);}
-  .ce-option-row.edit{color:#2563A8;}
+  .ce-option-row.edit{color:var(--clr-primary);}
   .ce-option-label{font-size:14.5px; font-weight:700; flex:1;}
 
   /* ================= CATEGORY: Delete-Blocked Modal ================= */
@@ -903,7 +907,7 @@
   .txd-action-link{ display:flex; align-items:center; gap:6px; background:none; border:none; font-size:14px; font-weight:700; cursor:pointer; padding:8px 4px; }
   .txd-action-link svg{width:16px;height:16px;}
   .txd-action-link.delete{color:var(--clr-owe-to-me);}
-  .txd-action-link.edit{color:#2563A8;}
+  .txd-action-link.edit{color:var(--clr-primary);}
 
   /* ================= CATEGORY: Action Sheet (photo picker) ================= */
   .sheet-overlay{ position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:650; opacity:0; pointer-events:none; transition:opacity .2s ease; }
@@ -3790,12 +3794,12 @@
   // আলাদা ভ্যারিয়েবল হলেও এক জায়গায় লেখা ছিল, তাই থিম বদলালে সবগুলো
   // একসাথে না বদলালে কোথাও পুরনো রঙ, কোথাও নতুন রঙ থেকে যেত।
   const THEME_PRESETS = {
-    red:    { name:'লাল',    primary:'#C8102E', primaryDark:'#9A0C22', accent:'#D6304A' },
-    blue:   { name:'নীল',    primary:'#1E5FB8', primaryDark:'#154078', accent:'#2E74D6' },
-    green:  { name:'সবুজ',   primary:'#1E8A4C', primaryDark:'#146536', accent:'#2AA35D' },
-    purple: { name:'বেগুনি', primary:'#7C3AED', primaryDark:'#5B21B6', accent:'#8B5CF6' },
-    orange: { name:'কমলা',   primary:'#D96A1E', primaryDark:'#A34E13', accent:'#E8802E' },
-    teal:   { name:'টিল',    primary:'#0E7C7C', primaryDark:'#0A5C5C', accent:'#159090' },
+    red:    { name:'লাল',    primary:'#C8102E', primaryDark:'#9A0C22', accent:'#D6304A', tint:'#FFF0EE', tint2:'#FFE1DE', cardTintA:'#FFEFD9', cardTintB:'#FFE1BC' },
+    blue:   { name:'নীল',    primary:'#1E5FB8', primaryDark:'#154078', accent:'#2E74D6', tint:'#E9F1FC', tint2:'#D3E4F8', cardTintA:'#DCEAFB', cardTintB:'#C3DDF7' },
+    green:  { name:'সবুজ',   primary:'#1E8A4C', primaryDark:'#146536', accent:'#2AA35D', tint:'#E9F7EE', tint2:'#D4F0DE', cardTintA:'#E1F5E9', cardTintB:'#C7ECD5' },
+    purple: { name:'বেগুনি', primary:'#7C3AED', primaryDark:'#5B21B6', accent:'#8B5CF6', tint:'#F3EDFE', tint2:'#E6D9FD', cardTintA:'#EFE5FE', cardTintB:'#E0CFFC' },
+    orange: { name:'কমলা',   primary:'#D96A1E', primaryDark:'#A34E13', accent:'#E8802E', tint:'#FDF0E4', tint2:'#FBE1C6', cardTintA:'#FDEADA', cardTintB:'#FBDBB8' },
+    teal:   { name:'টিল',    primary:'#0E7C7C', primaryDark:'#0A5C5C', accent:'#159090', tint:'#E7F5F5', tint2:'#D1EBEB', cardTintA:'#DFF3F3', cardTintB:'#C7E9E9' },
   };
   const THEME_STORAGE_KEY = 'appColorTheme';
   function applyTheme(key){
@@ -3805,6 +3809,10 @@
     root.setProperty('--clr-primary-dark', t.primaryDark);
     root.setProperty('--clr-fab', t.accent);
     root.setProperty('--clr-owe-to-me', t.accent);
+    root.setProperty('--clr-primary-tint', t.tint);
+    root.setProperty('--clr-primary-tint2', t.tint2);
+    root.setProperty('--clr-card-tint-a', t.cardTintA);
+    root.setProperty('--clr-card-tint-b', t.cardTintB);
     try{ localStorage.setItem(THEME_STORAGE_KEY, key); }catch(e){}
   }
   function getCurrentThemeKey(){
