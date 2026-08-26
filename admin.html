@@ -49,6 +49,13 @@
   .panel-textarea{ width:100%; min-height:70px; border:1.6px solid var(--clr-line); border-radius:11px; padding:11px 13px; font-size:13.5px; font-family:inherit; outline:none; resize:vertical; }
   .ad-field-label{ display:block; font-size:12px; font-weight:700; color:var(--clr-ink-soft); margin:12px 0 5px; }
   .ad-field-input{ width:100%; box-sizing:border-box; border:1.6px solid var(--clr-line); border-radius:10px; padding:10px 13px; font-size:13px; font-family:inherit; outline:none; }
+  .ad-image-upload-row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .ad-image-preview{ width:52px; height:52px; border-radius:8px; object-fit:cover; border:1.6px solid var(--clr-line); }
+  .ad-image-status{ font-size:12px; color:var(--clr-ink-soft); }
+  .banner-slide-row{ border:1.6px solid var(--clr-line); border-radius:12px; padding:12px; margin-bottom:10px; }
+  .banner-slide-row-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+  .banner-slide-row-label{ font-size:12px; font-weight:700; color:var(--clr-ink-soft); }
+  .banner-slide-remove-btn{ border:none; background:none; color:var(--clr-primary); font-size:12px; font-weight:700; cursor:pointer; font-family:inherit; padding:0; }
   .panel-row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:10px; }
   .toggle-mini{ display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600; }
   .btn-primary{ padding:10px 18px; border:none; border-radius:10px; background:linear-gradient(160deg,var(--clr-primary),var(--clr-primary-dark)); color:#fff; font-weight:700; font-size:13px; cursor:pointer; font-family:inherit; }
@@ -179,15 +186,11 @@
 
     <div class="admin-tab-panel" id="tabPanel-ads">
       <div class="panel-card">
-        <div class="panel-title">🖼️ ব্যানার বিজ্ঞাপন <small>হোমপেজের উপরের দিকে সবসময় দেখাবে</small></div>
-        <label class="ad-field-label">ছবির লিংক (URL)</label>
-        <input type="text" id="bannerImageInput" class="ad-field-input" placeholder="https://..." />
-        <label class="ad-field-label">চাপলে যে লিংকে যাবে</label>
-        <input type="text" id="bannerLinkInput" class="ad-field-input" placeholder="https://..." />
-        <label class="ad-field-label">ছবির নিচের ছোট লাইন (এই লিংকেই যাবে)</label>
-        <input type="text" id="bannerCaptionInput" class="ad-field-input" placeholder="যেমনঃ এখানে ক্লিক করে দেখতে পারো" />
-        <label class="ad-field-label">বিস্তারিত লেখা (কোনো লিংক থাকবে না)</label>
-        <textarea class="panel-textarea" id="bannerDetailsInput" placeholder="বিজ্ঞাপনের বিস্তারিত..."></textarea>
+        <div class="panel-title">🖼️ ব্যানার বিজ্ঞাপন (স্লাইডশো) <small>হোমপেজের উপরের দিকে, একাধিক ছবি ঘুরে ঘুরে দেখাবে</small></div>
+        <div id="bannerSlidesList"></div>
+        <button type="button" class="btn-secondary" id="addBannerSlideBtn" style="margin-top:6px;">+ আরেকটা ছবি যোগ করুন</button>
+        <label class="ad-field-label">প্রতিটা ছবি কত সেকেন্ড পরপর বদলাবে</label>
+        <input type="number" id="bannerIntervalInput" class="ad-field-input" value="3" min="1" style="max-width:120px;" />
         <div class="panel-row">
           <label class="toggle-mini"><input type="checkbox" id="bannerActiveInput" /> সক্রিয় (হোমপেজে দেখাবে)</label>
         </div>
@@ -195,8 +198,14 @@
 
       <div class="panel-card">
         <div class="panel-title">🪟 পপ-আপ বিজ্ঞাপন <small>অ্যাপ বন্ধ করে আবার খুললে একবার দেখাবে</small></div>
-        <label class="ad-field-label">ছবির লিংক (URL)</label>
-        <input type="text" id="popupImageInput" class="ad-field-input" placeholder="https://..." />
+        <label class="ad-field-label">ছবি</label>
+        <div class="ad-image-upload-row">
+          <img id="popupImagePreview" class="ad-image-preview" style="display:none;" />
+          <button type="button" class="btn-secondary" id="popupImageUploadBtn">ছবি বেছে নিন</button>
+          <span id="popupImageStatus" class="ad-image-status"></span>
+          <input type="file" accept="image/*" id="popupImageFileInput" style="display:none;" />
+          <input type="hidden" id="popupImageInput" />
+        </div>
         <label class="ad-field-label">চাপলে যে লিংকে যাবে</label>
         <input type="text" id="popupLinkInput" class="ad-field-input" placeholder="https://..." />
         <label class="ad-field-label">ছবির নিচের ছোট লাইন (এই লিংকেই যাবে)</label>
@@ -334,19 +343,167 @@
     }).join('');
   }
 
+  // ক্রেতার ছবির জন্য মূল অ্যাপে যে একই কম্প্রেশন+আপলোড ব্যবস্থা (Cloudinary)
+  // ব্যবহার হয়, বিজ্ঞাপনের ছবির জন্যও এখানে সেটাই পুনর্ব্যবহার করা হচ্ছে —
+  // Google Drive-এর শেয়ার লিংকের মতো সমস্যা (সরাসরি ছবি না, শুধু দেখার পেজ)
+  // এখানে হবে না, কারণ এটা সবসময় একটা আসল, সরাসরি-লোড-হওয়া ছবির লিংক দেয়।
+  const CLOUDINARY_CLOUD_NAME = "cazy5ymb";
+  const CLOUDINARY_UPLOAD_PRESET = "bakir-khata";
+  function compressImageOnce(file, maxDimension, quality){
+    return new Promise((resolve, reject)=>{
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = ()=>{
+        URL.revokeObjectURL(url);
+        let { width, height } = img;
+        if(width > height && width > maxDimension){ height = Math.round(height * (maxDimension/width)); width = maxDimension; }
+        else if(height > maxDimension){ width = Math.round(width * (maxDimension/height)); height = maxDimension; }
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        canvas.toBlob(blob=> blob ? resolve(blob) : reject(new Error('compress failed')), 'image/jpeg', quality);
+      };
+      img.onerror = reject;
+      img.src = url;
+    });
+  }
+  const AD_IMAGE_TARGET_MAX_BYTES = 150 * 1024; // বিজ্ঞাপনের ছবি একটু বড় রাখা যায় কাস্টমারের ছবির চেয়ে
+  async function compressAdImageFile(file){
+    const steps = [
+      { maxDimension: 1200, quality: 0.8 },
+      { maxDimension: 900, quality: 0.7 },
+      { maxDimension: 700, quality: 0.6 },
+      { maxDimension: 500, quality: 0.5 },
+    ];
+    let lastBlob = null;
+    for(const step of steps){
+      lastBlob = await compressImageOnce(file, step.maxDimension, step.quality);
+      if(lastBlob.size <= AD_IMAGE_TARGET_MAX_BYTES) return lastBlob;
+    }
+    return lastBlob;
+  }
+  async function uploadAdImage(file, pathHint){
+    let uploadBlob = file;
+    try{ uploadBlob = await compressAdImageFile(file); }
+    catch(e){ /* কম্প্রেশন ব্যর্থ হলেও আসল ফাইলটাই আপলোড করে দাও */ }
+    const formData = new FormData();
+    formData.append('file', uploadBlob, `${pathHint}.jpg`);
+    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+    formData.append('public_id', `ads/${pathHint}-${Date.now()}`);
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, { method: 'POST', body: formData });
+    const data = await res.json();
+    if(!res.ok || !data.secure_url) throw new Error((data.error && data.error.message) || 'upload failed');
+    return data.secure_url;
+  }
+  function wireAdImageUpload(btnId, fileInputId, hiddenInputId, previewId, statusId, pathHint){
+    const btn = document.getElementById(btnId);
+    const fileInput = document.getElementById(fileInputId);
+    btn.addEventListener('click', ()=> fileInput.click());
+    fileInput.addEventListener('change', async ()=>{
+      const file = fileInput.files[0];
+      if(!file) return;
+      const status = document.getElementById(statusId);
+      status.textContent = 'আপলোড হচ্ছে...';
+      btn.disabled = true;
+      try{
+        const url = await uploadAdImage(file, pathHint);
+        document.getElementById(hiddenInputId).value = url;
+        setAdImagePreview(previewId, url);
+        status.textContent = 'আপলোড সম্পন্ন ✓';
+      }catch(e){
+        status.textContent = '';
+        alert('ছবি আপলোড করা যায়নি, আবার চেষ্টা করো');
+      }finally{
+        btn.disabled = false;
+        fileInput.value = '';
+      }
+    });
+  }
+  wireAdImageUpload('popupImageUploadBtn', 'popupImageFileInput', 'popupImageInput', 'popupImagePreview', 'popupImageStatus', 'popup');
+
+  // ================= ব্যানার স্লাইডশো (একাধিক ছবি) =================
+  let bannerSlidesData = []; // [{image, link}]
+  function renderBannerSlidesList(){
+    const container = document.getElementById('bannerSlidesList');
+    container.innerHTML = bannerSlidesData.map((slide, i) => `
+      <div class="banner-slide-row">
+        <div class="banner-slide-row-top">
+          <span class="banner-slide-row-label">ছবি ${i+1}</span>
+          <button type="button" class="banner-slide-remove-btn" data-remove="${i}">মুছে ফেলুন</button>
+        </div>
+        <div class="ad-image-upload-row">
+          <img class="ad-image-preview banner-slide-preview" data-idx="${i}" src="${slide.image||''}" style="${slide.image?'':'display:none;'}" />
+          <button type="button" class="btn-secondary banner-slide-upload-btn" data-idx="${i}">ছবি বেছে নিন</button>
+          <span class="ad-image-status banner-slide-status" data-idx="${i}"></span>
+          <input type="file" accept="image/*" class="banner-slide-file-input" data-idx="${i}" style="display:none;" />
+        </div>
+        <label class="ad-field-label">চাপলে যে লিংকে যাবে</label>
+        <input type="text" class="ad-field-input banner-slide-link-input" data-idx="${i}" placeholder="https://..." value="${slide.link||''}" />
+      </div>
+    `).join('') || '<div style="color:var(--clr-ink-soft); font-size:12.5px; margin-bottom:8px;">এখনো কোনো ছবি যোগ করা হয়নি</div>';
+
+    container.querySelectorAll('[data-remove]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        bannerSlidesData.splice(Number(btn.dataset.remove), 1);
+        renderBannerSlidesList();
+      });
+    });
+    container.querySelectorAll('.banner-slide-link-input').forEach(input=>{
+      input.addEventListener('input', ()=>{ bannerSlidesData[Number(input.dataset.idx)].link = input.value; });
+    });
+    container.querySelectorAll('.banner-slide-upload-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        container.querySelector(`.banner-slide-file-input[data-idx="${btn.dataset.idx}"]`).click();
+      });
+    });
+    container.querySelectorAll('.banner-slide-file-input').forEach(fileInput=>{
+      fileInput.addEventListener('change', async ()=>{
+        const idx = Number(fileInput.dataset.idx);
+        const file = fileInput.files[0];
+        if(!file) return;
+        const status = container.querySelector(`.banner-slide-status[data-idx="${idx}"]`);
+        const btn = container.querySelector(`.banner-slide-upload-btn[data-idx="${idx}"]`);
+        status.textContent = 'আপলোড হচ্ছে...';
+        btn.disabled = true;
+        try{
+          const url = await uploadAdImage(file, `banner-${idx}`);
+          bannerSlidesData[idx].image = url;
+          const preview = container.querySelector(`.banner-slide-preview[data-idx="${idx}"]`);
+          preview.src = url; preview.style.display = '';
+          status.textContent = 'আপলোড সম্পন্ন ✓';
+        }catch(e){
+          status.textContent = '';
+          alert('ছবি আপলোড করা যায়নি, আবার চেষ্টা করো');
+        }finally{
+          btn.disabled = false;
+          fileInput.value = '';
+        }
+      });
+    });
+  }
+  document.getElementById('addBannerSlideBtn').addEventListener('click', ()=>{
+    bannerSlidesData.push({ image: '', link: '' });
+    renderBannerSlidesList();
+  });
+
   let adConfigLoaded = false;
+  function setAdImagePreview(imgId, url){
+    const img = document.getElementById(imgId);
+    if(url){ img.src = url; img.style.display = ''; }
+    else{ img.style.display = 'none'; }
+  }
   async function loadAdConfigForAdmin(){
     if(adConfigLoaded) return; // একবার লোড হলেই যথেষ্ট — বারবার ট্যাব পাল্টালে ফর্মে যা টাইপ করছে তা মুছে যাবে না
     const { data, error } = await sb.rpc('rpc_get_ad_config');
     if(error) return;
     const row = Array.isArray(data) ? data[0] : data;
     if(!row) return;
-    document.getElementById('bannerImageInput').value = row.banner_image || '';
-    document.getElementById('bannerLinkInput').value = row.banner_link || '';
-    document.getElementById('bannerCaptionInput').value = row.banner_caption || '';
-    document.getElementById('bannerDetailsInput').value = row.banner_details || '';
+    bannerSlidesData = Array.isArray(row.banner_slides) ? row.banner_slides.map(s=>({ image: s.image||'', link: s.link||'' })) : [];
+    renderBannerSlidesList();
+    document.getElementById('bannerIntervalInput').value = row.banner_interval_seconds || 3;
     document.getElementById('bannerActiveInput').checked = !!row.banner_active;
     document.getElementById('popupImageInput').value = row.popup_image || '';
+    setAdImagePreview('popupImagePreview', row.popup_image);
     document.getElementById('popupLinkInput').value = row.popup_link || '';
     document.getElementById('popupCaptionInput').value = row.popup_caption || '';
     document.getElementById('popupDetailsInput').value = row.popup_details || '';
@@ -356,12 +513,11 @@
   document.getElementById('saveAdConfigBtn').addEventListener('click', async ()=>{
     const btn = document.getElementById('saveAdConfigBtn');
     btn.disabled = true;
+    const slidesToSave = bannerSlidesData.filter(s => s.image); // ছবি ছাড়া ফাঁকা স্লাইড বাদ
     const { error } = await sb.rpc('rpc_admin_save_ad_config', {
       p_secret: adminSecret,
-      p_banner_image: document.getElementById('bannerImageInput').value.trim() || null,
-      p_banner_link: document.getElementById('bannerLinkInput').value.trim() || null,
-      p_banner_caption: document.getElementById('bannerCaptionInput').value.trim() || null,
-      p_banner_details: document.getElementById('bannerDetailsInput').value.trim() || null,
+      p_banner_slides: slidesToSave,
+      p_banner_interval_seconds: Number(document.getElementById('bannerIntervalInput').value) || 3,
       p_banner_active: document.getElementById('bannerActiveInput').checked,
       p_popup_image: document.getElementById('popupImageInput').value.trim() || null,
       p_popup_link: document.getElementById('popupLinkInput').value.trim() || null,
