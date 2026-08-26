@@ -168,6 +168,8 @@
   #app.show-dailyreport #screen-dailyReport{ transform:translateX(0); }
   #screen-netProfitReport{ transform:translateX(100%); z-index:3; }
   #app.show-netprofitreport #screen-netProfitReport{ transform:translateX(0); }
+  #screen-themeSettings{ transform:translateX(100%); z-index:2; }
+  #app.show-themesettings #screen-themeSettings{ transform:translateX(0); }
   #screen-cashReport{ transform:translateX(100%); z-index:3; }
   #app.show-cashreport #screen-cashReport{ transform:translateX(0); }
   #screen-installmentDetail{ transform:translateX(100%); z-index:5; }
@@ -230,6 +232,7 @@
   #app.show-collectionreport .fab, #app.show-collectionreport .bottom-nav,
   #app.show-dailyreport .fab, #app.show-dailyreport .bottom-nav,
   #app.show-netprofitreport .fab, #app.show-netprofitreport .bottom-nav,
+  #app.show-themesettings .fab, #app.show-themesettings .bottom-nav,
   #app.show-cashreport .fab, #app.show-cashreport .bottom-nav,
   #app.show-installmentdetail .fab, #app.show-installmentdetail .bottom-nav
   { display:none; }
@@ -536,6 +539,15 @@
   .rh-card-icon svg{ width:21px; height:21px; }
   .rh-card-title{ flex:1; font-size:14px; font-weight:700; color:var(--clr-ink); }
   .rh-card-arrow{ width:18px; height:18px; color:var(--clr-ink-soft); flex-shrink:0; }
+
+  /* ================= CATEGORY: কালার ও থিম পরিবর্তন ================= */
+  .theme-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:14px; }
+  .theme-swatch{ display:flex; flex-direction:column; align-items:center; gap:8px; background:none; border:none; cursor:pointer; font-family:inherit; padding:0; }
+  .theme-swatch-circle{ width:56px; height:56px; border-radius:50%; border:3px solid transparent; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(0,0,0,.1); }
+  .theme-swatch.active .theme-swatch-circle{ border-color:var(--clr-ink); }
+  .theme-swatch-check{ width:20px; height:20px; color:#fff; opacity:0; }
+  .theme-swatch.active .theme-swatch-check{ opacity:1; }
+  .theme-swatch-name{ font-size:12px; font-weight:700; color:var(--clr-ink); }
 
   /* ================= CATEGORY: দৈনিক হিসাব রিপোর্ট ================= */
   .dr-section{ background:var(--clr-card); border-radius:14px; padding:14px 16px; margin-bottom:12px; box-shadow:0 1px 4px rgba(0,0,0,.04); }
@@ -1120,7 +1132,7 @@
           <span>ডাটা ব্যাকআপ</span>
         </button>
         <button class="quick-action" data-action="bulk-sms">
-          <span class="qa-icon" style="color:#D6304A;"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM8 15H6v-2h2v2zm0-3H6V9.99h2V12zm0-3.01H6V7h2v1.99zM18 15h-8v-2h8v2zm0-3h-8V9.99h8V12zm0-3.01h-8V7h8v1.99z"/></svg></span>
+          <span class="qa-icon" style="color:var(--clr-primary);"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM8 15H6v-2h2v2zm0-3H6V9.99h2V12zm0-3.01H6V7h2v1.99zM18 15h-8v-2h8v2zm0-3h-8V9.99h8V12zm0-3.01h-8V7h8v1.99z"/></svg></span>
           <span>টালি-মেসেজ</span>
         </button>
         <button class="quick-action" data-action="cashbox">
@@ -1441,6 +1453,19 @@
       <button class="sheet-cancel" id="expCancelBtn">বাতিল</button>
     </div>
   </div>
+
+  <section class="screen" id="screen-themeSettings">
+    <div class="cd-topbar">
+      <button class="cd-back" id="themeBackBtn" aria-label="ফিরে যান">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      </button>
+      <div class="cd-title">কালার ও থিম পরিবর্তন</div>
+    </div>
+    <div style="padding:16px;">
+      <div style="font-size:12.5px; color:var(--clr-ink-soft); margin-bottom:16px;">একটা রঙ বেছে নাও — পুরো অ্যাপের সব জায়গায় (বাটন, আইকন, হাইলাইট) সেই একই রঙ ব্যবহার হবে।</div>
+      <div class="theme-grid" id="themeGrid"></div>
+    </div>
+  </section>
 
   <section class="screen" id="screen-cashReport">
     <div class="cd-topbar">
@@ -2557,6 +2582,10 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
         <span id="menuPushNotifyLabel">নোটিফিকেশন চালু করুন</span>
       </button>
+      <button class="menu-drawer-item" id="menuThemeBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+        <span>কালার ও থিম পরিবর্তন</span>
+      </button>
       <button class="menu-drawer-item logout" id="menuLogoutBtn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         <span>লগ আউট</span>
@@ -3252,7 +3281,7 @@
     try{ sessionStorage.setItem('lastScreen', JSON.stringify({ screen: name, customerId: currentCustomer ? currentCustomer.id : null })); }catch(e){}
   }
   function goToAddCustomer(){ appEl.classList.add('show-add'); pushAppState('add'); }
-  function goHome(){ appEl.classList.remove('show-add'); appEl.classList.remove('show-detail'); appEl.classList.remove('show-newdue'); appEl.classList.remove('show-txdetail'); appEl.classList.remove('show-customeredit'); appEl.classList.remove('show-newinstallment'); appEl.classList.remove('show-collectinstallment'); appEl.classList.remove('show-report'); appEl.classList.remove('show-shopsettings'); appEl.classList.remove('show-appsettings'); appEl.classList.remove('show-purchasehistory'); appEl.classList.remove('show-groupreminder'); appEl.classList.remove('show-installmentsummary'); appEl.classList.remove('show-installmentdetail'); appEl.classList.remove('show-expenses'); appEl.classList.remove('show-reportshub'); appEl.classList.remove('show-collectionreport'); appEl.classList.remove('show-dailyreport'); appEl.classList.remove('show-netprofitreport'); appEl.classList.remove('show-cashreport'); resetAddForm(); try{ sessionStorage.removeItem('lastScreen'); }catch(e){} }
+  function goHome(){ appEl.classList.remove('show-add'); appEl.classList.remove('show-detail'); appEl.classList.remove('show-newdue'); appEl.classList.remove('show-txdetail'); appEl.classList.remove('show-customeredit'); appEl.classList.remove('show-newinstallment'); appEl.classList.remove('show-collectinstallment'); appEl.classList.remove('show-report'); appEl.classList.remove('show-shopsettings'); appEl.classList.remove('show-appsettings'); appEl.classList.remove('show-purchasehistory'); appEl.classList.remove('show-groupreminder'); appEl.classList.remove('show-installmentsummary'); appEl.classList.remove('show-installmentdetail'); appEl.classList.remove('show-expenses'); appEl.classList.remove('show-reportshub'); appEl.classList.remove('show-collectionreport'); appEl.classList.remove('show-dailyreport'); appEl.classList.remove('show-netprofitreport'); appEl.classList.remove('show-cashreport'); appEl.classList.remove('show-themesettings'); resetAddForm(); try{ sessionStorage.removeItem('lastScreen'); }catch(e){} }
 
   /* ================================================================ */
   /* ================= CATEGORY: Side Menu Drawer ===================== */
@@ -3752,6 +3781,63 @@
     closeMenuDrawer();
     subscribeToPushNotifications();
   });
+
+  /* ================================================================ */
+  /* ================= CATEGORY: কালার ও থিম পরিবর্তন =================== */
+  /* ================================================================ */
+  // প্রতিটা থিমে চারটা রঙ একসাথে বদলায় (শুধু একটা না) — এটাই আগের
+  // অসামঞ্জস্যের আসল কারণ ছিল: --clr-primary আর --clr-fab/--clr-owe-to-me
+  // আলাদা ভ্যারিয়েবল হলেও এক জায়গায় লেখা ছিল, তাই থিম বদলালে সবগুলো
+  // একসাথে না বদলালে কোথাও পুরনো রঙ, কোথাও নতুন রঙ থেকে যেত।
+  const THEME_PRESETS = {
+    red:    { name:'লাল',    primary:'#C8102E', primaryDark:'#9A0C22', accent:'#D6304A' },
+    blue:   { name:'নীল',    primary:'#1E5FB8', primaryDark:'#154078', accent:'#2E74D6' },
+    green:  { name:'সবুজ',   primary:'#1E8A4C', primaryDark:'#146536', accent:'#2AA35D' },
+    purple: { name:'বেগুনি', primary:'#7C3AED', primaryDark:'#5B21B6', accent:'#8B5CF6' },
+    orange: { name:'কমলা',   primary:'#D96A1E', primaryDark:'#A34E13', accent:'#E8802E' },
+    teal:   { name:'টিল',    primary:'#0E7C7C', primaryDark:'#0A5C5C', accent:'#159090' },
+  };
+  const THEME_STORAGE_KEY = 'appColorTheme';
+  function applyTheme(key){
+    const t = THEME_PRESETS[key] || THEME_PRESETS.red;
+    const root = document.documentElement.style;
+    root.setProperty('--clr-primary', t.primary);
+    root.setProperty('--clr-primary-dark', t.primaryDark);
+    root.setProperty('--clr-fab', t.accent);
+    root.setProperty('--clr-owe-to-me', t.accent);
+    try{ localStorage.setItem(THEME_STORAGE_KEY, key); }catch(e){}
+  }
+  function getCurrentThemeKey(){
+    try{ return localStorage.getItem(THEME_STORAGE_KEY) || 'red'; }catch(e){ return 'red'; }
+  }
+  applyTheme(getCurrentThemeKey()); // পেজ লোড হওয়ার সাথে সাথেই আগের বাছাই করা থিম প্রয়োগ হয়
+
+  function goToThemeSettings(){
+    closeMenuDrawer();
+    renderThemeGrid();
+    appEl.classList.add('show-themesettings');
+    pushAppState('themesettings');
+  }
+  function closeThemeSettings(){ appEl.classList.remove('show-themesettings'); }
+  document.getElementById('menuThemeBtn').addEventListener('click', goToThemeSettings);
+  document.getElementById('themeBackBtn').addEventListener('click', ()=> history.back());
+  function renderThemeGrid(){
+    const current = getCurrentThemeKey();
+    const grid = document.getElementById('themeGrid');
+    grid.innerHTML = Object.entries(THEME_PRESETS).map(([key, t]) => `
+      <button class="theme-swatch ${key===current?'active':''}" data-key="${key}">
+        <div class="theme-swatch-circle" style="background:${t.primary};">
+          <svg class="theme-swatch-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="theme-swatch-name">${t.name}</div>
+      </button>`).join('');
+    grid.querySelectorAll('.theme-swatch').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        applyTheme(btn.dataset.key);
+        renderThemeGrid();
+      });
+    });
+  }
 
   // হোমপেজের ব্যানার — মেনুর বাটনের মতোই কাজ করে, শুধু আগে থেকেই চোখের
   // সামনে থাকে বলে বেশি মানুষ খুঁজে বের না করেই চালু করে নিতে পারবে।
@@ -6146,6 +6232,7 @@
       case 'dailyreport': goToDailyReport(); break;
       case 'netprofitreport': goToNetProfitReport(); break;
       case 'cashreport': goToCashReport(); break;
+      case 'themesettings': goToThemeSettings(); break;
       case 'detail':
       case 'newdue':
       case 'txdetail':
@@ -6577,6 +6664,7 @@
     if(appEl.classList.contains('show-installmentdetail')){ closeInstallmentDetail(); return; }
     if(appEl.classList.contains('show-installmentsummary')){ closeInstallmentSummary(); return; }
     if(appEl.classList.contains('show-expenses')){ closeExpenses(); return; }
+    if(appEl.classList.contains('show-themesettings')){ closeThemeSettings(); return; }
     if(appEl.classList.contains('show-cashreport')){ closeCashReport(); return; }
     if(appEl.classList.contains('show-netprofitreport')){ closeNetProfitReport(); return; }
     if(appEl.classList.contains('show-dailyreport')){ closeDailyReport(); return; }
