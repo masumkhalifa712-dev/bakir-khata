@@ -691,12 +691,12 @@
   .confirm-btn:active.enabled{transform:scale(.98);}
 
   /* ================= CATEGORY: Customer Detail Screen (বাকির বিবরণ) ================= */
-  .cd-topbar{ display:flex; align-items:center; gap:12px; padding:calc(16px + var(--safe-top)) 16px 14px; background:linear-gradient(160deg, #F4B93C, #E29B1A); color:#241a00; }
-  .cd-back{ width:36px;height:36px; border-radius:50%; border:none; background:rgba(255,255,255,.35); display:flex;align-items:center;justify-content:center; cursor:pointer; color:#241a00; flex-shrink:0; }
+  .cd-topbar{ display:flex; align-items:center; gap:12px; padding:calc(16px + var(--safe-top)) 16px 14px; background:linear-gradient(160deg, var(--clr-primary), var(--clr-primary-dark)); color:#fff; }
+  .cd-back{ width:36px;height:36px; border-radius:50%; border:none; background:rgba(255,255,255,.25); display:flex;align-items:center;justify-content:center; cursor:pointer; color:#fff; flex-shrink:0; }
   .cd-back svg{width:19px;height:19px;}
   .cd-title{font-size:16.5px; font-weight:700; flex:1;}
   .cd-topbar-icons{display:flex; align-items:center; gap:14px;}
-  .cd-topbar-icons button{background:none; border:none; cursor:pointer; color:#241a00; display:flex; padding:2px;}
+  .cd-topbar-icons button{background:none; border:none; cursor:pointer; color:#fff; display:flex; padding:2px;}
   .cd-topbar-icons svg{width:21px;height:21px;}
 
   .cd-profile-card{ position:relative; margin:14px 16px 34px; background:linear-gradient(160deg, var(--clr-card-tint-a), var(--clr-card-tint-b)); border-radius:var(--radius-lg); display:flex; flex-direction:column; box-shadow:0 1px 4px rgba(0,0,0,.06); padding-bottom:6px; }
@@ -2592,6 +2592,10 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
         <span>রিপোর্ট ব্যবস্থাপনা</span>
       </button>
+      <button class="menu-drawer-item" id="menuReportDownloadBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span>রিপোর্ট ডাউনলোড</span>
+      </button>
       <button class="menu-drawer-item" id="menuPushNotifyBtn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
         <span id="menuPushNotifyLabel">নোটিফিকেশন চালু করুন</span>
@@ -3730,6 +3734,10 @@
   }
   function closeReportsHub(){ appEl.classList.remove('show-reportshub'); }
   document.getElementById('menuReportsHubBtn').addEventListener('click', goToReportsHub);
+  document.getElementById('menuReportDownloadBtn').addEventListener('click', ()=>{
+    closeMenuDrawer();
+    goToReportFilter();
+  });
 
   /* ================================================================ */
   /* ================= CATEGORY: পুশ নোটিফিকেশন (অনুমতি) ================ */
@@ -4934,14 +4942,16 @@
       }
     }
     // Single-mode shops (শুধু বাকি বা শুধু কিস্তি) don't need to see the other
-    // category's always-zero row — hide it so the card isn't cluttered.
+    // category's always-zero row — hide its content but keep the row's space
+    // reserved (visibility, not display:none), so the card doesn't shrink/
+    // shift depending on which mode is active — its size stays locked.
     if(instEl){
       const instRow = instEl.closest('.cd-profile-side-row');
-      if(instRow) instRow.style.display = (shopInfo.businessMode === 'general') ? 'none' : '';
+      if(instRow) instRow.style.visibility = (shopInfo.businessMode === 'general') ? 'hidden' : '';
     }
     if(genEl){
       const genRow = genEl.closest('.cd-profile-side-row');
-      if(genRow) genRow.style.display = (shopInfo.businessMode === 'installment') ? 'none' : '';
+      if(genRow) genRow.style.visibility = (shopInfo.businessMode === 'installment') ? 'hidden' : '';
     }
     const photoImg = document.getElementById(prefix+'ProfilePhotoImg');
     const photoFallback = document.getElementById(prefix+'ProfilePhotoFallback');
