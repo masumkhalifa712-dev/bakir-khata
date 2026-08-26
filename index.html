@@ -267,10 +267,14 @@
   .push-prompt-btn{ flex-shrink:0; background:var(--clr-primary); color:#fff; border:none; border-radius:999px; padding:8px 14px; font-size:12px; font-weight:700; font-family:inherit; cursor:pointer; white-space:nowrap; }
   .push-prompt-close{ flex-shrink:0; width:26px; height:26px; border-radius:50%; border:none; background:rgba(0,0,0,.06); color:var(--clr-ink-soft); display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0; }
   .push-prompt-close svg{ width:13px; height:13px; }
-  .banner-ad{ margin:16px 18px 0; background:var(--clr-card); border-radius:var(--radius-lg); overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,.05); display:flex; flex-direction:column; }
-  .banner-ad img{ width:100%; display:block; border-radius:var(--radius-lg) var(--radius-lg) 0 0; }
-  .banner-ad-caption{ display:block; font-size:12.5px; font-weight:700; color:var(--clr-primary); text-decoration:none; padding:10px 14px 0; }
-  .banner-ad-details{ font-size:11.5px; color:var(--clr-ink-soft); padding:4px 14px 12px; line-height:1.4; }
+  .banner-ad{ margin:16px 18px 0; background:var(--clr-card); border-radius:var(--radius-lg); overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,.05); position:relative; }
+  .banner-ad-track{ display:flex; transition:transform .5s ease; }
+  .banner-ad-track a{ flex:0 0 100%; display:block; line-height:0; }
+  .banner-ad-track img{ width:100%; display:block; }
+  .banner-ad-dots{ position:absolute; left:50%; transform:translateX(-50%); bottom:8px; display:flex; gap:5px; padding:4px 8px; }
+  .banner-ad-dots::before{ content:''; position:absolute; inset:0; background:rgba(0,0,0,.25); border-radius:999px; z-index:-1; }
+  .banner-ad-dot{ width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.55); transition:background .2s ease, width .2s ease; }
+  .banner-ad-dot.active{ background:#fff; width:16px; border-radius:3px; }
 
   /* ================= CATEGORY: পপ-আপ বিজ্ঞাপন ================= */
   .popup-ad-overlay{ position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:700; display:none; align-items:center; justify-content:center; padding:24px; }
@@ -1105,11 +1109,8 @@
     </div>
 
     <div class="banner-ad" id="bannerAd" style="display:none;">
-      <a href="#" id="bannerAdImageLink" target="_blank" rel="noopener">
-        <img id="bannerAdImage" alt="বিজ্ঞাপন" />
-      </a>
-      <a href="#" id="bannerAdCaptionLink" class="banner-ad-caption" target="_blank" rel="noopener"></a>
-      <div class="banner-ad-details" id="bannerAdDetails"></div>
+      <div class="banner-ad-track" id="bannerAdTrack"></div>
+      <div class="banner-ad-dots" id="bannerAdDots"></div>
     </div>
 
     <div class="collapsible-header-section" id="collapsibleHeaderSection">
@@ -6184,20 +6185,39 @@
       maybeShowPopupAd(row);
     }catch(e){ /* ad_config হয়তো এখনো তৈরি হয়নি, বা অফলাইন — চুপচাপ বাদ */ }
   }
+  let bannerSlideTimer = null;
+  let bannerSlideIndex = 0;
   function renderBannerAd(row){
-    if(!row.banner_active || !row.banner_image) return;
-    document.getElementById('bannerAdImage').src = row.banner_image;
-    document.getElementById('bannerAdImageLink').href = row.banner_link || '#';
-    const captionLink = document.getElementById('bannerAdCaptionLink');
-    if(row.banner_caption){
-      captionLink.textContent = row.banner_caption;
-      captionLink.href = row.banner_link || '#';
-      captionLink.style.display = '';
+    const slides = Array.isArray(row.banner_slides) ? row.banner_slides.filter(s => s && s.image) : [];
+    if(!row.banner_active || slides.length === 0) return;
+
+    const track = document.getElementById('bannerAdTrack');
+    track.innerHTML = slides.map(s => `
+      <a href="${escapeHtml(s.link || '#')}" target="_blank" rel="noopener">
+        <img src="${escapeHtml(s.image)}" alt="বিজ্ঞাপন" />
+      </a>`).join('');
+
+    const dotsWrap = document.getElementById('bannerAdDots');
+    if(slides.length > 1){
+      dotsWrap.innerHTML = slides.map((_, i) => `<div class="banner-ad-dot ${i===0?'active':''}"></div>`).join('');
+      dotsWrap.style.display = '';
     }else{
-      captionLink.style.display = 'none';
+      dotsWrap.innerHTML = '';
+      dotsWrap.style.display = 'none';
     }
-    document.getElementById('bannerAdDetails').textContent = row.banner_details || '';
+
     document.getElementById('bannerAd').style.display = '';
+    bannerSlideIndex = 0;
+
+    if(bannerSlideTimer){ clearInterval(bannerSlideTimer); bannerSlideTimer = null; }
+    if(slides.length > 1){
+      const intervalMs = Math.max(1, row.banner_interval_seconds || 3) * 1000;
+      bannerSlideTimer = setInterval(()=>{
+        bannerSlideIndex = (bannerSlideIndex + 1) % slides.length;
+        track.style.transform = `translateX(-${bannerSlideIndex * 100}%)`;
+        dotsWrap.querySelectorAll('.banner-ad-dot').forEach((dot, i)=> dot.classList.toggle('active', i === bannerSlideIndex));
+      }, intervalMs);
+    }
   }
   let popupAdCountdownTimer = null;
   function maybeShowPopupAd(row){
