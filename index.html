@@ -173,6 +173,8 @@
   #app.show-dailyreport #screen-dailyReport{ transform:translateX(0); }
   #screen-netProfitReport{ transform:translateX(100%); z-index:3; }
   #app.show-netprofitreport #screen-netProfitReport{ transform:translateX(0); }
+  #screen-appAccess{ transform:translateX(100%); z-index:2; }
+  #app.show-appaccess #screen-appAccess{ transform:translateX(0); }
   #screen-themeSettings{ transform:translateX(100%); z-index:2; }
   #app.show-themesettings #screen-themeSettings{ transform:translateX(0); }
   #screen-cashReport{ transform:translateX(100%); z-index:3; }
@@ -237,6 +239,7 @@
   #app.show-collectionreport .fab, #app.show-collectionreport .bottom-nav,
   #app.show-dailyreport .fab, #app.show-dailyreport .bottom-nav,
   #app.show-netprofitreport .fab, #app.show-netprofitreport .bottom-nav,
+  #app.show-appaccess .fab, #app.show-appaccess .bottom-nav,
   #app.show-themesettings .fab, #app.show-themesettings .bottom-nav,
   #app.show-cashreport .fab, #app.show-cashreport .bottom-nav,
   #app.show-installmentdetail .fab, #app.show-installmentdetail .bottom-nav
@@ -553,6 +556,22 @@
   .theme-swatch-check{ width:20px; height:20px; color:#fff; opacity:0; }
   .theme-swatch.active .theme-swatch-check{ opacity:1; }
   .theme-swatch-name{ font-size:12px; font-weight:700; color:var(--clr-ink); }
+
+  /* ================= CATEGORY: কর্মচারী প্রোফাইল (অ্যাপ এক্সেস) ================= */
+  .emp-row{ display:flex; align-items:center; justify-content:space-between; background:var(--clr-card); border-radius:12px; padding:13px 15px; margin-bottom:8px; box-shadow:0 1px 3px rgba(0,0,0,.04); }
+  .emp-row-name{ font-size:13.5px; font-weight:700; color:var(--clr-ink); }
+  .emp-row-mobile{ font-size:11.5px; color:var(--clr-ink-soft); font-weight:600; margin-top:2px; }
+  .emp-row-status{ font-size:10.5px; font-weight:700; padding:3px 9px; border-radius:999px; margin-top:4px; display:inline-block; }
+  .emp-row-status.active{ background:#DFF4E6; color:#1E8A4C; }
+  .emp-row-status.inactive{ background:var(--clr-line); color:var(--clr-ink-soft); }
+  .emp-row-toggle-btn{ flex-shrink:0; border:1.4px solid var(--clr-line); border-radius:999px; padding:7px 13px; font-size:11.5px; font-weight:700; background:var(--clr-card); color:var(--clr-ink-soft); cursor:pointer; font-family:inherit; }
+
+  .employee-placeholder{ position:fixed; inset:0; background:var(--clr-bg); z-index:900; display:none; align-items:center; justify-content:center; padding:24px; }
+  .employee-placeholder.show{ display:flex; }
+  .employee-placeholder-card{ text-align:center; max-width:340px; }
+  .employee-placeholder-icon{ font-size:44px; margin-bottom:14px; }
+  .employee-placeholder-title{ font-size:18px; font-weight:800; color:var(--clr-ink); margin-bottom:10px; }
+  .employee-placeholder-text{ font-size:13px; color:var(--clr-ink-soft); line-height:1.6; margin-bottom:22px; }
 
   /* ================= CATEGORY: দৈনিক হিসাব রিপোর্ট ================= */
   .dr-section{ background:var(--clr-card); border-radius:14px; padding:14px 16px; margin-bottom:12px; box-shadow:0 1px 4px rgba(0,0,0,.04); }
@@ -1091,6 +1110,20 @@
   </div>
 
   <!-- ================================================================ -->
+  <!-- ========== TEMPORARY: কর্মচারীর প্লেসহোল্ডার ড্যাশবোর্ড ============== -->
+  <!-- ধাপ ৩-এ এটা সম্পূর্ণ সীমিত ইন্টারফেস দিয়ে বদলে যাবে — আপাতত শুধু লগইন
+       ফ্লো-টা যাচাই করার জন্য। -->
+  <!-- ================================================================ -->
+  <div class="employee-placeholder" id="employeePlaceholderScreen">
+    <div class="employee-placeholder-card">
+      <div class="employee-placeholder-icon">👷</div>
+      <div class="employee-placeholder-title">স্বাগতম, <span id="empPlaceholderName"></span>!</div>
+      <div class="employee-placeholder-text">কর্মচারীর সম্পূর্ণ ড্যাশবোর্ড এখনো তৈরি হচ্ছে — শীঘ্রই আসছে। তোমার লগইন সফলভাবে যাচাই হয়েছে।</div>
+      <button class="ss-save-btn" id="empPlaceholderLogoutBtn">লগ আউট করুন</button>
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
   <!-- ================= SCREEN: Home ================================ -->
   <!-- ================================================================ -->
   <section class="screen" id="screen-home">
@@ -1140,9 +1173,9 @@
           <span class="qa-icon" style="color:var(--clr-primary);"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM8 15H6v-2h2v2zm0-3H6V9.99h2V12zm0-3.01H6V7h2v1.99zM18 15h-8v-2h8v2zm0-3h-8V9.99h8V12zm0-3.01h-8V7h8v1.99z"/></svg></span>
           <span>টালি-মেসেজ</span>
         </button>
-        <button class="quick-action" data-action="cashbox">
-          <span class="qa-icon" style="color:#D18B1D;"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 6h-2.18c.11-.31.18-.65.18-1a2.996 2.996 0 0 0-5.5-1.65l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zM15 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z"/></svg></span>
-          <span>ক্যাশবক্স</span>
+        <button class="quick-action" data-action="appaccess">
+          <span class="qa-icon" style="color:#D18B1D;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1.5"/></svg></span>
+          <span>অ্যাপ এক্সেস</span>
         </button>
         <button class="quick-action" data-action="reminder">
           <span class="qa-icon" style="color:#2E9E5B; position:relative;">
@@ -1456,6 +1489,32 @@
       <button class="ss-save-btn" id="expSaveBtn">সংরক্ষণ করুন</button>
       <button class="ss-save-btn" id="expDeleteBtn" style="display:none; background:transparent; color:var(--clr-primary); border:1.4px solid var(--clr-primary); margin-top:8px;">মুছে ফেলুন</button>
       <button class="sheet-cancel" id="expCancelBtn">বাতিল</button>
+    </div>
+  </div>
+
+  <section class="screen" id="screen-appAccess">
+    <div class="cd-topbar">
+      <button class="cd-back" id="aaBackBtn" aria-label="ফিরে যান">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      </button>
+      <div class="cd-title">অ্যাপ এক্সেস</div>
+    </div>
+    <div style="padding:16px;">
+      <div class="gr-section-title">কর্মচারী প্রোফাইল <span style="font-weight:400;">(সর্বোচ্চ ৩ জন)</span></div>
+      <div id="employeeList" style="margin-bottom:14px;"></div>
+      <button class="ss-save-btn" id="addEmployeeBtn">+ নতুন কর্মচারী যোগ করুন</button>
+    </div>
+  </section>
+
+  <div class="sheet-overlay" id="addEmployeeSheetOverlay">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title">নতুন কর্মচারী যোগ করুন</div>
+      <input type="text" class="ni-calc-input" id="empNameInput" placeholder="কর্মচারীর নাম" style="width:100%; margin-bottom:14px;" />
+      <input type="tel" class="ni-calc-input" id="empMobileInput" placeholder="কর্মচারীর মোবাইল নাম্বার" style="width:100%; margin-bottom:14px;" />
+      <input type="text" inputmode="numeric" class="ni-calc-input" id="empPinInput" placeholder="৪ সংখ্যার পিন সেট করুন" maxlength="4" style="width:100%; margin-bottom:16px;" />
+      <button class="ss-save-btn" id="empSaveBtn">সংরক্ষণ করুন</button>
+      <button class="sheet-cancel" id="empCancelBtn">বাতিল</button>
     </div>
   </div>
 
@@ -3228,6 +3287,7 @@
   document.querySelectorAll('.quick-action').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       if(btn.dataset.action === 'reminder'){ goToGroupReminder(); return; }
+      if(btn.dataset.action === 'appaccess'){ goToAppAccess(); return; }
       showToast(btn.querySelector('span:last-child').textContent + " (শীঘ্রই আসছে)");
     });
   });
@@ -3299,7 +3359,7 @@
     try{ sessionStorage.setItem('lastScreen', JSON.stringify({ screen: name, customerId: currentCustomer ? currentCustomer.id : null })); }catch(e){}
   }
   function goToAddCustomer(){ appEl.classList.add('show-add'); pushAppState('add'); }
-  function goHome(){ appEl.classList.remove('show-add'); appEl.classList.remove('show-detail'); appEl.classList.remove('show-newdue'); appEl.classList.remove('show-txdetail'); appEl.classList.remove('show-customeredit'); appEl.classList.remove('show-newinstallment'); appEl.classList.remove('show-collectinstallment'); appEl.classList.remove('show-report'); appEl.classList.remove('show-shopsettings'); appEl.classList.remove('show-appsettings'); appEl.classList.remove('show-purchasehistory'); appEl.classList.remove('show-groupreminder'); appEl.classList.remove('show-installmentsummary'); appEl.classList.remove('show-installmentdetail'); appEl.classList.remove('show-expenses'); appEl.classList.remove('show-reportshub'); appEl.classList.remove('show-collectionreport'); appEl.classList.remove('show-dailyreport'); appEl.classList.remove('show-netprofitreport'); appEl.classList.remove('show-cashreport'); appEl.classList.remove('show-themesettings'); resetAddForm(); try{ sessionStorage.removeItem('lastScreen'); }catch(e){} }
+  function goHome(){ appEl.classList.remove('show-add'); appEl.classList.remove('show-detail'); appEl.classList.remove('show-newdue'); appEl.classList.remove('show-txdetail'); appEl.classList.remove('show-customeredit'); appEl.classList.remove('show-newinstallment'); appEl.classList.remove('show-collectinstallment'); appEl.classList.remove('show-report'); appEl.classList.remove('show-shopsettings'); appEl.classList.remove('show-appsettings'); appEl.classList.remove('show-purchasehistory'); appEl.classList.remove('show-groupreminder'); appEl.classList.remove('show-installmentsummary'); appEl.classList.remove('show-installmentdetail'); appEl.classList.remove('show-expenses'); appEl.classList.remove('show-reportshub'); appEl.classList.remove('show-collectionreport'); appEl.classList.remove('show-dailyreport'); appEl.classList.remove('show-netprofitreport'); appEl.classList.remove('show-cashreport'); appEl.classList.remove('show-themesettings'); appEl.classList.remove('show-appaccess'); resetAddForm(); try{ sessionStorage.removeItem('lastScreen'); }catch(e){} }
 
   /* ================================================================ */
   /* ================= CATEGORY: Side Menu Drawer ===================== */
@@ -3837,6 +3897,89 @@
     try{ return localStorage.getItem(THEME_STORAGE_KEY) || 'red'; }catch(e){ return 'red'; }
   }
   applyTheme(getCurrentThemeKey()); // পেজ লোড হওয়ার সাথে সাথেই আগের বাছাই করা থিম প্রয়োগ হয়
+
+  /* ================================================================ */
+  /* ================= CATEGORY: অ্যাপ এক্সেস (কর্মচারী প্রোফাইল) ========= */
+  /* ================================================================ */
+  function goToAppAccess(){
+    renderEmployeeList();
+    appEl.classList.add('show-appaccess');
+    pushAppState('appaccess');
+  }
+  function closeAppAccess(){ appEl.classList.remove('show-appaccess'); }
+  document.getElementById('aaBackBtn').addEventListener('click', ()=> history.back());
+
+  async function renderEmployeeList(){
+    const list = document.getElementById('employeeList');
+    list.innerHTML = '<div style="color:var(--clr-ink-soft); font-size:12.5px;">লোড হচ্ছে...</div>';
+    try{
+      const { data, error } = await sb.rpc('rpc_owner_list_employees', { p_owner_mobile: currentUserMobile, p_owner_pin: currentUserPin });
+      if(error) throw error;
+      if(!data || data.length === 0){
+        list.innerHTML = '<div class="gr-empty">এখনো কোনো কর্মচারী যোগ করা হয়নি</div>';
+        return;
+      }
+      list.innerHTML = data.map(emp => `
+        <div class="emp-row">
+          <div>
+            <div class="emp-row-name">${escapeHtml(emp.name)}</div>
+            <div class="emp-row-mobile">${escapeHtml(emp.employee_mobile)}</div>
+            <div class="emp-row-status ${emp.active ? 'active' : 'inactive'}">${emp.active ? 'সক্রিয়' : 'নিষ্ক্রিয়'}</div>
+          </div>
+          <button class="emp-row-toggle-btn" data-id="${emp.id}" data-active="${emp.active}">${emp.active ? 'বন্ধ করুন' : 'চালু করুন'}</button>
+        </div>`).join('');
+      list.querySelectorAll('.emp-row-toggle-btn').forEach(btn=>{
+        btn.addEventListener('click', async ()=>{
+          const newActive = btn.dataset.active !== 'true';
+          btn.disabled = true;
+          const { error } = await sb.rpc('rpc_owner_toggle_employee', {
+            p_owner_mobile: currentUserMobile, p_owner_pin: currentUserPin,
+            p_employee_id: Number(btn.dataset.id), p_active: newActive,
+          });
+          if(error){ showToast('আপডেট করা যায়নি', 'danger'); btn.disabled = false; return; }
+          renderEmployeeList();
+        });
+      });
+    }catch(e){
+      list.innerHTML = '<div class="gr-empty">লোড করা যায়নি</div>';
+    }
+  }
+  document.getElementById('addEmployeeBtn').addEventListener('click', ()=>{
+    document.getElementById('empNameInput').value = '';
+    document.getElementById('empMobileInput').value = '';
+    document.getElementById('empPinInput').value = '';
+    document.getElementById('addEmployeeSheetOverlay').classList.add('show');
+  });
+  function closeAddEmployeeSheet(){ document.getElementById('addEmployeeSheetOverlay').classList.remove('show'); }
+  document.getElementById('empCancelBtn').addEventListener('click', closeAddEmployeeSheet);
+  document.getElementById('addEmployeeSheetOverlay').addEventListener('click', (e)=>{
+    if(e.target.id === 'addEmployeeSheetOverlay') closeAddEmployeeSheet();
+  });
+  document.getElementById('empSaveBtn').addEventListener('click', async ()=>{
+    const name = document.getElementById('empNameInput').value.trim();
+    const mobile = document.getElementById('empMobileInput').value.trim();
+    const pin = document.getElementById('empPinInput').value.trim();
+    if(!name || !mobile || !/^\d{4}$/.test(pin)){
+      showToast('নাম, মোবাইল আর ৪ সংখ্যার পিন দিতে হবে', 'danger');
+      return;
+    }
+    const btn = document.getElementById('empSaveBtn');
+    btn.disabled = true;
+    try{
+      const { error } = await sb.rpc('rpc_owner_add_employee', {
+        p_owner_mobile: currentUserMobile, p_owner_pin: currentUserPin,
+        p_employee_mobile: mobile, p_employee_pin: pin, p_employee_name: name,
+      });
+      if(error) throw error;
+      closeAddEmployeeSheet();
+      showToast('কর্মচারী যোগ হয়েছে');
+      renderEmployeeList();
+    }catch(e){
+      showToast(e.message && e.message.includes('সর্বোচ্চ') ? e.message : 'যোগ করা যায়নি — নাম্বারটি হয়তো আগে থেকেই ব্যবহৃত', 'danger');
+    }finally{
+      btn.disabled = false;
+    }
+  });
 
   function goToThemeSettings(){
     closeMenuDrawer();
@@ -6079,6 +6222,24 @@
       return !!data;
     }catch(e){ return undefined; } // undefined = couldn't reach the server (vs false = genuinely no account)
   }
+  // মালিকের একাউন্ট, কারো কর্মচারী, নাকি একেবারেই নতুন নাম্বার — এই তিনটার
+  // মধ্যে কোনটা সেটা বলে দেয়, যাতে ফোন-নম্বর দেওয়ার ধাপেই সঠিক পথে
+  // (সাইনআপ/মালিকের লগইন/কর্মচারীর লগইন) পাঠানো যায়।
+  async function checkAccountType(mobile){
+    try{
+      const { data, error } = await sb.rpc('rpc_check_account_type', { p_mobile: mobile });
+      if(error) throw error;
+      return data; // 'owner' | 'employee' | 'none'
+    }catch(e){ return undefined; }
+  }
+  async function verifyEmployeeLogin(mobile, pin){
+    try{
+      const { data, error } = await sb.rpc('rpc_employee_verify_login', { p_employee_mobile: mobile, p_employee_pin: pin });
+      if(error) throw error;
+      const row = Array.isArray(data) ? data[0] : data;
+      return row || { ok: false, blocked: false };
+    }catch(e){ return { ok: undefined, blocked: false }; }
+  }
   // Creates a new account or resets the PIN on an existing one — the database
   // hashes the PIN itself; the plaintext is only ever used for this one call.
   async function signupOrResetPin(mobile, pin){
@@ -6109,6 +6270,10 @@
   let authFirstPin = '';
   let authBuffer = '';
   let authIsFreshSignup = false; // only true right after a brand-new number completes OTP — controls whether a device token gets registered
+  // কর্মচারীর লগইন মালিকের একই স্ক্রিন/ডিভাইস-নিরাপত্তা পথ ব্যবহার করে —
+  // শুধু এই দুটো ফ্ল্যাগ দিয়ে ট্র্যাক করা হয় এটা আসলে কে লগইন করছে।
+  let authIsEmployeeLogin = false;
+  let pendingEmployeeInfo = null; // { name, ownerMobile } — pin-login ধাপে verify হওয়ার পর বসে
   // The otp-signup screen is now shared between two flows — brand-new
   // signups and new-device verification for existing accounts — this tracks
   // which one is currently active so verify/resend send the right purpose
@@ -6291,6 +6456,22 @@
     restoreLastScreen();
     authScreenEl.classList.add('hide');
   }
+  // কর্মচারীর লগইন সফল হলে এখানে আসে — মালিকের মতো পুরো অ্যাপ না দেখিয়ে
+  // আপাতত একটা সহজ প্লেসহোল্ডার দেখায় (ধাপ ৩-এ আসল সীমিত ইন্টারফেস বসবে)।
+  let currentEmployeeMobile = null, currentEmployeePin = null;
+  async function completeEmployeeAuth(mobile, pin){
+    currentEmployeeMobile = mobile;
+    currentEmployeePin = pin;
+    document.getElementById('empPlaceholderName').textContent = (pendingEmployeeInfo && pendingEmployeeInfo.name) || '';
+    authScreenEl.classList.add('hide');
+    document.getElementById('employeePlaceholderScreen').classList.add('show');
+  }
+  document.getElementById('empPlaceholderLogoutBtn').addEventListener('click', ()=>{
+    currentEmployeeMobile = null; currentEmployeePin = null; pendingEmployeeInfo = null;
+    document.getElementById('employeePlaceholderScreen').classList.remove('show');
+    clearAuthAccount();
+    location.reload();
+  });
   // A pull-to-refresh gesture fully reloads the page (all JS state is lost),
   // so without this, every refresh would bounce back to the home screen even
   // mid-task. Standalone screens reopen directly; screens tied to a specific
@@ -6317,6 +6498,7 @@
       case 'netprofitreport': goToNetProfitReport(); break;
       case 'cashreport': goToCashReport(); break;
       case 'themesettings': goToThemeSettings(); break;
+      case 'appaccess': goToAppAccess(); break;
       case 'detail':
       case 'newdue':
       case 'txdetail':
@@ -6433,7 +6615,22 @@
       // data call still re-verifies this PIN server-side, so a blocked/changed
       // account is caught the moment it tries to load anything, not silently.
       authPhoneValue = saved.mobile;
-      await completeAuth(saved.mobile, saved.pin);
+      // এই ডিভাইসে সেভ করা একাউন্টটা মালিকের নাকি কর্মচারীর — সেই অনুযায়ী
+      // সঠিক পথে পাঠাতে হবে, নাহলে সেভ করা কর্মচারী-লগইনও ভুলভাবে মালিকের
+      // পথে (completeAuth) চলে যেত।
+      const accountType = await checkAccountType(saved.mobile);
+      if(accountType === 'employee'){
+        const result = await verifyEmployeeLogin(saved.mobile, saved.pin);
+        if(result.ok){
+          pendingEmployeeInfo = { name: result.employee_name, ownerMobile: result.owner_mobile };
+          await completeEmployeeAuth(saved.mobile, saved.pin);
+        }else{
+          clearAuthAccount();
+          showAuthStep('phone');
+        }
+      }else{
+        await completeAuth(saved.mobile, saved.pin);
+      }
     }else{
       showAuthStep('phone');
     }
@@ -6459,18 +6656,22 @@
     // Check whether this number already has an account (possibly registered
     // on a different device) before deciding signup vs login — otherwise a
     // fresh device could silently overwrite someone else's existing PIN.
+    // এটাই প্রথম জায়গা যেখানে বোঝা যায় এই নাম্বারটা মালিকের, কারো
+    // কর্মচারীর, নাকি একদম নতুন — তিনটাই এক স্ক্রিন থেকেই শুরু হয়।
     btn.disabled = true;
     const originalLabel = btn.textContent;
     btn.textContent = 'যাচাই করা হচ্ছে...';
-    const exists = await checkAccountExists(val);
+    const accountType = await checkAccountType(val);
     btn.disabled = false;
     btn.textContent = originalLabel;
 
-    if(exists === undefined){
+    if(accountType === undefined){
       hint.textContent = 'ইন্টারনেট কানেকশন সমস্যা — আবার চেষ্টা করো';
       wrap.classList.add('error');
       return;
     }
+    authIsEmployeeLogin = (accountType === 'employee');
+    const exists = accountType === 'owner' || accountType === 'employee';
 
     authPhoneValue = val;
     authFirstPin = '';
@@ -6698,6 +6899,29 @@
         setTimeout(()=>{ authFirstPin=''; document.getElementById('authConfirmHint').textContent=''; showAuthStep('pin-setup'); }, 500);
       }
     }else if(authCurrentStep === 'pin-login'){
+      if(authIsEmployeeLogin){
+        const result = await verifyEmployeeLogin(authPhoneValue, authBuffer);
+        if(result.ok === undefined){
+          document.getElementById('authLoginHint').textContent = 'ইন্টারনেট কানেকশন সমস্যা — আবার চেষ্টা করো';
+          shakeCurrentPinBoxes();
+          return;
+        }
+        if(result.blocked){
+          document.getElementById('authLoginHint').textContent = 'তোমার এই একাউন্টের অ্যাক্সেস সাময়িকভাবে বন্ধ রাখা হয়েছে';
+          shakeCurrentPinBoxes();
+          return;
+        }
+        if(result.ok){
+          saveAuthAccountLocal({ mobile: authPhoneValue, pin: authBuffer });
+          pendingEmployeeInfo = { name: result.employee_name, ownerMobile: result.owner_mobile };
+          setTimeout(()=>completeEmployeeAuth(authPhoneValue, authBuffer), 120);
+        }else{
+          document.getElementById('authLoginHint').textContent = 'ভুল PIN, আবার চেষ্টা করুন';
+          shakeCurrentPinBoxes();
+          setTimeout(()=>{ authBuffer=''; renderPinBoxes('pin-login'); document.getElementById('authLoginHint').textContent=''; }, 450);
+        }
+        return;
+      }
       const result = await verifyLogin(authPhoneValue, authBuffer);
       if(result.ok === undefined){
         document.getElementById('authLoginHint').textContent = 'ইন্টারনেট কানেকশন সমস্যা — আবার চেষ্টা করো';
@@ -6748,6 +6972,7 @@
     if(appEl.classList.contains('show-installmentdetail')){ closeInstallmentDetail(); return; }
     if(appEl.classList.contains('show-installmentsummary')){ closeInstallmentSummary(); return; }
     if(appEl.classList.contains('show-expenses')){ closeExpenses(); return; }
+    if(appEl.classList.contains('show-appaccess')){ closeAppAccess(); return; }
     if(appEl.classList.contains('show-themesettings')){ closeThemeSettings(); return; }
     if(appEl.classList.contains('show-cashreport')){ closeCashReport(); return; }
     if(appEl.classList.contains('show-netprofitreport')){ closeNetProfitReport(); return; }
