@@ -134,7 +134,8 @@
   /* ================= CATEGORY: Report Filter Screen ================= */
   .rf-body{ padding:18px 16px; }
   .rf-date-row{ display:flex; align-items:center; gap:10px; margin-bottom:22px; }
-  .rf-date-wrap{ flex:1; display:flex; align-items:center; gap:8px; border:1.4px solid var(--clr-line); border-radius:10px; padding:10px 12px; background:var(--clr-card); }
+  .rf-date-wrap{ flex:1; display:flex; align-items:center; gap:8px; border:1.4px solid var(--clr-line); border-radius:10px; padding:10px 12px; background:var(--clr-card); cursor:pointer; font-family:inherit; text-align:left; }
+  .rf-date-wrap span{ font-size:14px; color:var(--clr-ink); }
   .rf-date-wrap svg{ width:18px; height:18px; color:var(--clr-ink-soft); flex-shrink:0; }
   .rf-date-wrap input{ border:none; outline:none; font-size:14px; font-family:var(--font-body); color:var(--clr-ink); width:100%; background:transparent; }
   .rf-date-sep{ font-size:13px; font-weight:600; color:var(--clr-ink-soft); white-space:nowrap; }
@@ -758,7 +759,7 @@
 
   .cd-custom-range{ margin:8px 16px 0; display:flex; align-items:center; gap:8px; }
   .cd-custom-range span{ font-size:12px; font-weight:600; color:var(--clr-ink-soft); }
-  .cd-custom-range input{ flex:1; min-width:0; border:1px solid var(--clr-line); background:var(--clr-card); border-radius:9px; padding:8px 9px; font-size:12.5px; font-family:var(--font-body); color:var(--clr-ink); }
+  .cd-custom-range-btn{ flex:1; min-width:0; border:1px solid var(--clr-line); background:var(--clr-card); border-radius:9px; padding:8px 9px; font-size:12.5px; font-family:var(--font-body); color:var(--clr-ink); cursor:pointer; text-align:left; }
 
   .cd-table-header{ margin:16px 16px 0; display:grid; grid-template-columns:1.5fr 1fr 1fr 1fr; gap:4px; font-size:11.5px; font-weight:700; color:var(--clr-ink-soft); padding:0 4px; }
   .cd-table-header span:not(:first-child){text-align:center;}
@@ -1677,15 +1678,17 @@
         <option value="month">এই মাস</option>
       </select>
       <div class="rf-date-row" style="margin-bottom:6px;">
-        <div class="rf-date-wrap">
+        <button class="rf-date-wrap" id="phDateFromBtn" type="button">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          <input type="date" class="wdp-input" id="phDateFrom" />
-        </div>
+          <span id="phDateFromLabel"></span>
+        </button>
         <span class="rf-date-sep">থেকে</span>
-        <div class="rf-date-wrap">
+        <button class="rf-date-wrap" id="phDateToBtn" type="button">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          <input type="date" class="wdp-input" id="phDateTo" />
-        </div>
+          <span id="phDateToLabel"></span>
+        </button>
+        <input type="date" id="phDateFrom" style="position:absolute; opacity:0; pointer-events:none; width:1px; height:1px;" />
+        <input type="date" id="phDateTo" style="position:absolute; opacity:0; pointer-events:none; width:1px; height:1px;" />
       </div>
     </div>
 
@@ -1715,15 +1718,17 @@
 
     <div class="rf-body">
       <div class="rf-date-row">
-        <div class="rf-date-wrap">
+        <button class="rf-date-wrap" id="rfDateFromBtn" type="button">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          <input type="date" class="wdp-input" id="rfDateFrom" />
-        </div>
+          <span id="rfDateFromLabel"></span>
+        </button>
         <span class="rf-date-sep">তারিখ হইতে</span>
-        <div class="rf-date-wrap">
+        <button class="rf-date-wrap" id="rfDateToBtn" type="button">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          <input type="date" class="wdp-input" id="rfDateTo" />
-        </div>
+          <span id="rfDateToLabel"></span>
+        </button>
+        <input type="date" id="rfDateFrom" style="position:absolute; opacity:0; pointer-events:none; width:1px; height:1px;" />
+        <input type="date" id="rfDateTo" style="position:absolute; opacity:0; pointer-events:none; width:1px; height:1px;" />
       </div>
 
       <div id="rfManagementTypeWrap">
@@ -1888,9 +1893,11 @@
       </button>
     </div>
     <div class="cd-custom-range" id="cdCustomRange" style="display:none;">
-      <span class="wdp-trigger"><input type="date" class="wdp-input" id="cdCustomFrom" /></span>
+      <button class="cd-custom-range-btn" id="cdCustomFromBtn" type="button"><span id="cdCustomFromLabel"></span></button>
       <span>থেকে</span>
-      <span class="wdp-trigger"><input type="date" class="wdp-input" id="cdCustomTo" /></span>
+      <button class="cd-custom-range-btn" id="cdCustomToBtn" type="button"><span id="cdCustomToLabel"></span></button>
+      <input type="date" id="cdCustomFrom" style="position:absolute; opacity:0; pointer-events:none; width:1px; height:1px;" />
+      <input type="date" id="cdCustomTo" style="position:absolute; opacity:0; pointer-events:none; width:1px; height:1px;" />
     </div>
 
     <!-- ===== CATEGORY: Transaction Table ===== -->
@@ -2299,7 +2306,10 @@
         </div>
         <div class="ni-calc-row">
           <div class="ni-calc-row-label">প্রথম কিস্তি <span class="req">*</span></div>
-          <input type="date" class="ni-calc-input wdp-input" id="niFirstInstallmentDate" />
+          <button class="ni-calc-input" id="niFirstInstallmentDateBtn" style="text-align:left; background:var(--clr-card); cursor:pointer;">
+            <span id="niFirstInstallmentDateLabel"></span>
+          </button>
+          <input type="date" id="niFirstInstallmentDate" style="position:absolute; opacity:0; pointer-events:none; width:1px; height:1px;" />
         </div>
         <div class="ni-calc-row">
           <div class="ni-calc-row-label">বিলম্ব জরিমানা (%) <span class="req">*</span></div>
@@ -4275,6 +4285,8 @@
     document.getElementById('phPeriodSelect').value = 'all';
     document.getElementById('phDateFrom').value = '';
     document.getElementById('phDateTo').value = '';
+    document.getElementById('phDateFromLabel').textContent = '';
+    document.getElementById('phDateToLabel').textContent = '';
     renderPurchaseHistoryList();
     appEl.classList.add('show-purchasehistory');
     pushAppState('purchasehistory');
@@ -4341,10 +4353,16 @@
   document.getElementById('phPeriodSelect').addEventListener('change', ()=>{
     document.getElementById('phDateFrom').value = '';
     document.getElementById('phDateTo').value = '';
+    document.getElementById('phDateFromLabel').textContent = '';
+    document.getElementById('phDateToLabel').textContent = '';
     renderPurchaseHistoryList();
   });
-  document.getElementById('phDateFrom').addEventListener('change', renderPurchaseHistoryList);
-  document.getElementById('phDateTo').addEventListener('change', renderPurchaseHistoryList);
+  wireDateField('phDateFromBtn', 'phDateFrom', 'phDateFromLabel', renderPurchaseHistoryList);
+  wireDateField('phDateToBtn', 'phDateTo', 'phDateToLabel', renderPurchaseHistoryList);
+  const updateRfDateFromLabel = wireDateField('rfDateFromBtn', 'rfDateFrom', 'rfDateFromLabel');
+  const updateRfDateToLabel = wireDateField('rfDateToBtn', 'rfDateTo', 'rfDateToLabel');
+  wireDateField('cdCustomFromBtn', 'cdCustomFrom', 'cdCustomFromLabel');
+  wireDateField('cdCustomToBtn', 'cdCustomTo', 'cdCustomToLabel');
 
   function openPurchaseEntryDetail(i){
     const e = currentPurchaseEntries[i];
@@ -4440,6 +4458,8 @@
     const today = new Date().toISOString().slice(0,10);
     document.getElementById('rfDateFrom').value = today;
     document.getElementById('rfDateTo').value = today;
+    updateRfDateFromLabel(today);
+    updateRfDateToLabel(today);
     document.getElementById('rfManagementType').value = 'both';
     updateReportFilterModeUI();
     appEl.classList.add('show-report');
@@ -4476,15 +4496,34 @@
       else due = c.amount || 0;
       if(due <= 0) return;
 
-      const lastInstTx = [...matchingTxs].reverse().find(t=>t.category==='installment');
-      const lastTx = matchingTxs[matchingTxs.length-1];
-      const dateInfo = lastInstTx
-        ? `${lastInstTx.date}${lastInstTx.perInstallment!=null ? ' / '+bn(lastInstTx.perInstallment)+' টাকা' : ''}`
-        : (lastTx ? lastTx.date : '');
+      // কিস্তির তারিখ (সবগুলো সক্রিয় রশিদের মধ্যে সবচেয়ে কাছের/জরুরি পরবর্তী
+      // তারিখ) আর কিস্তির পরিমাণ (সব সক্রিয় রশিদের প্রতি-কিস্তির যোগফল) —
+      // কিস্তি আদায়ের রশিদ ড্রপডাউনে যেভাবে হিসাব হয় সেই একই
+      // getCustomerReceipts()/getScheduleStatus() পুনর্ব্যবহার করা হচ্ছে,
+      // যাতে দুই জায়গায় ভিন্ন উত্তর না আসে। আগে এখানে ভুলভাবে "রিপোর্টের
+      // সময়সীমার ভেতরে পড়া সর্বশেষ লেনদেন"-এর তারিখ দেখানো হতো — সেটা
+      // অনেক সময় আসল কিস্তির তারিখ না হয়ে কোনো আদায়ের তারিখও হতে পারত।
+      let installmentDate = '', installmentAmount = null;
+      if(wantInstallment){
+        const receipts = getCustomerReceipts(c);
+        if(receipts.length > 0){
+          installmentAmount = receipts.reduce((s,r)=> s + (r.perInstallment||0), 0);
+          let earliestDue = null;
+          receipts.forEach(r=>{
+            const schedule = getScheduleStatus(c, r.saleTx);
+            const nextSlot = schedule.find(s=> s.status==='due' || s.status==='upcoming');
+            if(nextSlot){
+              const d = new Date(nextSlot.date+'T00:00:00');
+              if(!earliestDue || d < earliestDue) earliestDue = d;
+            }
+          });
+          if(earliestDue) installmentDate = formatGrDate(earliestDue);
+        }
+      }
 
       rows.push({
         name: c.name || '', mobile: c.mobile || '',
-        dateInfo, due, id:c.id
+        installmentDate, installmentAmount, due, id:c.id
       });
     });
     return rows;
@@ -4506,13 +4545,14 @@
         if(r){
           bodyRows += `<tr style="height:36px;background:${bg};">
             <td style="width:5%;text-align:center;font-weight:bold;border:1px solid #cbd5e0;">${p*ROWS_PER_PAGE+i+1}</td>
-            <td style="width:35%;text-align:left;padding-left:8px;border:1px solid #cbd5e0;">
+            <td style="width:28%;text-align:left;padding-left:8px;border:1px solid #cbd5e0;">
               <div style="font-weight:bold;font-size:9pt;">${escapeHtml(r.name)}${r.id ? ' · '+r.id : ''}</div>
               <div style="font-size:8.5pt;color:#333;">${r.mobile}</div>
             </td>
-            <td style="width:17%;text-align:center;border:1px solid #cbd5e0;">${r.dateInfo}</td>
+            <td style="width:13%;text-align:center;border:1px solid #cbd5e0;">${r.installmentDate || '—'}</td>
+            <td style="width:12%;text-align:center;border:1px solid #cbd5e0;">${r.installmentAmount!=null ? bn(r.installmentAmount)+' টাকা' : '—'}</td>
             <td style="width:13%;text-align:right;padding-right:8px;font-weight:bold;border:1px solid #cbd5e0;">${bn(r.due)} টাকা</td>
-            <td style="width:15%;border:1px solid #cbd5e0;"></td>
+            <td style="width:14%;border:1px solid #cbd5e0;"></td>
             <td style="width:15%;border:1px solid #cbd5e0;"></td>
           </tr>`;
         }else{
@@ -4520,6 +4560,7 @@
             <td style="border:1px solid #cbd5e0;"></td><td style="border:1px solid #cbd5e0;"></td>
             <td style="border:1px solid #cbd5e0;"></td><td style="border:1px solid #cbd5e0;"></td>
             <td style="border:1px solid #cbd5e0;"></td><td style="border:1px solid #cbd5e0;"></td>
+            <td style="border:1px solid #cbd5e0;"></td>
           </tr>`;
         }
       }
@@ -4532,10 +4573,11 @@
             <thead>
               <tr style="background:#c6f6d5;">
                 <th style="width:5%;border:1px solid #2d3748;font-size:9pt;font-weight:bold;color:#1a202c;padding:6px 0;">নং</th>
-                <th style="width:35%;border:1px solid #2d3748;font-size:9pt;font-weight:bold;color:#1a202c;text-align:left;padding-left:8px;">ক্রেতার তথ্য ও মোবাইল নাম্বার</th>
-                <th style="width:17%;border:1px solid #2d3748;font-size:9pt;font-weight:bold;color:#1a202c;">কিস্তির তারিখ/প্রতি কিস্তি</th>
+                <th style="width:28%;border:1px solid #2d3748;font-size:9pt;font-weight:bold;color:#1a202c;text-align:left;padding-left:8px;">ক্রেতার তথ্য ও মোবাইল নাম্বার</th>
+                <th style="width:13%;border:1px solid #2d3748;font-size:9pt;font-weight:bold;color:#1a202c;">কিস্তির তারিখ</th>
+                <th style="width:12%;border:1px solid #2d3748;font-size:9pt;font-weight:bold;color:#1a202c;">কিস্তির পরিমাণ</th>
                 <th style="width:13%;border:1px solid #2d3748;font-size:9pt;font-weight:bold;color:#1a202c;text-align:right;padding-right:8px;">মোট পাওনা</th>
-                <th style="width:15%;border:1px solid #2d3748;font-size:9pt;font-weight:bold;color:#1a202c;">আদায়ের পরিমাণ</th>
+                <th style="width:14%;border:1px solid #2d3748;font-size:9pt;font-weight:bold;color:#1a202c;">আদায়ের পরিমাণ</th>
                 <th style="width:15%;border:1px solid #2d3748;font-size:9pt;font-weight:bold;color:#1a202c;">সংভাব্য তারিখ</th>
               </tr>
             </thead>
@@ -5081,7 +5123,7 @@
       document.getElementById('niInstallmentType').value = tx.installmentType || 'monthly';
       document.getElementById('niLateFee').value = (tx.lateFee != null ? tx.lateFee : 10);
       document.getElementById('niNoteInput').value = tx.note || '';
-      if(tx.dueDate) document.getElementById('niFirstInstallmentDate').value = tx.dueDate;
+      if(tx.dueDate){ document.getElementById('niFirstInstallmentDate').value = tx.dueDate; updateNiFirstInstallmentDateLabel(tx.dueDate); }
       recalcInstallmentPlan();
     }else if(tx.take){
       sheetMode = 'take';
@@ -5359,7 +5401,9 @@
       document.getElementById('niDownPayment').value = 0;
       document.getElementById('niInstallmentCount').value = '';
       document.getElementById('niInstallmentType').value = 'monthly';
-      document.getElementById('niFirstInstallmentDate').value = new Date().toISOString().slice(0,10);
+      { const __firstIso = new Date().toISOString().slice(0,10);
+        document.getElementById('niFirstInstallmentDate').value = __firstIso;
+        updateNiFirstInstallmentDateLabel(__firstIso); }
       document.getElementById('niLateFee').value = 10;
       document.getElementById('niNoteInput').value = '';
     }else{
@@ -5609,6 +5653,28 @@
       updateNiSaleDateLabel(iso);
     });
   });
+
+  // সাধারণীকৃত সংস্করণ — বাকি সব "লুকানো ইনপুট + দেখানো লেবেল" তারিখ-ঘরের
+  // জন্য এই একটাই ফাংশন ব্যবহার হবে, যাতে একই কোড বারবার লিখতে না হয়।
+  // onSelect(iso) — ঐচ্ছিক, তারিখ বদলানোর পরে আর কিছু করতে হলে (যেমন
+  // তালিকা আবার রেন্ডার করা) সেটার জন্য।
+  function wireDateField(triggerId, hiddenInputId, labelId, onSelect){
+    const label = document.getElementById(labelId);
+    const input = document.getElementById(hiddenInputId);
+    function update(iso){
+      label.textContent = iso ? formatDMYDash(new Date(iso+'T00:00:00')) : '';
+    }
+    document.getElementById(triggerId).addEventListener('click', ()=>{
+      openWheelDatePicker(input.value, (iso)=>{
+        input.value = iso;
+        update(iso);
+        if(onSelect) onSelect(iso);
+      });
+    });
+    if(input.value) update(input.value);
+    return update;
+  }
+  const updateNiFirstInstallmentDateLabel = wireDateField('niFirstInstallmentDateBtn', 'niFirstInstallmentDate', 'niFirstInstallmentDateLabel');
 
   // One entry per সহজ কিস্তি sale that still has money owed on it — used to
   // populate the রশিদ নাম্বার dropdown and to know which specific product a
