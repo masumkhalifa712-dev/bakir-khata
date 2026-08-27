@@ -7681,17 +7681,17 @@
     }
   }
   function makeHelpWidgetDraggable(widget){
-    let startX=0, startY=0, origX=0, origY=0, moved=false;
+    let startX=0, startY=0, origX=0, origY=0, moved=false, dragging=false;
     widget.addEventListener('pointerdown', (e)=>{
+      dragging = true;
       moved = false;
       const rect = widget.getBoundingClientRect();
       origX = rect.left; origY = rect.top;
       startX = e.clientX; startY = e.clientY;
-      widget.setPointerCapture(e.pointerId);
+      try{ widget.setPointerCapture(e.pointerId); }catch(err){ /* কিছু মোবাইল ব্রাউজারে এটা ব্যর্থ হতে পারে — বাকি জেসচার তবুও যেন থেমে না যায় */ }
     });
     widget.addEventListener('pointermove', (e)=>{
-      if(e.buttons === 0 && e.pointerType === 'mouse') return;
-      if(!widget.hasPointerCapture(e.pointerId)) return;
+      if(!dragging) return;
       const dx = e.clientX - startX, dy = e.clientY - startY;
       if(Math.abs(dx) > 6 || Math.abs(dy) > 6) moved = true;
       if(!moved) return;
@@ -7703,6 +7703,8 @@
       widget.style.right = 'auto';
     });
     widget.addEventListener('pointerup', (e)=>{
+      if(!dragging) return;
+      dragging = false;
       if(moved){
         const rect = widget.getBoundingClientRect();
         try{ localStorage.setItem(HELP_WIDGET_POS_KEY, JSON.stringify({ x: rect.left, y: rect.top })); }catch(err){}
@@ -7710,6 +7712,7 @@
         openHelpWidgetMenu();
       }
     });
+    widget.addEventListener('pointercancel', ()=>{ dragging = false; });
   }
   function openHelpWidgetMenu(){ document.getElementById('helpWidgetMenuOverlay').classList.add('show'); }
   function closeHelpWidgetMenu(){ document.getElementById('helpWidgetMenuOverlay').classList.remove('show'); }
