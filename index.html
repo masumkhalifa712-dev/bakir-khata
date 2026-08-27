@@ -130,11 +130,12 @@
   .help-widget-icon{ width:52px; height:52px; border-radius:50%; background:linear-gradient(160deg, var(--clr-fab), var(--clr-primary-dark)); color:#fff; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 16px rgba(0,0,0,.28); }
   .help-widget-icon svg{ width:25px; height:25px; }
   .help-widget-label{ font-size:9.5px; font-weight:700; color:var(--clr-ink); background:var(--clr-card); padding:2px 7px; border-radius:999px; box-shadow:0 1px 4px rgba(0,0,0,.12); white-space:nowrap; }
-  .help-widget-mini{ position:absolute; left:50%; width:42px; height:42px; border-radius:50%; border:none; display:flex; align-items:center; justify-content:center; color:#fff; cursor:pointer; box-shadow:0 4px 14px rgba(0,0,0,.28); opacity:0; pointer-events:none; transform:translateX(-50%) scale(.4); transition:transform .18s ease, opacity .18s ease; }
+  .help-widget-mini{ position:absolute; width:42px; height:42px; border-radius:50%; border:none; display:flex; align-items:center; justify-content:center; color:#fff; cursor:pointer; box-shadow:0 4px 14px rgba(0,0,0,.28); opacity:0; pointer-events:none; transform:translate(var(--mx,-50%), var(--my,0)) scale(.4); transition:transform .18s ease, opacity .18s ease; }
   .help-widget-mini svg{ width:20px; height:20px; }
   .help-widget-mini.call{ background:linear-gradient(160deg, var(--clr-primary), var(--clr-primary-dark)); }
   .help-widget-mini.whatsapp{ background:#25D366; }
-  .help-widget-wrap.open .help-widget-mini{ opacity:1; pointer-events:auto; transform:translateX(-50%) scale(1); }
+  .help-widget-wrap.open .help-widget-mini{ opacity:1; pointer-events:auto; transform:translate(var(--mx,-50%), var(--my,0)) scale(1); }
+  .help-widget-wrap.snapping{ transition:left .22s ease, top .22s ease, right .22s ease; }
 
   .auth-keypad{ display:none; grid-template-columns:repeat(3,1fr); gap:4px; margin-top:auto; padding-top:20px; }
   .auth-keypad.show{ display:grid; }
@@ -7640,7 +7641,9 @@
   /* ================= CATEGORY: ভাসমান সাহায্য বাটন (গ্লোবাল) ========== */
   /* ================================================================ */
   const HELP_WIDGET_POS_KEY = 'helpWidgetPosition';
+  const HELP_WIDGET_EDGE_MARGIN = 6;
   let helpDeskWhatsapp = '', helpDeskPhone = '';
+  let helpWidgetZone = 'right';
   async function initHelpWidget(){
     const wrap = document.getElementById('helpWidgetWrap');
     try{
@@ -7650,16 +7653,15 @@
       if(!row || (!row.whatsapp_number && !row.phone_number)) return; // কোনো নাম্বারই সেট করা নেই — বাটনটাই দেখাবে না
       helpDeskWhatsapp = row.whatsapp_number || '';
       helpDeskPhone = row.phone_number || '';
-      const callBtn = document.getElementById('helpWidgetCallBtn');
-      const waBtn = document.getElementById('helpWidgetWhatsappBtn');
-      callBtn.style.display = helpDeskPhone ? '' : 'none';
-      waBtn.style.display = helpDeskWhatsapp ? '' : 'none';
-      // যেগুলো আসলেই দেখানো হচ্ছে (একটা বা দুটোই), সেগুলো একটার পর একটা
-      // সাজানো হয় — খালি ফাঁকা জায়গা যেন না থাকে
-      const visibleMinis = [waBtn, callBtn].filter(b => b.style.display !== 'none');
-      visibleMinis.forEach((btn, i)=>{ btn.style.bottom = `calc(100% + ${8 + i*50}px)`; });
+      document.getElementById('helpWidgetCallBtn').style.display = helpDeskPhone ? '' : 'none';
+      document.getElementById('helpWidgetWhatsappBtn').style.display = helpDeskWhatsapp ? '' : 'none';
       wrap.style.display = 'block';
       restoreHelpWidgetPosition(wrap);
+      // পেজ লোড হওয়ার সাথে সাথেই (আগে সেভ করা অবস্থান মাঝখানের কাছাকাছি
+      // হয়ে থাকলেও) সবচেয়ে কাছের কিনারায় সেঁটে দেওয়া হয় — কখনোই মাঝখানে
+      // থাকবে না এই নিয়মটা প্রতিবারই কার্যকর থাকে।
+      helpWidgetZone = snapWidgetToEdge(wrap, false);
+      positionMinisForZone(helpWidgetZone);
       makeHelpWidgetDraggable(wrap);
     }catch(e){ /* কনফিগার করা না থাকলে বা অফলাইন হলে চুপচাপ বাদ — বাটন দেখাবে না */ }
   }
@@ -7675,6 +7677,66 @@
       wrap.style.right = '10px';
       wrap.style.top = '45%';
     }
+  }
+  // বর্তমান অবস্থান থেকে চারটা কিনারার (উপর/নিচ/ডান/বাম) মধ্যে কোনটা
+  // সবচেয়ে কাছে সেটা বের করে — শুধু হিসাব করে, কিছু সরায় না।
+  function computeWidgetZone(rect){
+    const cx = rect.left + rect.width/2, cy = rect.top + rect.height/2;
+    const distLeft = cx, distRight = window.innerWidth - cx;
+    const distTop = cy, distBottom = window.innerHeight - cy;
+    const minDist = Math.min(distLeft, distRight, distTop, distBottom);
+    if(minDist === distLeft) return 'left';
+    if(minDist === distRight) return 'right';
+    if(minDist === distTop) return 'top';
+    return 'bottom';
+  }
+  // সবচেয়ে কাছের কিনারায় বাটনটাকে সত্যিই সরিয়ে বসিয়ে দেয় (মাঝখানে থামতে
+  // দেয় না) — animate=true হলে মসৃণভাবে স্লাইড করে যাবে (টেনে ছেড়ে দেওয়ার
+  // পরে), animate=false দিয়ে পেজ লোডের সময় সরাসরি বসিয়ে দেওয়া হয়।
+  function snapWidgetToEdge(wrap, animate){
+    const rect = wrap.getBoundingClientRect();
+    const zone = computeWidgetZone(rect);
+    let newLeft = rect.left, newTop = rect.top;
+    if(zone === 'left') newLeft = HELP_WIDGET_EDGE_MARGIN;
+    else if(zone === 'right') newLeft = window.innerWidth - rect.width - HELP_WIDGET_EDGE_MARGIN;
+    else if(zone === 'top') newTop = HELP_WIDGET_EDGE_MARGIN;
+    else newTop = window.innerHeight - rect.height - HELP_WIDGET_EDGE_MARGIN;
+    newLeft = Math.max(HELP_WIDGET_EDGE_MARGIN, Math.min(window.innerWidth - rect.width - HELP_WIDGET_EDGE_MARGIN, newLeft));
+    newTop = Math.max(HELP_WIDGET_EDGE_MARGIN, Math.min(window.innerHeight - rect.height - HELP_WIDGET_EDGE_MARGIN, newTop));
+    if(animate){
+      wrap.classList.add('snapping');
+      setTimeout(()=> wrap.classList.remove('snapping'), 260);
+    }
+    wrap.style.left = newLeft + 'px';
+    wrap.style.top = newTop + 'px';
+    wrap.style.right = 'auto';
+    try{ localStorage.setItem(HELP_WIDGET_POS_KEY, JSON.stringify({ x: newLeft, y: newTop })); }catch(err){}
+    return zone;
+  }
+  // বাটন এখন কোন দিকের কিনারায় আছে তার উপর ভিত্তি করে ভিতরের আইকন দুটো
+  // উল্টো দিকে খোলে — ডানে থাকলে বামে, বামে থাকলে ডানে, উপরে থাকলে নিচে,
+  // নিচে থাকলে উপরে — যাতে কখনো স্ক্রিনের বাইরে চলে না যায়।
+  function positionMinisForZone(zone){
+    const callBtn = document.getElementById('helpWidgetCallBtn');
+    const waBtn = document.getElementById('helpWidgetWhatsappBtn');
+    const visibleMinis = [waBtn, callBtn].filter(b => b.style.display !== 'none');
+    [callBtn, waBtn].forEach(btn=>{ btn.style.top = btn.style.bottom = btn.style.left = btn.style.right = ''; });
+    visibleMinis.forEach((btn, i)=>{
+      const gap = 8 + i * 50;
+      if(zone === 'top'){
+        btn.style.top = `calc(100% + ${gap}px)`; btn.style.left = '50%';
+        btn.style.setProperty('--mx', '-50%'); btn.style.setProperty('--my', '0');
+      }else if(zone === 'bottom'){
+        btn.style.bottom = `calc(100% + ${gap}px)`; btn.style.left = '50%';
+        btn.style.setProperty('--mx', '-50%'); btn.style.setProperty('--my', '0');
+      }else if(zone === 'left'){
+        btn.style.left = `calc(100% + ${gap}px)`; btn.style.top = '50%';
+        btn.style.setProperty('--mx', '0'); btn.style.setProperty('--my', '-50%');
+      }else{ // right
+        btn.style.right = `calc(100% + ${gap}px)`; btn.style.top = '50%';
+        btn.style.setProperty('--mx', '0'); btn.style.setProperty('--my', '-50%');
+      }
+    });
   }
   function makeHelpWidgetDraggable(wrap){
     const handle = document.getElementById('helpWidget');
@@ -7708,8 +7770,8 @@
       if(!dragging) return;
       dragging = false;
       if(moved){
-        const rect = wrap.getBoundingClientRect();
-        try{ localStorage.setItem(HELP_WIDGET_POS_KEY, JSON.stringify({ x: rect.left, y: rect.top })); }catch(err){}
+        helpWidgetZone = snapWidgetToEdge(wrap, true);
+        positionMinisForZone(helpWidgetZone);
       }else{
         toggleHelpWidgetMini();
       }
