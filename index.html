@@ -569,6 +569,9 @@
   .emp-row-status.inactive{ background:var(--clr-line); color:var(--clr-ink-soft); }
   .emp-row-toggle-btn{ flex-shrink:0; border:1.4px solid var(--clr-line); border-radius:999px; padding:7px 13px; font-size:11.5px; font-weight:700; background:var(--clr-card); color:var(--clr-ink-soft); cursor:pointer; font-family:inherit; }
   .mobile-check-icon{ position:absolute; right:12px; top:50%; transform:translateY(-50%); font-size:16px; font-weight:800; display:none; }
+  .mobile-field-block{ margin-bottom:14px; }
+  .mobile-field-label{ display:block; font-size:12px; font-weight:600; color:var(--clr-ink-soft); margin-bottom:5px; }
+  .mobile-field-wrap{ position:relative; }
   .mobile-check-icon.ok{ display:block; color:#1E8A4C; }
   .mobile-check-icon.taken{ display:block; color:var(--clr-primary); }
 
@@ -1173,7 +1176,7 @@
       <!-- হোম প্যানেল: খোঁজা + কাস্টমার তালিকা -->
       <div class="emp-panel active" id="empPanel-home">
         <div style="padding:14px 16px 0;">
-          <input type="text" class="ni-calc-input" id="empSearchInput" placeholder="নাম বা মোবাইল দিয়ে খুঁজুন" style="width:100%; margin-bottom:12px;" />
+          <input type="text" class="ni-calc-input" id="empSearchInput" placeholder="নাম বা মোবাইল দিয়ে খুঁজুন" style="width:100%; max-width:100%; box-sizing:border-box; margin-bottom:12px;" />
         </div>
         <div id="empCustomerList" style="padding:0 16px 90px;"></div>
         <button class="exp-fab" id="empAddCustomerFab" aria-label="নতুন কাস্টমার">
@@ -1211,10 +1214,10 @@
 
           <div id="empNewCustFields" style="display:none;">
             <div class="ni-calc-row"><div class="ni-calc-row-label">নাম <span class="req">*</span></div><input type="text" class="ni-calc-input" id="empNewCustName" /></div>
-            <div class="ni-calc-row">
-              <div class="ni-calc-row-label">মোবাইল <span class="req">*</span></div>
-              <div style="position:relative; flex:1;">
-                <input type="tel" class="ni-calc-input" id="empNewCustMobile" style="width:100%;" />
+            <div class="mobile-field-block">
+              <label class="mobile-field-label">মোবাইল <span class="req">*</span></label>
+              <div class="mobile-field-wrap">
+                <input type="tel" class="ni-calc-input" id="empNewCustMobile" style="width:100%; max-width:100%; box-sizing:border-box; padding-right:38px;" />
                 <span class="mobile-check-icon" id="empNewCustMobileCheckIcon"></span>
               </div>
             </div>
@@ -1632,8 +1635,8 @@
         <option value="মেরামত">মেরামত</option>
         <option value="অন্যান্য" selected>অন্যান্য</option>
       </select>
-      <input type="number" inputmode="decimal" class="ni-calc-input" id="expAmountInput" placeholder="টাকার পরিমাণ" style="width:100%; margin-bottom:14px;" />
-      <button class="ni-calc-input" id="expDateBtn" style="width:100%; text-align:left; background:var(--clr-card); cursor:pointer; margin-bottom:14px;">
+      <input type="number" inputmode="decimal" class="ni-calc-input" id="expAmountInput" placeholder="টাকার পরিমাণ" style="width:100%; max-width:100%; box-sizing:border-box; margin-bottom:14px;" />
+      <button class="ni-calc-input" id="expDateBtn" style="width:100%; max-width:100%; box-sizing:border-box; text-align:left; background:var(--clr-card); cursor:pointer; margin-bottom:14px;">
         <span id="expDateLabel"></span>
       </button>
       <input type="date" id="expDateInput" style="position:absolute; opacity:0; pointer-events:none; width:1px; height:1px;" />
@@ -1679,12 +1682,12 @@
     <div class="sheet">
       <div class="sheet-handle"></div>
       <div class="sheet-title">নতুন কর্মচারী যোগ করুন</div>
-      <input type="text" class="ni-calc-input" id="empNameInput" placeholder="কর্মচারীর নাম" style="width:100%; margin-bottom:14px;" />
-      <div style="position:relative; margin-bottom:14px;">
-        <input type="tel" class="ni-calc-input" id="empMobileInput" placeholder="কর্মচারীর মোবাইল নাম্বার" style="width:100%;" />
+      <input type="text" class="ni-calc-input" id="empNameInput" placeholder="কর্মচারীর নাম" style="width:100%; max-width:100%; box-sizing:border-box; margin-bottom:14px;" />
+      <div class="mobile-field-wrap" style="margin-bottom:14px;">
+        <input type="tel" class="ni-calc-input" id="empMobileInput" placeholder="কর্মচারীর মোবাইল নাম্বার" style="width:100%; max-width:100%; box-sizing:border-box; padding-right:38px;" />
         <span class="mobile-check-icon" id="empMobileCheckIcon"></span>
       </div>
-      <input type="text" inputmode="numeric" class="ni-calc-input" id="empPinInput" placeholder="৪ সংখ্যার পিন সেট করুন" maxlength="4" style="width:100%; margin-bottom:16px;" />
+      <input type="text" inputmode="numeric" class="ni-calc-input" id="empPinInput" placeholder="৪ সংখ্যার পিন সেট করুন" maxlength="4" style="width:100%; max-width:100%; box-sizing:border-box; margin-bottom:16px;" />
       <button class="ss-save-btn" id="empSaveBtn">সংরক্ষণ করুন</button>
       <button class="sheet-cancel" id="empCancelBtn">বাতিল</button>
     </div>
@@ -1711,7 +1714,7 @@
       <div class="cd-title">ক্যাশ রিপোর্ট</div>
     </div>
     <div class="ss-body" style="padding-bottom:0;">
-      <button class="ni-calc-input" id="crpDateBtn" style="width:100%; text-align:left; background:var(--clr-card); cursor:pointer; margin-bottom:16px; display:flex; align-items:center; gap:10px;">
+      <button class="ni-calc-input" id="crpDateBtn" style="width:100%; max-width:100%; box-sizing:border-box; text-align:left; background:var(--clr-card); cursor:pointer; margin-bottom:16px; display:flex; align-items:center; gap:10px;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
         <span id="crpDateLabel"></span>
       </button>
@@ -1723,7 +1726,7 @@
       </div>
       <div class="dr-section">
         <div class="dr-section-title">হাতে গোনা আসল ক্যাশ</div>
-        <input type="number" inputmode="decimal" class="ni-calc-input" id="crpActualInput" placeholder="টাকার পরিমাণ" style="width:100%; margin-bottom:12px;" />
+        <input type="number" inputmode="decimal" class="ni-calc-input" id="crpActualInput" placeholder="টাকার পরিমাণ" style="width:100%; max-width:100%; box-sizing:border-box; margin-bottom:12px;" />
         <textarea class="nd-note-textarea" id="crpNoteInput" placeholder="গরমিলের কারণ (ঐচ্ছিক)"></textarea>
       </div>
       <div class="dr-net-card" id="crpResultCard" style="display:none;">
@@ -1777,7 +1780,7 @@
       <div class="cd-title">দৈনিক হিসাব রিপোর্ট</div>
     </div>
     <div class="ss-body" style="padding-bottom:0;">
-      <button class="ni-calc-input" id="drDateBtn" style="width:100%; text-align:left; background:var(--clr-card); cursor:pointer; margin-bottom:16px; display:flex; align-items:center; gap:10px;">
+      <button class="ni-calc-input" id="drDateBtn" style="width:100%; max-width:100%; box-sizing:border-box; text-align:left; background:var(--clr-card); cursor:pointer; margin-bottom:16px; display:flex; align-items:center; gap:10px;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
         <span id="drDateLabel"></span>
       </button>
