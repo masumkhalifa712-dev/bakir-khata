@@ -565,9 +565,33 @@
   .emp-row-status.active{ background:#DFF4E6; color:#1E8A4C; }
   .emp-row-status.inactive{ background:var(--clr-line); color:var(--clr-ink-soft); }
   .emp-row-toggle-btn{ flex-shrink:0; border:1.4px solid var(--clr-line); border-radius:999px; padding:7px 13px; font-size:11.5px; font-weight:700; background:var(--clr-card); color:var(--clr-ink-soft); cursor:pointer; font-family:inherit; }
+  .mobile-check-icon{ position:absolute; right:12px; top:50%; transform:translateY(-50%); font-size:16px; font-weight:800; display:none; }
+  .mobile-check-icon.ok{ display:block; color:#1E8A4C; }
+  .mobile-check-icon.taken{ display:block; color:var(--clr-primary); }
 
-  .employee-placeholder{ position:fixed; inset:0; background:var(--clr-bg); z-index:900; display:none; align-items:center; justify-content:center; padding:24px; }
-  .employee-placeholder.show{ display:flex; }
+  .employee-placeholder{ position:fixed; inset:0; background:var(--clr-bg); z-index:900; display:none; overflow-y:auto; }
+  .employee-placeholder.show{ display:block; }
+  .employee-app{ min-height:100%; }
+  .emp-panel{ display:none; }
+  .emp-panel.active{ display:block; }
+  .emp-back-row{ display:flex; align-items:center; gap:6px; padding:14px 16px 4px; border:none; background:none; color:var(--clr-ink-soft); font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; }
+  .emp-cust-row{ display:flex; align-items:center; justify-content:space-between; background:var(--clr-card); border-radius:12px; padding:13px 15px; margin-bottom:8px; box-shadow:0 1px 3px rgba(0,0,0,.04); cursor:pointer; border:none; width:100%; text-align:left; font-family:inherit; }
+  .emp-cust-row-name{ font-size:13.5px; font-weight:700; color:var(--clr-ink); }
+  .emp-cust-row-mobile{ font-size:11.5px; color:var(--clr-ink-soft); margin-top:2px; }
+  .emp-cust-row-due{ font-size:13px; font-weight:800; color:var(--clr-primary); flex-shrink:0; }
+  .emp-cust-card{ background:linear-gradient(160deg, var(--clr-card-tint-a), var(--clr-card-tint-b)); border-radius:16px; padding:18px 16px; margin-top:14px; }
+  .emp-cust-name{ font-size:17px; font-weight:800; color:var(--clr-ink); }
+  .emp-cust-mobile{ font-size:12.5px; color:var(--clr-ink-soft); font-weight:600; margin-top:2px; }
+  .emp-cust-dues{ margin-top:12px; font-size:13px; font-weight:700; color:var(--clr-ink); }
+  .emp-entry-row{ background:var(--clr-card); border-radius:12px; padding:12px 14px; margin-bottom:8px; box-shadow:0 1px 3px rgba(0,0,0,.04); }
+  .emp-entry-row-top{ display:flex; justify-content:space-between; align-items:center; }
+  .emp-entry-title{ font-size:13px; font-weight:700; color:var(--clr-ink); }
+  .emp-entry-status{ font-size:10.5px; font-weight:700; padding:3px 9px; border-radius:999px; }
+  .emp-entry-status.pending{ background:#FFF6D6; color:#8A6A00; }
+  .emp-entry-status.approved{ background:#DFF4E6; color:#1E8A4C; }
+  .emp-entry-status.rejected{ background:#FFE1DE; color:var(--clr-primary); }
+  .emp-entry-date{ font-size:11px; color:var(--clr-ink-soft); margin-top:3px; }
+
   .employee-placeholder-card{ text-align:center; max-width:340px; }
   .employee-placeholder-icon{ font-size:44px; margin-bottom:14px; }
   .employee-placeholder-title{ font-size:18px; font-weight:800; color:var(--clr-ink); margin-bottom:10px; }
@@ -1115,11 +1139,118 @@
        ফ্লো-টা যাচাই করার জন্য। -->
   <!-- ================================================================ -->
   <div class="employee-placeholder" id="employeePlaceholderScreen">
-    <div class="employee-placeholder-card">
-      <div class="employee-placeholder-icon">👷</div>
-      <div class="employee-placeholder-title">স্বাগতম, <span id="empPlaceholderName"></span>!</div>
-      <div class="employee-placeholder-text">কর্মচারীর সম্পূর্ণ ড্যাশবোর্ড এখনো তৈরি হচ্ছে — শীঘ্রই আসছে। তোমার লগইন সফলভাবে যাচাই হয়েছে।</div>
-      <button class="ss-save-btn" id="empPlaceholderLogoutBtn">লগ আউট করুন</button>
+    <div class="employee-app" id="employeeApp">
+      <div class="cd-topbar">
+        <div class="cd-title" id="empTopbarTitle">কর্মচারী — স্বাগতম</div>
+        <div class="cd-topbar-icons">
+          <button id="empMyEntriesBtn" aria-label="আমার এন্ট্রি">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          </button>
+          <button id="empPlaceholderLogoutBtn" aria-label="লগ আউট">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- হোম প্যানেল: খোঁজা + কাস্টমার তালিকা -->
+      <div class="emp-panel active" id="empPanel-home">
+        <div style="padding:14px 16px 0;">
+          <input type="text" class="ni-calc-input" id="empSearchInput" placeholder="নাম বা মোবাইল দিয়ে খুঁজুন" style="width:100%; margin-bottom:12px;" />
+        </div>
+        <div id="empCustomerList" style="padding:0 16px 90px;"></div>
+        <button class="exp-fab" id="empAddCustomerFab" aria-label="নতুন কাস্টমার">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+      </div>
+
+      <!-- কাস্টমার বিস্তারিত প্যানেল -->
+      <div class="emp-panel" id="empPanel-customer">
+        <button class="emp-back-row" id="empCustomerBackBtn">← হোমে ফিরে যান</button>
+        <div style="padding:0 16px;">
+          <div class="emp-cust-card">
+            <div class="emp-cust-name" id="empCustName"></div>
+            <div class="emp-cust-mobile" id="empCustMobile"></div>
+            <div class="emp-cust-dues" id="empCustDues"></div>
+          </div>
+          <button class="ss-save-btn" id="empGiveBtn" style="margin-top:16px;">নতুন বাকি/কিস্তি দিন</button>
+          <button class="ss-save-btn" id="empTakeBtn" style="margin-top:10px; background:linear-gradient(160deg, #1E8A4C, #146536);">আদায় করুন</button>
+        </div>
+      </div>
+
+      <!-- এন্ট্রি ফর্ম (দিচ্ছি/নিচ্ছি, নতুন কাস্টমার এন্ট্রিও এখান দিয়েই যাবে) -->
+      <div class="emp-panel" id="empPanel-form">
+        <button class="emp-back-row" id="empFormBackBtn">← ফিরে যান</button>
+        <div style="padding:0 16px;">
+          <div class="gr-section-title" id="empFormTitle">নতুন এন্ট্রি</div>
+
+          <div class="ni-calc-row">
+            <div class="ni-calc-row-label">তারিখ</div>
+            <button class="ni-calc-input" id="empEntryDateBtn" type="button" style="text-align:left; background:var(--clr-card); cursor:pointer;">
+              <span id="empEntryDateLabel"></span>
+            </button>
+            <input type="date" id="empEntryDateInput" style="position:absolute; opacity:0; pointer-events:none; width:1px; height:1px;" />
+          </div>
+
+          <div id="empNewCustFields" style="display:none;">
+            <div class="ni-calc-row"><div class="ni-calc-row-label">নাম <span class="req">*</span></div><input type="text" class="ni-calc-input" id="empNewCustName" /></div>
+            <div class="ni-calc-row">
+              <div class="ni-calc-row-label">মোবাইল <span class="req">*</span></div>
+              <div style="position:relative; flex:1;">
+                <input type="tel" class="ni-calc-input" id="empNewCustMobile" style="width:100%;" />
+                <span class="mobile-check-icon" id="empNewCustMobileCheckIcon"></span>
+              </div>
+            </div>
+            <div class="ni-calc-row">
+              <div class="ni-calc-row-label">ধরন</div>
+              <select class="ni-calc-input" id="empNewCustType"><option value="customer">কাস্টমার</option><option value="supplier">সাপ্লায়ার</option></select>
+            </div>
+          </div>
+
+          <div class="ni-calc-row">
+            <div class="ni-calc-row-label">ক্যাটাগরি</div>
+            <select class="ni-calc-input" id="empCategorySelect">
+              <option value="general">সাধারণ বাকি</option>
+              <option value="installment">সহজ কিস্তি</option>
+            </select>
+          </div>
+
+          <div id="empInstallmentFields" style="display:none;">
+            <div class="ni-calc-row"><div class="ni-calc-row-label">পণ্যের নাম</div><input type="text" class="ni-calc-input" id="empProductName" /></div>
+            <div class="ni-calc-row"><div class="ni-calc-row-label">বিক্রয় মূল্য <span class="req">*</span></div><input type="number" inputmode="decimal" class="ni-calc-input" id="empSalePrice" /></div>
+            <div class="ni-calc-row"><div class="ni-calc-row-label">ডাউন পেমেন্ট</div><input type="number" inputmode="decimal" class="ni-calc-input" id="empDownPayment" value="0" /></div>
+            <div class="ni-calc-row"><div class="ni-calc-row-label">কিস্তি সংখ্যা <span class="req">*</span></div><input type="number" inputmode="numeric" class="ni-calc-input" id="empInstallmentCount" /></div>
+            <div class="ni-calc-row">
+              <div class="ni-calc-row-label">কিস্তির ধরন</div>
+              <select class="ni-calc-input" id="empInstallmentType"><option value="monthly">মাসিক</option><option value="weekly">সাপ্তাহিক</option><option value="daily">দৈনিক</option></select>
+            </div>
+            <div class="ni-calc-row"><div class="ni-calc-row-label">বিলম্ব জরিমানা (%)</div><input type="number" inputmode="decimal" class="ni-calc-input" id="empLateFee" value="10" /></div>
+            <div class="ni-calc-row">
+              <div class="ni-calc-row-label">প্রথম কিস্তির তারিখ</div>
+              <button class="ni-calc-input" id="empFirstInstallmentDateBtn" type="button" style="text-align:left; background:var(--clr-card); cursor:pointer;">
+                <span id="empFirstInstallmentDateLabel"></span>
+              </button>
+              <input type="date" id="empFirstInstallmentDateInput" style="position:absolute; opacity:0; pointer-events:none; width:1px; height:1px;" />
+            </div>
+          </div>
+
+          <div id="empSimpleAmountField">
+            <div class="ni-calc-row"><div class="ni-calc-row-label">টাকার পরিমাণ <span class="req">*</span></div><input type="number" inputmode="decimal" class="ni-calc-input" id="empAmountInput" /></div>
+          </div>
+
+          <div class="ni-calc-row"><div class="ni-calc-row-label">নোট</div><input type="text" class="ni-calc-input" id="empNoteInput" placeholder="ঐচ্ছিক" /></div>
+
+          <button class="ss-save-btn" id="empSubmitBtn" style="margin:16px 0 30px;">অনুমোদনের জন্য জমা দিন</button>
+        </div>
+      </div>
+
+      <!-- আমার জমা দেওয়া এন্ট্রি -->
+      <div class="emp-panel" id="empPanel-myentries">
+        <button class="emp-back-row" id="empMyEntriesBackBtn">← হোমে ফিরে যান</button>
+        <div style="padding:0 16px;">
+          <div class="gr-section-title">আমার জমা দেওয়া এন্ট্রি</div>
+          <div id="empMyEntriesList"></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1511,7 +1642,10 @@
       <div class="sheet-handle"></div>
       <div class="sheet-title">নতুন কর্মচারী যোগ করুন</div>
       <input type="text" class="ni-calc-input" id="empNameInput" placeholder="কর্মচারীর নাম" style="width:100%; margin-bottom:14px;" />
-      <input type="tel" class="ni-calc-input" id="empMobileInput" placeholder="কর্মচারীর মোবাইল নাম্বার" style="width:100%; margin-bottom:14px;" />
+      <div style="position:relative; margin-bottom:14px;">
+        <input type="tel" class="ni-calc-input" id="empMobileInput" placeholder="কর্মচারীর মোবাইল নাম্বার" style="width:100%;" />
+        <span class="mobile-check-icon" id="empMobileCheckIcon"></span>
+      </div>
       <input type="text" inputmode="numeric" class="ni-calc-input" id="empPinInput" placeholder="৪ সংখ্যার পিন সেট করুন" maxlength="4" style="width:100%; margin-bottom:16px;" />
       <button class="ss-save-btn" id="empSaveBtn">সংরক্ষণ করুন</button>
       <button class="sheet-cancel" id="empCancelBtn">বাতিল</button>
@@ -3948,12 +4082,33 @@
     document.getElementById('empNameInput').value = '';
     document.getElementById('empMobileInput').value = '';
     document.getElementById('empPinInput').value = '';
+    document.getElementById('empMobileCheckIcon').className = 'mobile-check-icon';
     document.getElementById('addEmployeeSheetOverlay').classList.add('show');
   });
   function closeAddEmployeeSheet(){ document.getElementById('addEmployeeSheetOverlay').classList.remove('show'); }
   document.getElementById('empCancelBtn').addEventListener('click', closeAddEmployeeSheet);
   document.getElementById('addEmployeeSheetOverlay').addEventListener('click', (e)=>{
     if(e.target.id === 'addEmployeeSheetOverlay') closeAddEmployeeSheet();
+  });
+  // মোবাইল নাম্বার টাইপ করতে করতেই (submit করার আগেই) ✓/✗ দেখানো — ঠিক
+  // মূল অ্যাপের কাস্টমার-এন্ট্রির মতোই। ১১ ডিজিট হলেই সার্ভারে চেক করা হয়।
+  let empMobileCheckTimer = null;
+  document.getElementById('empMobileInput').addEventListener('input', (e)=>{
+    const icon = document.getElementById('empMobileCheckIcon');
+    icon.className = 'mobile-check-icon';
+    clearTimeout(empMobileCheckTimer);
+    const mobile = e.target.value.trim();
+    if(mobile.length !== 11) return;
+    empMobileCheckTimer = setTimeout(async ()=>{
+      try{
+        const { data, error } = await sb.rpc('rpc_check_employee_mobile_available', {
+          p_owner_mobile: currentUserMobile, p_owner_pin: currentUserPin, p_mobile: mobile,
+        });
+        if(error) throw error;
+        icon.textContent = data ? '✓' : '✗';
+        icon.className = 'mobile-check-icon ' + (data ? 'ok' : 'taken');
+      }catch(e2){ /* নেটওয়ার্ক সমস্যা হলে চুপচাপ বাদ — submit করার সময় তো যাচাই হবেই */ }
+    }, 300);
   });
   document.getElementById('empSaveBtn').addEventListener('click', async ()=>{
     const name = document.getElementById('empNameInput').value.trim();
@@ -3975,7 +4130,7 @@
       showToast('কর্মচারী যোগ হয়েছে');
       renderEmployeeList();
     }catch(e){
-      showToast(e.message && e.message.includes('সর্বোচ্চ') ? e.message : 'যোগ করা যায়নি — নাম্বারটি হয়তো আগে থেকেই ব্যবহৃত', 'danger');
+      showToast((e.message && (e.message.includes('সর্বোচ্চ') || e.message.includes('ব্যবহৃত'))) ? e.message : 'যোগ করা যায়নি, আবার চেষ্টা করো', 'danger');
     }finally{
       btn.disabled = false;
     }
@@ -6456,15 +6611,19 @@
     restoreLastScreen();
     authScreenEl.classList.add('hide');
   }
-  // কর্মচারীর লগইন সফল হলে এখানে আসে — মালিকের মতো পুরো অ্যাপ না দেখিয়ে
-  // আপাতত একটা সহজ প্লেসহোল্ডার দেখায় (ধাপ ৩-এ আসল সীমিত ইন্টারফেস বসবে)।
+  // কর্মচারীর লগইন সফল হলে এখানে আসে — এখন থেকে আসল (সীমিত) ইন্টারফেস দেখাবে।
   let currentEmployeeMobile = null, currentEmployeePin = null;
+  let empCustomersCache = [];
+  let empSelectedCustomer = null; // null মানে "নতুন কাস্টমার" ফর্ম মোড
+  let empFormMode = 'give'; // 'give' | 'take'
   async function completeEmployeeAuth(mobile, pin){
     currentEmployeeMobile = mobile;
     currentEmployeePin = pin;
-    document.getElementById('empPlaceholderName').textContent = (pendingEmployeeInfo && pendingEmployeeInfo.name) || '';
+    document.getElementById('empTopbarTitle').textContent = `স্বাগতম, ${(pendingEmployeeInfo && pendingEmployeeInfo.name) || ''}`;
     authScreenEl.classList.add('hide');
     document.getElementById('employeePlaceholderScreen').classList.add('show');
+    showEmpPanel('home');
+    await loadEmpCustomers();
   }
   document.getElementById('empPlaceholderLogoutBtn').addEventListener('click', ()=>{
     currentEmployeeMobile = null; currentEmployeePin = null; pendingEmployeeInfo = null;
@@ -6472,6 +6631,207 @@
     clearAuthAccount();
     location.reload();
   });
+
+  function showEmpPanel(name){
+    document.querySelectorAll('.emp-panel').forEach(p=> p.classList.toggle('active', p.id === 'empPanel-'+name));
+  }
+  async function loadEmpCustomers(){
+    try{
+      const { data, error } = await sb.rpc('rpc_employee_get_customers', { p_employee_mobile: currentEmployeeMobile, p_employee_pin: currentEmployeePin });
+      if(error) throw error;
+      const row = Array.isArray(data) ? data[0] : data;
+      empCustomersCache = (row && row.customers) || [];
+      renderEmpCustomerList();
+    }catch(e){
+      document.getElementById('empCustomerList').innerHTML = '<div class="gr-empty">লোড করা যায়নি — ইন্টারনেট চেক করো</div>';
+    }
+  }
+  function renderEmpCustomerList(){
+    const q = document.getElementById('empSearchInput').value.trim().toLowerCase();
+    const filtered = empCustomersCache.filter(c=>
+      !q || (c.name||'').toLowerCase().includes(q) || (c.mobile||'').includes(q)
+    );
+    const list = document.getElementById('empCustomerList');
+    list.innerHTML = filtered.map(c => `
+      <button class="emp-cust-row" data-id="${c.id}">
+        <div>
+          <div class="emp-cust-row-name">${escapeHtml(c.name)}${c.id ? ' · '+c.id : ''}</div>
+          <div class="emp-cust-row-mobile">${escapeHtml(c.mobile||'')}</div>
+        </div>
+        <div class="emp-cust-row-due">${bn(Math.round(c.amount||0))} টাকা</div>
+      </button>`).join('') || '<div class="gr-empty">কোনো কাস্টমার নেই</div>';
+    list.querySelectorAll('.emp-cust-row').forEach(row=>{
+      row.addEventListener('click', ()=>{
+        const cust = empCustomersCache.find(c=>c.id === row.dataset.id);
+        if(cust) goToEmpCustomerDetail(cust);
+      });
+    });
+  }
+  document.getElementById('empSearchInput').addEventListener('input', renderEmpCustomerList);
+
+  function goToEmpCustomerDetail(cust){
+    empSelectedCustomer = cust;
+    document.getElementById('empCustName').textContent = `${cust.name}${cust.id ? ' · '+cust.id : ''}`;
+    document.getElementById('empCustMobile').textContent = cust.mobile || '';
+    document.getElementById('empCustDues').textContent = `কিস্তি বাকি: ${bn(Math.round(cust.installmentDue||0))} টাকা · সাধারণ বাকি: ${bn(Math.round(cust.generalDue||0))} টাকা`;
+    showEmpPanel('customer');
+  }
+  document.getElementById('empCustomerBackBtn').addEventListener('click', ()=> showEmpPanel('home'));
+  document.getElementById('empMyEntriesBtn').addEventListener('click', ()=>{ showEmpPanel('myentries'); loadEmpMyEntries(); });
+  document.getElementById('empMyEntriesBackBtn').addEventListener('click', ()=> showEmpPanel('home'));
+
+  function openEmpForm(mode, customer){
+    empFormMode = mode; // 'give' | 'take'
+    empSelectedCustomer = customer || null; // null = নতুন কাস্টমার
+    const isNew = !customer;
+    document.getElementById('empNewCustFields').style.display = isNew ? '' : 'none';
+    document.getElementById('empNewCustName').value = '';
+    document.getElementById('empNewCustMobile').value = '';
+    document.getElementById('empNewCustMobileCheckIcon').className = 'mobile-check-icon';
+    document.getElementById('empCategorySelect').value = 'general';
+    document.getElementById('empProductName').value = '';
+    document.getElementById('empSalePrice').value = '';
+    document.getElementById('empDownPayment').value = 0;
+    document.getElementById('empInstallmentCount').value = '';
+    document.getElementById('empLateFee').value = 10;
+    document.getElementById('empAmountInput').value = '';
+    document.getElementById('empNoteInput').value = '';
+    { const __today = new Date().toISOString().slice(0,10);
+      document.getElementById('empEntryDateInput').value = __today;
+      updateEmpEntryDateLabel(__today);
+      document.getElementById('empFirstInstallmentDateInput').value = __today;
+      updateEmpFirstInstallmentDateLabel(__today); }
+    updateEmpFormFieldsVisibility();
+    const custLabel = customer ? `${customer.name} — ` : '';
+    document.getElementById('empFormTitle').textContent = isNew
+      ? 'নতুন কাস্টমার যোগ করুন'
+      : (mode==='give' ? `${custLabel}নতুন বাকি/কিস্তি দিন` : `${custLabel}আদায় করুন`);
+    showEmpPanel('form');
+  }
+  document.getElementById('empGiveBtn').addEventListener('click', ()=> openEmpForm('give', empSelectedCustomer));
+  document.getElementById('empTakeBtn').addEventListener('click', ()=> openEmpForm('take', empSelectedCustomer));
+  document.getElementById('empAddCustomerFab').addEventListener('click', ()=> openEmpForm('give', null));
+  // এখানে শুধু মালিকের এই ক্রেতা-তালিকায় (empCustomersCache, আগে থেকেই লোড
+  // করা) নাম্বারটা আছে কিনা দেখা হয় — কর্মচারী/মালিকের একাউন্ট না, শুধু
+  // ক্রেতার তালিকা। তাই এটা তাৎক্ষণিক, কোনো সার্ভার-কল লাগে না।
+  document.getElementById('empNewCustMobile').addEventListener('input', (e)=>{
+    const icon = document.getElementById('empNewCustMobileCheckIcon');
+    const mobile = e.target.value.trim();
+    if(mobile.length !== 11){ icon.className = 'mobile-check-icon'; return; }
+    const taken = empCustomersCache.some(c => c.mobile === mobile);
+    icon.textContent = taken ? '✗' : '✓';
+    icon.className = 'mobile-check-icon ' + (taken ? 'taken' : 'ok');
+  });
+  document.getElementById('empFormBackBtn').addEventListener('click', ()=> showEmpPanel(empSelectedCustomer ? 'customer' : 'home'));
+  document.getElementById('empCategorySelect').addEventListener('change', updateEmpFormFieldsVisibility);
+  const updateEmpEntryDateLabel = wireDateField('empEntryDateBtn', 'empEntryDateInput', 'empEntryDateLabel');
+  const updateEmpFirstInstallmentDateLabel = wireDateField('empFirstInstallmentDateBtn', 'empFirstInstallmentDateInput', 'empFirstInstallmentDateLabel');
+  function updateEmpFormFieldsVisibility(){
+    const isInstallmentGive = document.getElementById('empCategorySelect').value === 'installment' && empFormMode === 'give';
+    document.getElementById('empInstallmentFields').style.display = isInstallmentGive ? '' : 'none';
+    document.getElementById('empSimpleAmountField').style.display = isInstallmentGive ? 'none' : '';
+  }
+  document.getElementById('empSubmitBtn').addEventListener('click', async ()=>{
+    const isNew = !empSelectedCustomer;
+    const category = document.getElementById('empCategorySelect').value;
+    const isInstallmentGive = category === 'installment' && empFormMode === 'give';
+    const note = document.getElementById('empNoteInput').value.trim();
+
+    if(isNew){
+      const name = document.getElementById('empNewCustName').value.trim();
+      const mobile = document.getElementById('empNewCustMobile').value.trim();
+      if(!name || !mobile){ showToast('নাম আর মোবাইল দিতে হবে', 'danger'); return; }
+      const dupCust = empCustomersCache.find(c => c.mobile === mobile);
+      if(dupCust){ showToast(`এই নম্বরে ইতিমধ্যে একজন কাস্টমার আছে — ${dupCust.name}`, 'danger'); return; }
+    }
+    let entryFields;
+    if(isInstallmentGive){
+      const salePrice = Number(document.getElementById('empSalePrice').value);
+      const count = Number(document.getElementById('empInstallmentCount').value);
+      if(!salePrice || !count){ showToast('বিক্রয় মূল্য আর কিস্তি সংখ্যা দিতে হবে', 'danger'); return; }
+      entryFields = {
+        category: 'installment', direction: 'give',
+        productName: document.getElementById('empProductName').value.trim(),
+        salePrice, downPayment: Number(document.getElementById('empDownPayment').value)||0,
+        installmentCount: count, installmentType: document.getElementById('empInstallmentType').value,
+        lateFee: Number(document.getElementById('empLateFee').value)||0,
+        firstInstallmentDate: document.getElementById('empFirstInstallmentDateInput').value,
+      };
+    }else{
+      const amount = Number(document.getElementById('empAmountInput').value);
+      if(!amount || amount <= 0){ showToast('টাকার পরিমাণ দিতে হবে', 'danger'); return; }
+      entryFields = { category, direction: empFormMode, amount };
+    }
+    entryFields.note = note;
+    // এই তারিখটাই ব্যবহার হবে (আজকের তারিখ না, কর্মচারী নিজে যা বেছে
+    // নিয়েছে) — শুধু রশিদ নাম্বারটাই অনুমোদনের সময় (ধাপ ৫) বসবে।
+    entryFields.entryDate = document.getElementById('empEntryDateInput').value;
+
+    const btn = document.getElementById('empSubmitBtn');
+    btn.disabled = true;
+    try{
+      let entryType, payload;
+      if(isNew){
+        entryType = 'new_customer';
+        payload = {
+          name: document.getElementById('empNewCustName').value.trim(),
+          mobile: document.getElementById('empNewCustMobile').value.trim(),
+          type: document.getElementById('empNewCustType').value,
+          initialEntry: entryFields,
+        };
+      }else{
+        entryType = 'transaction';
+        payload = {
+          customerId: empSelectedCustomer.id,
+          customerName: empSelectedCustomer.name,
+          entry: entryFields,
+        };
+      }
+      const { error } = await sb.rpc('rpc_employee_submit_entry', {
+        p_employee_mobile: currentEmployeeMobile, p_employee_pin: currentEmployeePin,
+        p_entry_type: entryType, p_payload: payload,
+      });
+      if(error) throw error;
+      showToast('অনুমোদনের জন্য জমা হয়েছে ✓');
+      showEmpPanel(isNew ? 'home' : 'customer');
+      if(isNew) loadEmpCustomers();
+    }catch(e){
+      showToast('জমা দেওয়া যায়নি, আবার চেষ্টা করো', 'danger');
+    }finally{
+      btn.disabled = false;
+    }
+  });
+
+  async function loadEmpMyEntries(){
+    const list = document.getElementById('empMyEntriesList');
+    list.innerHTML = '<div style="color:var(--clr-ink-soft); font-size:12.5px;">লোড হচ্ছে...</div>';
+    try{
+      const { data, error } = await sb.rpc('rpc_employee_get_my_entries', { p_employee_mobile: currentEmployeeMobile, p_employee_pin: currentEmployeePin });
+      if(error) throw error;
+      if(!data || data.length === 0){
+        list.innerHTML = '<div class="gr-empty">এখনো কিছু জমা দাওনি</div>';
+        return;
+      }
+      const statusLabels = { pending:'অপেক্ষমাণ', approved:'অনুমোদিত', rejected:'বাতিল' };
+      list.innerHTML = data.map(row => {
+        const title = row.entry_type === 'new_customer'
+          ? `নতুন কাস্টমার — ${escapeHtml(row.payload.name||'')}`
+          : `${escapeHtml(row.payload.customerName||'')}-এর জন্য এন্ট্রি`;
+        const dt = new Date(row.created_at);
+        const dateStr = dt.toLocaleString('bn-BD', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+        return `<div class="emp-entry-row">
+          <div class="emp-entry-row-top">
+            <div class="emp-entry-title">${title}</div>
+            <div class="emp-entry-status ${row.status}">${statusLabels[row.status]||row.status}</div>
+          </div>
+          <div class="emp-entry-date">${dateStr}</div>
+        </div>`;
+      }).join('');
+    }catch(e){
+      list.innerHTML = '<div class="gr-empty">লোড করা যায়নি</div>';
+    }
+  }
+
   // A pull-to-refresh gesture fully reloads the page (all JS state is lost),
   // so without this, every refresh would bounce back to the home screen even
   // mid-task. Standalone screens reopen directly; screens tied to a specific
