@@ -175,6 +175,8 @@
   #app.show-netprofitreport #screen-netProfitReport{ transform:translateX(0); }
   #screen-appAccess{ transform:translateX(100%); z-index:2; }
   #app.show-appaccess #screen-appAccess{ transform:translateX(0); }
+  #screen-pendingEntries{ transform:translateX(100%); z-index:3; }
+  #app.show-pendingentries #screen-pendingEntries{ transform:translateX(0); }
   #screen-themeSettings{ transform:translateX(100%); z-index:2; }
   #app.show-themesettings #screen-themeSettings{ transform:translateX(0); }
   #screen-cashReport{ transform:translateX(100%); z-index:3; }
@@ -240,6 +242,7 @@
   #app.show-dailyreport .fab, #app.show-dailyreport .bottom-nav,
   #app.show-netprofitreport .fab, #app.show-netprofitreport .bottom-nav,
   #app.show-appaccess .fab, #app.show-appaccess .bottom-nav,
+  #app.show-pendingentries .fab, #app.show-pendingentries .bottom-nav,
   #app.show-themesettings .fab, #app.show-themesettings .bottom-nav,
   #app.show-cashreport .fab, #app.show-cashreport .bottom-nav,
   #app.show-installmentdetail .fab, #app.show-installmentdetail .bottom-nav
@@ -568,6 +571,21 @@
   .mobile-check-icon{ position:absolute; right:12px; top:50%; transform:translateY(-50%); font-size:16px; font-weight:800; display:none; }
   .mobile-check-icon.ok{ display:block; color:#1E8A4C; }
   .mobile-check-icon.taken{ display:block; color:var(--clr-primary); }
+
+  /* ================= CATEGORY: অনুমোদনের অপেক্ষায় ================= */
+  .pending-badge{ background:var(--clr-primary); color:#fff; font-size:11px; font-weight:800; min-width:20px; height:20px; padding:0 6px; border-radius:999px; display:flex; align-items:center; justify-content:center; margin-right:6px; }
+  .pe-card{ background:var(--clr-card); border-radius:14px; padding:14px 16px; margin-bottom:10px; box-shadow:0 1px 4px rgba(0,0,0,.05); }
+  .pe-card-top{ display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; }
+  .pe-card-title{ font-size:13.5px; font-weight:800; color:var(--clr-ink); }
+  .pe-card-sub{ font-size:11.5px; color:var(--clr-ink-soft); font-weight:600; margin-top:2px; }
+  .pe-card-emp{ font-size:11px; color:var(--clr-primary); font-weight:700; margin-top:4px; }
+  .pe-card-body{ font-size:12.5px; color:var(--clr-ink); line-height:1.6; margin:8px 0; }
+  .pe-card-actions{ display:flex; gap:8px; margin-top:10px; }
+  .pe-approve-btn{ flex:1; background:linear-gradient(160deg, #1E8A4C, #146536); color:#fff; border:none; border-radius:10px; padding:10px; font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; }
+  .pe-reject-btn{ flex:1; background:none; color:var(--clr-primary); border:1.4px solid var(--clr-primary); border-radius:10px; padding:10px; font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; }
+  .pe-status-chip{ font-size:10.5px; font-weight:700; padding:3px 9px; border-radius:999px; }
+  .pe-status-chip.approved{ background:#DFF4E6; color:#1E8A4C; }
+  .pe-status-chip.rejected{ background:#FFE1DE; color:var(--clr-primary); }
 
   .employee-placeholder{ position:fixed; inset:0; background:var(--clr-bg); z-index:900; display:none; overflow-y:auto; }
   .employee-placeholder.show{ display:block; }
@@ -1305,7 +1323,10 @@
           <span>টালি-মেসেজ</span>
         </button>
         <button class="quick-action" data-action="appaccess">
-          <span class="qa-icon" style="color:#D18B1D;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1.5"/></svg></span>
+          <span class="qa-icon" style="color:#D18B1D; position:relative;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1.5"/></svg>
+            <span class="qa-badge" id="appAccessBadge" style="display:none;">0</span>
+          </span>
           <span>অ্যাপ এক্সেস</span>
         </button>
         <button class="quick-action" data-action="reminder">
@@ -1631,10 +1652,27 @@
       <div class="cd-title">অ্যাপ এক্সেস</div>
     </div>
     <div style="padding:16px;">
+      <button class="rh-card" id="pendingEntriesBtn" style="margin-bottom:18px;">
+        <span class="rh-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
+        <span class="rh-card-title">অনুমোদনের অপেক্ষায়</span>
+        <span class="pending-badge" id="pendingEntriesBadge" style="display:none;">0</span>
+        <svg class="rh-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+
       <div class="gr-section-title">কর্মচারী প্রোফাইল <span style="font-weight:400;">(সর্বোচ্চ ৩ জন)</span></div>
       <div id="employeeList" style="margin-bottom:14px;"></div>
       <button class="ss-save-btn" id="addEmployeeBtn">+ নতুন কর্মচারী যোগ করুন</button>
     </div>
+  </section>
+
+  <section class="screen" id="screen-pendingEntries">
+    <div class="cd-topbar">
+      <button class="cd-back" id="peBackBtn" aria-label="ফিরে যান">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      </button>
+      <div class="cd-title">অনুমোদনের অপেক্ষায়</div>
+    </div>
+    <div id="pendingEntriesList" style="padding:14px 16px 30px;"></div>
   </section>
 
   <div class="sheet-overlay" id="addEmployeeSheetOverlay">
@@ -3493,7 +3531,7 @@
     try{ sessionStorage.setItem('lastScreen', JSON.stringify({ screen: name, customerId: currentCustomer ? currentCustomer.id : null })); }catch(e){}
   }
   function goToAddCustomer(){ appEl.classList.add('show-add'); pushAppState('add'); }
-  function goHome(){ appEl.classList.remove('show-add'); appEl.classList.remove('show-detail'); appEl.classList.remove('show-newdue'); appEl.classList.remove('show-txdetail'); appEl.classList.remove('show-customeredit'); appEl.classList.remove('show-newinstallment'); appEl.classList.remove('show-collectinstallment'); appEl.classList.remove('show-report'); appEl.classList.remove('show-shopsettings'); appEl.classList.remove('show-appsettings'); appEl.classList.remove('show-purchasehistory'); appEl.classList.remove('show-groupreminder'); appEl.classList.remove('show-installmentsummary'); appEl.classList.remove('show-installmentdetail'); appEl.classList.remove('show-expenses'); appEl.classList.remove('show-reportshub'); appEl.classList.remove('show-collectionreport'); appEl.classList.remove('show-dailyreport'); appEl.classList.remove('show-netprofitreport'); appEl.classList.remove('show-cashreport'); appEl.classList.remove('show-themesettings'); appEl.classList.remove('show-appaccess'); resetAddForm(); try{ sessionStorage.removeItem('lastScreen'); }catch(e){} }
+  function goHome(){ appEl.classList.remove('show-add'); appEl.classList.remove('show-detail'); appEl.classList.remove('show-newdue'); appEl.classList.remove('show-txdetail'); appEl.classList.remove('show-customeredit'); appEl.classList.remove('show-newinstallment'); appEl.classList.remove('show-collectinstallment'); appEl.classList.remove('show-report'); appEl.classList.remove('show-shopsettings'); appEl.classList.remove('show-appsettings'); appEl.classList.remove('show-purchasehistory'); appEl.classList.remove('show-groupreminder'); appEl.classList.remove('show-installmentsummary'); appEl.classList.remove('show-installmentdetail'); appEl.classList.remove('show-expenses'); appEl.classList.remove('show-reportshub'); appEl.classList.remove('show-collectionreport'); appEl.classList.remove('show-dailyreport'); appEl.classList.remove('show-netprofitreport'); appEl.classList.remove('show-cashreport'); appEl.classList.remove('show-themesettings'); appEl.classList.remove('show-appaccess'); appEl.classList.remove('show-pendingentries'); resetAddForm(); try{ sessionStorage.removeItem('lastScreen'); }catch(e){} }
 
   /* ================================================================ */
   /* ================= CATEGORY: Side Menu Drawer ===================== */
@@ -4037,6 +4075,7 @@
   /* ================================================================ */
   function goToAppAccess(){
     renderEmployeeList();
+    updatePendingEntriesBadge();
     appEl.classList.add('show-appaccess');
     pushAppState('appaccess');
   }
@@ -4078,6 +4117,180 @@
       list.innerHTML = '<div class="gr-empty">লোড করা যায়নি</div>';
     }
   }
+
+  /* ================================================================ */
+  /* ================= CATEGORY: অনুমোদনের অপেক্ষায় (মালিক) ============= */
+  /* ================================================================ */
+  async function updatePendingEntriesBadge(){
+    const badge = document.getElementById('pendingEntriesBadge');
+    const homeBadge = document.getElementById('appAccessBadge');
+    try{
+      const { data, error } = await sb.rpc('rpc_owner_get_pending_entries', { p_owner_mobile: currentUserMobile, p_owner_pin: currentUserPin });
+      if(error) throw error;
+      const count = (data||[]).filter(e=>e.status==='pending').length;
+      if(count > 0){
+        badge.textContent = bn(count); badge.style.display = 'flex';
+        homeBadge.textContent = bn(count); homeBadge.style.display = 'flex';
+      }else{
+        badge.style.display = 'none';
+        homeBadge.style.display = 'none';
+      }
+    }catch(e){ badge.style.display = 'none'; homeBadge.style.display = 'none'; }
+  }
+  function goToPendingEntries(){
+    renderPendingEntriesList();
+    appEl.classList.add('show-pendingentries');
+    pushAppState('pendingentries');
+  }
+  function closePendingEntries(){ appEl.classList.remove('show-pendingentries'); }
+  document.getElementById('pendingEntriesBtn').addEventListener('click', goToPendingEntries);
+  document.getElementById('peBackBtn').addEventListener('click', ()=> history.back());
+
+  async function renderPendingEntriesList(){
+    const list = document.getElementById('pendingEntriesList');
+    list.innerHTML = '<div style="color:var(--clr-ink-soft); font-size:12.5px;">লোড হচ্ছে...</div>';
+    try{
+      const { data, error } = await sb.rpc('rpc_owner_get_pending_entries', { p_owner_mobile: currentUserMobile, p_owner_pin: currentUserPin });
+      if(error) throw error;
+      if(!data || data.length === 0){
+        list.innerHTML = '<div class="gr-empty">এখনো কোনো এন্ট্রি জমা পড়েনি</div>';
+        return;
+      }
+      const categoryLabel = { general: 'সাধারণ বাকি', installment: 'সহজ কিস্তি' };
+      list.innerHTML = data.map(row => {
+        const p = row.payload;
+        const isNew = row.entry_type === 'new_customer';
+        const entry = isNew ? p.initialEntry : p.entry;
+        const title = isNew ? `নতুন কাস্টমার — ${escapeHtml(p.name)}` : `${escapeHtml(p.customerName)}`;
+        const sub = isNew ? escapeHtml(p.mobile||'') : (entry.direction==='give' ? 'নতুন এন্ট্রি (দিচ্ছি)' : 'আদায় (নিচ্ছি)');
+        let bodyLine;
+        if(entry.category === 'installment' && entry.direction === 'give'){
+          bodyLine = `${categoryLabel.installment} — ${escapeHtml(entry.productName||'')} — বিক্রয় মূল্য ${bn(entry.salePrice)} টাকা, ${bn(entry.installmentCount)} কিস্তি, তারিখ: ${entry.entryDate||'—'}`;
+        }else{
+          bodyLine = `${categoryLabel[entry.category]||entry.category} — ${bn(entry.amount)} টাকা, তারিখ: ${entry.entryDate||'—'}`;
+        }
+        if(entry.note) bodyLine += ` — নোট: ${escapeHtml(entry.note)}`;
+        const actionsOrStatus = row.status === 'pending'
+          ? `<div class="pe-card-actions">
+              <button class="pe-approve-btn" data-id="${row.id}" data-action="approve">✅ অনুমোদন</button>
+              <button class="pe-reject-btn" data-id="${row.id}" data-action="reject">❌ বাতিল</button>
+            </div>`
+          : `<span class="pe-status-chip ${row.status}">${row.status==='approved' ? 'অনুমোদিত' : 'বাতিল হয়েছে'}</span>`;
+        return `<div class="pe-card" data-entry-id="${row.id}">
+          <div class="pe-card-top">
+            <div>
+              <div class="pe-card-title">${title}</div>
+              <div class="pe-card-sub">${sub}</div>
+              <div class="pe-card-emp">কর্মচারী: ${escapeHtml(row.employee_name)}</div>
+            </div>
+          </div>
+          <div class="pe-card-body">${bodyLine}</div>
+          ${actionsOrStatus}
+        </div>`;
+      }).join('');
+      list.querySelectorAll('.pe-approve-btn, .pe-reject-btn').forEach(btn=>{
+        btn.addEventListener('click', ()=> resolvePendingEntry(Number(btn.dataset.id), btn.dataset.action, data.find(r=>r.id===Number(btn.dataset.id))));
+      });
+    }catch(e){
+      list.innerHTML = '<div class="gr-empty">লোড করা যায়নি</div>';
+    }
+  }
+
+  // মালিকের নিজের ব্রাউজারেই কর্মচারীর জমা দেওয়া কাঁচা তথ্য থেকে আসল
+  // লেনদেন-অবজেক্ট তৈরি হয় — ঠিক নতুন বাকি/নতুন সহজ কিস্তি/কিস্তি আদায়
+  // ফর্মগুলো যেভাবে তৈরি করে সেই একই নিয়মে (একই ফাংশন পুনর্ব্যবহার করে
+  // — generateReceiptNumber, buildInstallmentSchedule), যাতে দুই জায়গার
+  // ডেটা কাঠামো কখনো আলাদা না হয়ে যায়।
+  function buildTransactionFromEmployeeEntry(entry, employeeName){
+    const d = entry.entryDate ? new Date(entry.entryDate+'T00:00:00') : new Date();
+    const dateStr = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
+    const { time } = nowDateTimeStrings();
+    const noteTag = `[কর্মচারী: ${employeeName}]`;
+    const note = entry.note ? `${noteTag} ${entry.note}` : noteTag;
+
+    if(entry.category === 'installment' && entry.direction === 'give'){
+      const salePrice = entry.salePrice || 0;
+      const downPayment = entry.downPayment || 0;
+      const remaining = Math.max(0, salePrice - downPayment);
+      const count = entry.installmentCount || 0;
+      const perInstallment = count > 0 ? (remaining / count) : 0;
+      const receiptNumber = generateReceiptNumber(d);
+      meta.nextReceiptSerial = (meta.nextReceiptSerial || 1) + 1;
+      const schedule = entry.firstInstallmentDate ? buildInstallmentSchedule(entry.firstInstallmentDate, count, entry.installmentType, perInstallment) : [];
+      return {
+        date: dateStr, time, note,
+        category: 'installment', take: 0, give: remaining, receiptNumber,
+        ...(entry.firstInstallmentDate ? { dueDate: entry.firstInstallmentDate } : {}),
+        productName: entry.productName || '', salePrice, downPayment, purchasePrice: 0,
+        remainingAmount: remaining, installmentCount: count, perInstallment,
+        installmentType: entry.installmentType, lateFee: entry.lateFee || 0, schedule,
+      };
+    }
+    if(entry.category === 'installment' && entry.direction === 'take'){
+      return { date: dateStr, time, note, category: 'installment', take: entry.amount||0, give: 0 };
+    }
+    // সাধারণ বাকি — দিচ্ছি/নিচ্ছি
+    return {
+      date: dateStr, time, note, category: 'general',
+      take: entry.direction === 'take' ? (entry.amount||0) : 0,
+      give: entry.direction === 'give' ? (entry.amount||0) : 0,
+    };
+  }
+
+  async function resolvePendingEntry(entryId, action, row){
+    const card = document.querySelector(`.pe-card[data-entry-id="${entryId}"]`);
+    if(card) card.querySelectorAll('button').forEach(b=> b.disabled = true);
+    try{
+      if(action === 'approve' && row){
+        const p = row.payload;
+        if(row.entry_type === 'new_customer'){
+          const dupCust = customers.find(c => c.mobile === p.mobile);
+          if(dupCust){
+            showToast(`এই নম্বরে ইতিমধ্যে একজন কাস্টমার আছে — ${dupCust.name}, অনুমোদন করা যায়নি`, 'danger');
+            if(card) card.querySelectorAll('button').forEach(b=> b.disabled = false);
+            return;
+          }
+          const id = generateCustomerId();
+          const newCustomer = {
+            id, name: p.name, mobile: p.mobile, type: p.type || 'customer',
+            time: "এখনই যোগ হয়েছে", amount: 0,
+            color: randomPastel(), initial: initialsFromName(p.name),
+            photo: null, transactions: [],
+          };
+          if(p.initialEntry){
+            newCustomer.transactions.push(buildTransactionFromEmployeeEntry(p.initialEntry, row.employee_name));
+          }
+          customers.unshift(newCustomer);
+          meta.nextSerial += 1;
+          recomputeCustomerTotals(newCustomer);
+        }else{
+          const customer = customers.find(c => c.id === p.customerId);
+          if(!customer){
+            showToast('কাস্টমার খুঁজে পাওয়া যায়নি — হয়তো মুছে ফেলা হয়েছে', 'danger');
+            if(card) card.querySelectorAll('button').forEach(b=> b.disabled = false);
+            return;
+          }
+          if(!customer.transactions) customer.transactions = [];
+          customer.transactions.push(buildTransactionFromEmployeeEntry(p.entry, row.employee_name));
+          recomputeCustomerTotals(customer);
+        }
+        await persistCustomersAndMeta();
+        renderList();
+      }
+      const { error } = await sb.rpc('rpc_owner_resolve_pending_entry', {
+        p_owner_mobile: currentUserMobile, p_owner_pin: currentUserPin,
+        p_entry_id: entryId, p_status: action === 'approve' ? 'approved' : 'rejected',
+      });
+      if(error) throw error;
+      showToast(action === 'approve' ? 'অনুমোদন হয়েছে ✓' : 'বাতিল করা হয়েছে');
+      renderPendingEntriesList();
+      updatePendingEntriesBadge();
+    }catch(e){
+      showToast('কাজটি করা যায়নি, আবার চেষ্টা করো', 'danger');
+      if(card) card.querySelectorAll('button').forEach(b=> b.disabled = false);
+    }
+  }
+
   document.getElementById('addEmployeeBtn').addEventListener('click', ()=>{
     document.getElementById('empNameInput').value = '';
     document.getElementById('empMobileInput').value = '';
@@ -6602,6 +6815,7 @@
     // Best-effort — lets the admin panel show who's actively using the app
     sb.rpc('rpc_touch_last_login', { p_mobile: mobile }).then(()=>{}, ()=>{});
     if(pushNotificationsSupported()){ updatePushMenuLabel(); maybeShowPushPrompt(); }
+    updatePendingEntriesBadge();
     await loadCustomers();
     checkBroadcastNotice();
     loadAdConfig();
@@ -6859,6 +7073,7 @@
       case 'cashreport': goToCashReport(); break;
       case 'themesettings': goToThemeSettings(); break;
       case 'appaccess': goToAppAccess(); break;
+      case 'pendingentries': goToPendingEntries(); break;
       case 'detail':
       case 'newdue':
       case 'txdetail':
@@ -7332,6 +7547,7 @@
     if(appEl.classList.contains('show-installmentdetail')){ closeInstallmentDetail(); return; }
     if(appEl.classList.contains('show-installmentsummary')){ closeInstallmentSummary(); return; }
     if(appEl.classList.contains('show-expenses')){ closeExpenses(); return; }
+    if(appEl.classList.contains('show-pendingentries')){ closePendingEntries(); return; }
     if(appEl.classList.contains('show-appaccess')){ closeAppAccess(); return; }
     if(appEl.classList.contains('show-themesettings')){ closeThemeSettings(); return; }
     if(appEl.classList.contains('show-cashreport')){ closeCashReport(); return; }
