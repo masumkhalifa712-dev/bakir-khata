@@ -572,6 +572,7 @@
   .mobile-field-block{ margin-bottom:14px; }
   .mobile-field-label{ display:block; font-size:12px; font-weight:600; color:var(--clr-ink-soft); margin-bottom:5px; }
   .mobile-field-wrap{ position:relative; }
+  .ni-calc-input-sized{ width:170px; max-width:52%; }
   .mobile-check-icon.ok{ display:block; color:#1E8A4C; }
   .mobile-check-icon.taken{ display:block; color:var(--clr-primary); }
 
@@ -1214,10 +1215,10 @@
 
           <div id="empNewCustFields" style="display:none;">
             <div class="ni-calc-row"><div class="ni-calc-row-label">নাম <span class="req">*</span></div><input type="text" class="ni-calc-input" id="empNewCustName" /></div>
-            <div class="mobile-field-block">
-              <label class="mobile-field-label">মোবাইল <span class="req">*</span></label>
-              <div class="mobile-field-wrap">
-                <input type="tel" class="ni-calc-input" id="empNewCustMobile" style="width:100%; max-width:100%; box-sizing:border-box; padding-right:38px;" />
+            <div class="ni-calc-row">
+              <div class="ni-calc-row-label">মোবাইল <span class="req">*</span></div>
+              <div class="mobile-field-wrap ni-calc-input-sized">
+                <input type="tel" class="ni-calc-input" id="empNewCustMobile" style="width:100%; max-width:100%; box-sizing:border-box; padding-right:32px;" />
                 <span class="mobile-check-icon" id="empNewCustMobileCheckIcon"></span>
               </div>
             </div>
@@ -1682,13 +1683,22 @@
     <div class="sheet">
       <div class="sheet-handle"></div>
       <div class="sheet-title">নতুন কর্মচারী যোগ করুন</div>
-      <input type="text" class="ni-calc-input" id="empNameInput" placeholder="কর্মচারীর নাম" style="width:100%; max-width:100%; box-sizing:border-box; margin-bottom:14px;" />
-      <div class="mobile-field-wrap" style="margin-bottom:14px;">
-        <input type="tel" class="ni-calc-input" id="empMobileInput" placeholder="কর্মচারীর মোবাইল নাম্বার" style="width:100%; max-width:100%; box-sizing:border-box; padding-right:38px;" />
-        <span class="mobile-check-icon" id="empMobileCheckIcon"></span>
+      <div class="ni-calc-row">
+        <div class="ni-calc-row-label">নাম</div>
+        <input type="text" class="ni-calc-input" id="empNameInput" placeholder="কর্মচারীর নাম" />
       </div>
-      <input type="text" inputmode="numeric" class="ni-calc-input" id="empPinInput" placeholder="৪ সংখ্যার পিন সেট করুন" maxlength="4" style="width:100%; max-width:100%; box-sizing:border-box; margin-bottom:16px;" />
-      <button class="ss-save-btn" id="empSaveBtn">সংরক্ষণ করুন</button>
+      <div class="ni-calc-row">
+        <div class="ni-calc-row-label">মোবাইল</div>
+        <div class="mobile-field-wrap ni-calc-input-sized">
+          <input type="tel" class="ni-calc-input" id="empMobileInput" placeholder="মোবাইল নাম্বার" style="width:100%; max-width:100%; box-sizing:border-box; padding-right:32px;" />
+          <span class="mobile-check-icon" id="empMobileCheckIcon"></span>
+        </div>
+      </div>
+      <div class="ni-calc-row">
+        <div class="ni-calc-row-label">পিন</div>
+        <input type="text" inputmode="numeric" class="ni-calc-input" id="empPinInput" placeholder="৪ সংখ্যার পিন" maxlength="4" />
+      </div>
+      <button class="ss-save-btn" id="empSaveBtn" style="margin-top:16px;">সংরক্ষণ করুন</button>
       <button class="sheet-cancel" id="empCancelBtn">বাতিল</button>
     </div>
   </div>
