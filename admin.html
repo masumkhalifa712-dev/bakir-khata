@@ -49,6 +49,10 @@
   .panel-textarea{ width:100%; min-height:70px; border:1.6px solid var(--clr-line); border-radius:11px; padding:11px 13px; font-size:13.5px; font-family:inherit; outline:none; resize:vertical; }
   .ad-field-label{ display:block; font-size:12px; font-weight:700; color:var(--clr-ink-soft); margin:12px 0 5px; }
   .ad-field-input{ width:100%; box-sizing:border-box; border:1.6px solid var(--clr-line); border-radius:10px; padding:10px 13px; font-size:13px; font-family:inherit; outline:none; }
+  .blocked-user-row{ display:flex; align-items:center; justify-content:space-between; padding:11px 0; border-bottom:1px solid var(--clr-line); }
+  .blocked-user-mobile{ font-size:13px; font-weight:700; color:var(--clr-ink); }
+  .blocked-user-date{ font-size:11px; color:var(--clr-ink-soft); margin-top:2px; }
+  .reset-pin-btn{ flex-shrink:0; border:1.4px solid var(--clr-primary); border-radius:999px; padding:7px 14px; font-size:11.5px; font-weight:700; background:none; color:var(--clr-primary); cursor:pointer; font-family:inherit; }
   .ad-image-upload-row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
   .ad-image-preview{ width:52px; height:52px; border-radius:8px; object-fit:cover; border:1.6px solid var(--clr-line); }
   .ad-image-status{ font-size:12px; color:var(--clr-ink-soft); }
@@ -131,6 +135,7 @@
       <button class="admin-tab" data-tab="notes">🗒️ নোট</button>
       <button class="admin-tab" data-tab="log">📜 লগ</button>
       <button class="admin-tab" data-tab="ads">🖼️ বিজ্ঞাপন</button>
+      <button class="admin-tab" data-tab="helpdesk">🆘 হেল্প ডেস্ক</button>
     </div>
 
     <div class="admin-tab-panel active" id="tabPanel-dashboard">
@@ -218,6 +223,22 @@
       </div>
 
       <button class="btn-primary" id="saveAdConfigBtn" style="width:100%;">বিজ্ঞাপন সংরক্ষণ করুন</button>
+    </div>
+
+    <div class="admin-tab-panel" id="tabPanel-helpdesk">
+      <div class="panel-card">
+        <div class="panel-title">📞 যোগাযোগের নাম্বার <small>মূল অ্যাপের লগইন পেজে "সাহায্য প্রয়োজন?" বাটনে দেখাবে</small></div>
+        <label class="ad-field-label">WhatsApp নাম্বার (দেশের কোডসহ, যেমন 8801XXXXXXXXX)</label>
+        <input type="text" id="hdWhatsappInput" class="ad-field-input" placeholder="8801XXXXXXXXX" />
+        <label class="ad-field-label">ফোন নাম্বার (ঐচ্ছিক)</label>
+        <input type="text" id="hdPhoneInput" class="ad-field-input" placeholder="01XXXXXXXXX" />
+        <button class="btn-primary" id="saveHelpDeskBtn" style="width:100%; margin-top:14px;">সংরক্ষণ করুন</button>
+      </div>
+
+      <div class="panel-card">
+        <div class="panel-title">🔓 ব্লক হওয়া ইউজার / পিন রিসেট <small>পুরনো পিন মুছে দিয়ে আনব্লক করে দেয় — ইউজার নিজেই "PIN ভুলে গিয়েছেন?" থেকে নতুন পিন বসাতে পারবে</small></div>
+        <div id="blockedUsersList"></div>
+      </div>
     </div>
 
     <div class="admin-tab-panel" id="tabPanel-users">
@@ -311,6 +332,7 @@
       document.querySelectorAll('.admin-tab-panel').forEach(p=> p.classList.toggle('active', p.id === 'tabPanel-'+target));
       if(target === 'log') loadActivityLog();
       if(target === 'ads') loadAdConfigForAdmin();
+      if(target === 'helpdesk'){ loadHelpDeskConfig(); renderBlockedUsersList(); }
     });
   });
 
@@ -328,7 +350,7 @@
     list.innerHTML = '<div style="color:var(--clr-ink-soft); font-size:12.5px;">লোড হচ্ছে...</div>';
     const { data, error } = await sb.rpc('rpc_admin_get_activity_log', { p_secret: adminSecret });
     if(error){ list.innerHTML = '<div style="color:var(--clr-ink-soft); font-size:12.5px;">লোড করা যায়নি</div>'; return; }
-    const labels = { block:'ব্লক করা হয়েছে', unblock:'আনব্লক করা হয়েছে', delete:'ডিলিট করা হয়েছে', set_plan:'প্ল্যান বদলানো হয়েছে', broadcast:'ঘোষণা', push_notification:'পুশ নোটিফিকেশন', ad_config:'বিজ্ঞাপন আপডেট' };
+    const labels = { block:'ব্লক করা হয়েছে', unblock:'আনব্লক করা হয়েছে', delete:'ডিলিট করা হয়েছে', set_plan:'প্ল্যান বদলানো হয়েছে', broadcast:'ঘোষণা', push_notification:'পুশ নোটিফিকেশন', ad_config:'বিজ্ঞাপন আপডেট', help_desk_config:'হেল্প ডেস্ক আপডেট', reset_pin:'পিন রিসেট + আনব্লক' };
     if(!data || data.length === 0){ list.innerHTML = '<div style="color:var(--clr-ink-soft); font-size:12.5px;">এখনো কোনো লগ নেই</div>'; return; }
     list.innerHTML = data.map(row=>{
       const dt = new Date(row.created_at);
@@ -492,6 +514,62 @@
     if(url){ img.src = url; img.style.display = ''; }
     else{ img.style.display = 'none'; }
   }
+  /* ================================================================ */
+  /* ================= CATEGORY: হেল্প ডেস্ক ============================ */
+  /* ================================================================ */
+  let helpDeskConfigLoaded = false;
+  async function loadHelpDeskConfig(){
+    if(helpDeskConfigLoaded) return;
+    const { data, error } = await sb.rpc('rpc_get_help_desk_config');
+    if(error) return;
+    const row = Array.isArray(data) ? data[0] : data;
+    if(!row) return;
+    document.getElementById('hdWhatsappInput').value = row.whatsapp_number || '';
+    document.getElementById('hdPhoneInput').value = row.phone_number || '';
+    helpDeskConfigLoaded = true;
+  }
+  document.getElementById('saveHelpDeskBtn').addEventListener('click', async ()=>{
+    const btn = document.getElementById('saveHelpDeskBtn');
+    btn.disabled = true;
+    const { error } = await sb.rpc('rpc_admin_save_help_desk_config', {
+      p_secret: adminSecret,
+      p_whatsapp_number: document.getElementById('hdWhatsappInput').value.trim() || null,
+      p_phone_number: document.getElementById('hdPhoneInput').value.trim() || null,
+    });
+    btn.disabled = false;
+    if(error){ alert('সংরক্ষণ করা যায়নি: ' + error.message); return; }
+    alert('সংরক্ষণ হয়েছে');
+    logAdminAction('help_desk_config', null, null);
+  });
+
+  function renderBlockedUsersList(){
+    const list = document.getElementById('blockedUsersList');
+    const blocked = allUsers.filter(u => u.blocked);
+    if(blocked.length === 0){ list.innerHTML = '<div style="color:var(--clr-ink-soft); font-size:12.5px;">এখন কোনো ইউজার ব্লক অবস্থায় নেই</div>'; return; }
+    list.innerHTML = blocked.map(u => `
+      <div class="blocked-user-row">
+        <div>
+          <div class="blocked-user-mobile">${u.mobile}</div>
+          <div class="blocked-user-date">যোগ দিয়েছে: ${u.created_at ? new Date(u.created_at).toLocaleDateString('bn-BD') : '—'}</div>
+        </div>
+        <button class="reset-pin-btn" data-mobile="${u.mobile}">পিন রিসেট + আনব্লক</button>
+      </div>`).join('');
+    list.querySelectorAll('.reset-pin-btn').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        const mobile = btn.dataset.mobile;
+        if(!confirm(`${mobile}-এর পুরনো পিন মুছে দিয়ে আনব্লক করতে চান? এই ইউজার এরপর "PIN ভুলে গিয়েছেন?" থেকে নতুন পিন বসাতে পারবে।`)) return;
+        btn.disabled = true;
+        const { error } = await sb.rpc('rpc_admin_reset_pin', { p_secret: adminSecret, p_mobile: mobile });
+        if(error){ alert('করা যায়নি: ' + error.message); btn.disabled = false; return; }
+        const user = allUsers.find(u=>u.mobile===mobile);
+        if(user) user.blocked = false;
+        logAdminAction('reset_pin', mobile, null);
+        alert('পিন রিসেট ও আনব্লক হয়েছে');
+        renderStats(); applyFiltersAndRender(); renderBlockedUsersList();
+      });
+    });
+  }
+
   async function loadAdConfigForAdmin(){
     if(adConfigLoaded) return; // একবার লোড হলেই যথেষ্ট — বারবার ট্যাব পাল্টালে ফর্মে যা টাইপ করছে তা মুছে যাবে না
     const { data, error } = await sb.rpc('rpc_get_ad_config');
