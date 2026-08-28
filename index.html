@@ -1728,10 +1728,11 @@
       <div class="ni-calc-row"><div class="ni-calc-row-label">পণ্যের নাম <span class="req">*</span></div><input type="text" class="ni-calc-input" id="stockNameInput" /></div>
       <div class="ni-calc-row">
         <div class="ni-calc-row-label">ক্যাটাগরি</div>
-        <select class="ni-calc-input" id="stockCategoryInput">
-          <option value="general">সাধারণ</option>
-          <option value="other">অন্যান্য</option>
-        </select>
+        <select class="ni-calc-input" id="stockCategoryInput"></select>
+      </div>
+      <div class="ni-calc-row">
+        <div class="ni-calc-row-label">একক/ইউনিট</div>
+        <select class="ni-calc-input" id="stockUnitInput"></select>
       </div>
       <div class="ni-calc-row"><div class="ni-calc-row-label">বর্তমান পরিমাণ <span class="req">*</span></div><input type="number" inputmode="numeric" class="ni-calc-input" id="stockQuantityInput" /></div>
       <div class="ni-calc-row"><div class="ni-calc-row-label">ক্রয় মূল্য (প্রতি ইউনিট)</div><input type="number" inputmode="decimal" class="ni-calc-input" id="stockPurchasePriceInput" /></div>
@@ -1740,6 +1741,26 @@
       <button class="ss-save-btn" id="stockProductSaveBtn" style="margin-top:16px;">সংরক্ষণ করুন</button>
       <button class="sheet-cancel" id="stockProductCancelBtn">বাতিল</button>
       <button class="sheet-delete-btn" id="stockProductDeleteBtn" style="display:none;">পণ্যটি মুছে ফেলুন</button>
+    </div>
+  </div>
+
+  <div class="sheet-overlay" id="stockNewCategorySheetOverlay">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title">নতুন ক্যাটাগরি যোগ করুন</div>
+      <div class="ni-calc-row"><div class="ni-calc-row-label">নাম <span class="req">*</span></div><input type="text" class="ni-calc-input" id="stockNewCategoryInput" placeholder="যেমনঃ ইলেকট্রনিক্স" /></div>
+      <button class="ss-save-btn" id="stockNewCategorySaveBtn" style="margin-top:16px;">সংরক্ষণ করুন</button>
+      <button class="sheet-cancel" id="stockNewCategoryCancelBtn">বাতিল</button>
+    </div>
+  </div>
+
+  <div class="sheet-overlay" id="stockNewUnitSheetOverlay">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title">নতুন একক/ইউনিট যোগ করুন</div>
+      <div class="ni-calc-row"><div class="ni-calc-row-label">নাম <span class="req">*</span></div><input type="text" class="ni-calc-input" id="stockNewUnitInput" placeholder="যেমনঃ লিটার, বক্স" /></div>
+      <button class="ss-save-btn" id="stockNewUnitSaveBtn" style="margin-top:16px;">সংরক্ষণ করুন</button>
+      <button class="sheet-cancel" id="stockNewUnitCancelBtn">বাতিল</button>
     </div>
   </div>
 
@@ -4276,11 +4297,36 @@
   document.getElementById('stockLowOnlyToggle').addEventListener('change', renderStockList);
   document.getElementById('addStockProductFab').addEventListener('click', ()=> openStockProductSheet(null));
 
+  function renderStockCategoryOptions(selected){
+    const sel = document.getElementById('stockCategoryInput');
+    const custom = meta.stockCategories || [];
+    const options = [
+      ...custom.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`),
+      `<option value="general">সাধারণ</option>`,
+      `<option value="other">অন্যান্য</option>`,
+      `<option value="__add_new__">+ ক্যাটাগরি যোগ করুন</option>`,
+    ];
+    sel.innerHTML = options.join('');
+    sel.value = selected && (custom.includes(selected) || selected==='general' || selected==='other') ? selected : 'general';
+  }
+  function renderStockUnitOptions(selected){
+    const sel = document.getElementById('stockUnitInput');
+    const custom = meta.stockUnits || [];
+    const options = [
+      `<option value="পিস">পিস</option>`,
+      `<option value="কেজি">কেজি</option>`,
+      ...custom.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`),
+      `<option value="__add_new__">+ ইউনিট যোগ করুন</option>`,
+    ];
+    sel.innerHTML = options.join('');
+    sel.value = selected && (selected==='পিস' || selected==='কেজি' || custom.includes(selected)) ? selected : 'পিস';
+  }
   function openStockProductSheet(product){
     stockEditingId = product ? product.id : null;
     document.getElementById('stockProductSheetTitle').textContent = product ? 'পণ্য এডিট করুন' : 'নতুন পণ্য যোগ করুন';
     document.getElementById('stockNameInput').value = product ? product.name : '';
-    document.getElementById('stockCategoryInput').value = product ? (product.category || 'general') : 'general';
+    renderStockCategoryOptions(product ? product.category : 'general');
+    renderStockUnitOptions(product ? product.unit : 'পিস');
     document.getElementById('stockQuantityInput').value = product ? product.quantity : '';
     document.getElementById('stockPurchasePriceInput').value = product ? (product.purchasePrice || '') : '';
     document.getElementById('stockSalePriceInput').value = product ? (product.salePrice || '') : '';
@@ -4300,6 +4346,7 @@
     const fields = {
       name,
       category: document.getElementById('stockCategoryInput').value,
+      unit: document.getElementById('stockUnitInput').value,
       quantity,
       purchasePrice: Number(document.getElementById('stockPurchasePriceInput').value) || 0,
       salePrice: Number(document.getElementById('stockSalePriceInput').value) || 0,
@@ -4326,6 +4373,53 @@
     await persistStockProducts();
     closeStockProductSheet();
     renderStockList();
+  });
+
+  // ================= কাস্টম ক্যাটাগরি/ইউনিট যোগ করা =================
+  document.getElementById('stockCategoryInput').addEventListener('change', (e)=>{
+    if(e.target.value === '__add_new__'){
+      document.getElementById('stockNewCategoryInput').value = '';
+      document.getElementById('stockNewCategorySheetOverlay').classList.add('show');
+    }
+  });
+  document.getElementById('stockNewCategoryCancelBtn').addEventListener('click', ()=>{
+    document.getElementById('stockNewCategorySheetOverlay').classList.remove('show');
+    renderStockCategoryOptions('general'); // "+ যোগ করুন"-এই আটকে না থেকে যায়
+  });
+  document.getElementById('stockNewCategorySheetOverlay').addEventListener('click', (e)=>{
+    if(e.target.id === 'stockNewCategorySheetOverlay') document.getElementById('stockNewCategoryCancelBtn').click();
+  });
+  document.getElementById('stockNewCategorySaveBtn').addEventListener('click', async ()=>{
+    const name = document.getElementById('stockNewCategoryInput').value.trim();
+    if(!name){ showToast('একটা নাম দিতে হবে', 'danger'); return; }
+    if(!meta.stockCategories) meta.stockCategories = [];
+    if(!meta.stockCategories.includes(name)) meta.stockCategories.unshift(name); // নতুনটা সবার উপরে
+    await persistMeta();
+    document.getElementById('stockNewCategorySheetOverlay').classList.remove('show');
+    renderStockCategoryOptions(name);
+  });
+
+  document.getElementById('stockUnitInput').addEventListener('change', (e)=>{
+    if(e.target.value === '__add_new__'){
+      document.getElementById('stockNewUnitInput').value = '';
+      document.getElementById('stockNewUnitSheetOverlay').classList.add('show');
+    }
+  });
+  document.getElementById('stockNewUnitCancelBtn').addEventListener('click', ()=>{
+    document.getElementById('stockNewUnitSheetOverlay').classList.remove('show');
+    renderStockUnitOptions('পিস');
+  });
+  document.getElementById('stockNewUnitSheetOverlay').addEventListener('click', (e)=>{
+    if(e.target.id === 'stockNewUnitSheetOverlay') document.getElementById('stockNewUnitCancelBtn').click();
+  });
+  document.getElementById('stockNewUnitSaveBtn').addEventListener('click', async ()=>{
+    const name = document.getElementById('stockNewUnitInput').value.trim();
+    if(!name){ showToast('একটা নাম দিতে হবে', 'danger'); return; }
+    if(!meta.stockUnits) meta.stockUnits = [];
+    if(!meta.stockUnits.includes(name)) meta.stockUnits.push(name);
+    await persistMeta();
+    document.getElementById('stockNewUnitSheetOverlay').classList.remove('show');
+    renderStockUnitOptions(name);
   });
 
   // ================= পণ্যে চাপ দিলে: বিক্রয় করুন / এডিট করুন =================
