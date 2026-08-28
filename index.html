@@ -1762,6 +1762,7 @@
         <select class="ni-calc-input" id="stockSellCategoryInput">
           <option value="installment">সহজ কিস্তি</option>
           <option value="general">সাধারণ বাকি</option>
+          <option value="quick">দ্রুত বিক্রয় (নগদ)</option>
         </select>
       </div>
       <div class="ni-calc-row"><div class="ni-calc-row-label">কী পরিমাণ বিক্রি হবে <span class="req">*</span></div><input type="number" inputmode="numeric" class="ni-calc-input" id="stockSellQuantityInput" value="1" min="1" /></div>
@@ -3417,7 +3418,7 @@
   function renderList(filter=""){
     const list = document.getElementById('customerList');
     const q = filter.trim().toLowerCase();
-    let filtered = customers.filter(c =>
+    let filtered = customers.filter(c => !c.hidden).filter(c =>
       c.name.toLowerCase().includes(q) ||
       (c.mobile && c.mobile.includes(q)) ||
       (c.id && c.id.toLowerCase().includes(q))
@@ -4367,8 +4368,9 @@
   document.getElementById('stockSellSheetOverlay').addEventListener('click', (e)=>{
     if(e.target.id === 'stockSellSheetOverlay') closeStockSellSheet();
   });
-  document.getElementById('stockSellConfirmBtn').addEventListener('click', ()=>{
+  document.getElementById('stockSellConfirmBtn').addEventListener('click', async ()=>{
     const quantity = Number(document.getElementById('stockSellQuantityInput').value);
+    const category = document.getElementById('stockSellCategoryInput').value;
     const warning = document.getElementById('stockSellQtyWarning');
     if(!quantity || quantity <= 0){ warning.textContent = 'সঠিক পরিমাণ দাও'; warning.style.display = 'block'; return; }
     if(quantity > stockSellProduct.quantity){
@@ -4376,16 +4378,53 @@
       warning.style.display = 'block';
       return;
     }
-    pendingStockSale = {
-      productId: stockSellProduct.id,
-      category: document.getElementById('stockSellCategoryInput').value,
-      quantity,
-    };
+    if(category === 'quick'){
+      if(!stockSellProduct.salePrice){
+        warning.textContent = 'দ্রুত বিক্রয়ের জন্য আগে এই পণ্যের বিক্রয় মূল্য বসাও (এডিট করে)';
+        warning.style.display = 'block';
+        return;
+      }
+      closeStockSellSheet();
+      await completeQuickCashSale(stockSellProduct, quantity);
+      renderStockList();
+      return;
+    }
+    pendingStockSale = { productId: stockSellProduct.id, category, quantity };
     closeStockSellSheet();
     closeStock();
     goHome();
     showToast(`এখন "${stockSellProduct.name}" কার কাছে বিক্রি হচ্ছে সেই কাস্টমার বেছে নাও (বা নতুন কাস্টমার যোগ করো)`);
   });
+  // ================= দ্রুত বিক্রয় (নগদ) — কোনো নির্দিষ্ট কাস্টমার লাগে না =========
+  // সব নগদ বিক্রয় একটা সংরক্ষিত, লুকানো (কাস্টমার তালিকায় দেখায় না)
+  // "নগদ বিক্রয়" নামের একক স্লটে জমা হয় — দিয়েছি আর নিয়েছি একই টাকায় দুটো
+  // আলাদা এন্ট্রি হিসেবে যোগ হয়, তাই কখনো বাকি থেকে যায় না অথচ ক্রয়-বিক্রয়/
+  // নেট প্রফিট/দৈনিক/ক্যাশ রিপোর্টে এমনিতেই ঠিকভাবে ধরা পড়ে (এগুলো সবই সব
+  // কাস্টমারের লেনদেন মিলিয়ে হিসাব করে, hidden ফ্ল্যাগ বাদ দেয় না)।
+  function getOrCreateCashSaleCustomer(){
+    let c = customers.find(cust => cust.id === 'CASHSALE');
+    if(!c){
+      c = { id: 'CASHSALE', name: 'নগদ বিক্রয়', mobile: '', type: 'customer', hidden: true, amount: 0, color: randomPastel(), initial: 'নগ', photo: null, transactions: [] };
+      customers.push(c);
+    }
+    return c;
+  }
+  async function completeQuickCashSale(product, quantity){
+    const amount = (product.salePrice || 0) * quantity;
+    const customer = getOrCreateCashSaleCustomer();
+    const { date, time } = nowDateTimeStrings();
+    const note = `পণ্য: ${product.name}${quantity > 1 ? ` (${bn(quantity)}টি)` : ''}`;
+    if(!customer.transactions) customer.transactions = [];
+    customer.transactions.push({ date, time, note, category: 'general', give: amount, take: 0 });
+    customer.transactions.push({ date, time, note, category: 'general', give: 0, take: amount });
+    recomputeCustomerTotals(customer);
+    await persistCustomersAndMeta();
+
+    product.quantity = Math.max(0, (product.quantity||0) - quantity);
+    await persistStockProducts();
+
+    showToast(`✅ দ্রুত বিক্রয় সম্পন্ন — ${bn(amount)} টাকা`);
+  }
   // বিক্রয়-ফর্মে প্রয়োজনীয় তথ্য আগে থেকে বসিয়ে দেয় — পণ্যের নাম, দাম
   // (পরিমাণ দিয়ে গুণ করে)। শুধু প্রথমবার ফর্ম খোলার সময়ই বসে, পরে ইউজার
   // চাইলে বদলে নিতে পারে।
