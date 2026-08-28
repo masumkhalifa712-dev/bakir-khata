@@ -4390,6 +4390,27 @@
     }
     pendingStockSale = null;
   }
+  // ধাপ ৩ — কেউ যদি স্টক পেজ দিয়ে না গিয়ে সরাসরি "নতুন সহজ কিস্তি" ফর্ম
+  // থেকেই একটা পণ্য বিক্রি করে ফেলে, তাহলেও সেই পণ্যটা স্বয়ংক্রিয়ভাবে
+  // স্টকের হিসাবে "অন্যান্য" ক্যাটাগরিতে ধরা পড়বে — নাম মিলিয়ে আগে থেকে
+  // থাকা পণ্য পাওয়া গেলে সেটার দামই হালনাগাদ হয়, না পেলে নতুন তৈরি হয়।
+  // যেহেতু একই মুহূর্তে "যোগ" আর "বিক্রি" দুটোই ঘটছে, নিট পরিমাণ ০-ই থাকে
+  // (স্টক-পেজ দিয়ে বিক্রি করলে যেমন হতো, ঠিক তেমনই ফলাফল)।
+  async function autoCaptureInstallmentProductToStock(productName, purchasePrice, salePrice){
+    if(!productName) return;
+    const existing = stockProducts.find(p => p.category === 'other' && p.name.toLowerCase() === productName.toLowerCase());
+    if(existing){
+      if(purchasePrice) existing.purchasePrice = purchasePrice;
+      if(salePrice) existing.salePrice = salePrice;
+    }else{
+      const { id, serial } = generateStockId();
+      stockProducts.push({
+        id, serial, name: productName, category: 'other', quantity: 0,
+        purchasePrice: purchasePrice || 0, salePrice: salePrice || 0, minAlert: null, history: [],
+      });
+    }
+    await persistStockProducts();
+  }
 
   function goToAppAccess(){
     renderEmployeeList();
@@ -6367,7 +6388,11 @@
     renderCustomerDetail(currentCustomer);
     renderList(document.getElementById('searchInput').value);
     if(isNewEntry){
-      if(pendingStockSale && pendingStockSale.category === 'installment') await applyPendingStockSale();
+      if(pendingStockSale && pendingStockSale.category === 'installment'){
+        await applyPendingStockSale();
+      }else{
+        await autoCaptureInstallmentProductToStock(productName, purchasePrice, salePrice);
+      }
       offerTxSms('installment', currentCustomer, remaining, currentCustomer.amount, { perInstallment, count }, closeNewInstallment, 'niSmsToggle');
     }else{
       closeNewInstallment();
