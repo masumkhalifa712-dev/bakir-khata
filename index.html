@@ -646,6 +646,10 @@
   .dr-net-label{ font-size:12.5px; font-weight:700; color:rgba(255,255,255,.75); }
   .dr-net-amount{ font-size:24px; font-weight:800; color:#fff; font-family:var(--font-display); margin-top:6px; }
   .dr-net-note{ font-size:10.5px; color:rgba(255,255,255,.55); margin-top:6px; }
+  .stats-row{ display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; }
+  .stat-card{ background:var(--clr-card); border-radius:12px; padding:11px 8px; text-align:center; box-shadow:0 1px 4px rgba(0,0,0,.04); }
+  .stat-label{ font-size:10px; font-weight:600; color:var(--clr-ink-soft); margin-bottom:4px; }
+  .stat-value{ font-size:15px; font-weight:800; color:var(--clr-ink); font-family:var(--font-display); }
   .fab:active{transform:scale(.9);}
   .fab svg{width:24px;height:24px;}
 
@@ -1365,7 +1369,10 @@
           <span>ডাটা ব্যাকআপ</span>
         </button>
         <button class="quick-action" data-action="stock">
-          <span class="qa-icon" style="color:var(--clr-primary);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8z"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg></span>
+          <span class="qa-icon" style="color:var(--clr-primary); position:relative;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8z"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg>
+            <span class="qa-badge" id="stockLowBadge" style="display:none;">0</span>
+          </span>
           <span>স্টকের হিসাব</span>
         </button>
         <button class="quick-action" data-action="appaccess">
@@ -1698,7 +1705,15 @@
       <div class="cd-title">স্টকের হিসাব</div>
     </div>
     <div style="padding:14px 16px 90px;">
-      <input type="text" class="ni-calc-input" id="stockSearchInput" placeholder="পণ্য খুঁজুন" style="width:100%; max-width:100%; box-sizing:border-box; margin-bottom:14px;" />
+      <div class="stats-row" style="margin-bottom:14px;">
+        <div class="stat-card"><div class="stat-label">মোট পণ্য</div><div class="stat-value" id="stockStatTotalProducts">০</div></div>
+        <div class="stat-card"><div class="stat-label">স্টকের মোট মূল্য</div><div class="stat-value" id="stockStatTotalValue">০</div></div>
+        <div class="stat-card"><div class="stat-label">কম স্টকে আছে</div><div class="stat-value" id="stockStatLowCount" style="color:var(--clr-primary);">০</div></div>
+      </div>
+      <div class="panel-row" style="display:flex; align-items:center; gap:8px; margin-bottom:14px;">
+        <input type="text" class="ni-calc-input" id="stockSearchInput" placeholder="পণ্য খুঁজুন" style="width:100%; max-width:100%; box-sizing:border-box; flex:1;" />
+        <label style="white-space:nowrap; font-size:11.5px; font-weight:600; color:var(--clr-ink-soft); display:flex; align-items:center; gap:5px;"><input type="checkbox" id="stockLowOnlyToggle" /> শুধু কম স্টক</label>
+      </div>
       <div id="stockProductList"></div>
     </div>
     <button class="exp-fab" id="addStockProductFab" aria-label="নতুন পণ্য">
@@ -3227,7 +3242,7 @@
     }
   }
   async function persistCashChecks(){ await saveUserDataRpc({ cash_checks: cashChecks }); }
-  async function persistStockProducts(){ await saveUserDataRpc({ stock_products: stockProducts }); }
+  async function persistStockProducts(){ await saveUserDataRpc({ stock_products: stockProducts }); updateStockLowBadge(); }
   async function persistExpenses(){ await saveUserDataRpc({ expenses }); }
   async function persistShopInfo(){ await saveUserDataRpc({ shop_info: shopInfo }); }
   async function persistCustomers(){ await saveUserDataRpc({ customers }); }
@@ -4214,16 +4229,27 @@
     const max = stockProducts.reduce((m,p)=> Math.max(m, p.serial||0), 0);
     return { id: 'P' + String(max+1).padStart(3,'0'), serial: max+1 };
   }
+  function isProductLow(p){ return p.minAlert != null && p.quantity <= p.minAlert; }
   function renderStockList(){
     const q = document.getElementById('stockSearchInput').value.trim().toLowerCase();
+    const lowOnly = document.getElementById('stockLowOnlyToggle').checked;
     const list = document.getElementById('stockProductList');
-    const filtered = stockProducts.filter(p => !q || (p.name||'').toLowerCase().includes(q));
+    let filtered = stockProducts.filter(p => !q || (p.name||'').toLowerCase().includes(q));
+    if(lowOnly) filtered = filtered.filter(isProductLow);
+
+    // সারাংশ — সবসময় খোঁজা/ফিল্টারের বাইরে গিয়ে সব পণ্য মিলিয়ে হিসাব হয়
+    const totalValue = stockProducts.reduce((s,p)=> s + (p.quantity||0) * (p.purchasePrice||0), 0);
+    const lowCount = stockProducts.filter(isProductLow).length;
+    document.getElementById('stockStatTotalProducts').textContent = bn(stockProducts.length);
+    document.getElementById('stockStatTotalValue').textContent = bn(Math.round(totalValue));
+    document.getElementById('stockStatLowCount').textContent = bn(lowCount);
+
     if(filtered.length === 0){
-      list.innerHTML = '<div class="gr-empty">এখনো কোনো পণ্য যোগ করা হয়নি</div>';
+      list.innerHTML = `<div class="gr-empty">${lowOnly ? 'কম স্টকে কোনো পণ্য নেই' : 'এখনো কোনো পণ্য যোগ করা হয়নি'}</div>`;
       return;
     }
     list.innerHTML = filtered.map(p => {
-      const isLow = p.minAlert != null && p.quantity <= p.minAlert;
+      const isLow = isProductLow(p);
       return `<div class="emp-row" data-id="${p.id}" style="cursor:pointer;">
         <div>
           <div class="emp-row-name">${escapeHtml(p.name)}</div>
@@ -4239,7 +4265,14 @@
       row.addEventListener('click', ()=> openStockActionSheet(stockProducts.find(p=>p.id===row.dataset.id)));
     });
   }
+  function updateStockLowBadge(){
+    const badge = document.getElementById('stockLowBadge');
+    const lowCount = stockProducts.filter(isProductLow).length;
+    if(lowCount > 0){ badge.textContent = bn(lowCount); badge.style.display = 'flex'; }
+    else{ badge.style.display = 'none'; }
+  }
   document.getElementById('stockSearchInput').addEventListener('input', renderStockList);
+  document.getElementById('stockLowOnlyToggle').addEventListener('change', renderStockList);
   document.getElementById('addStockProductFab').addEventListener('click', ()=> openStockProductSheet(null));
 
   function openStockProductSheet(product){
@@ -7183,6 +7216,7 @@
     if(pushNotificationsSupported()){ updatePushMenuLabel(); maybeShowPushPrompt(); }
     updatePendingEntriesBadge();
     await loadCustomers();
+    updateStockLowBadge();
     checkBroadcastNotice();
     loadAdConfig();
     // Applied WHILE still hidden behind the logo screen, so whatever page
