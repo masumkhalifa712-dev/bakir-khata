@@ -187,6 +187,8 @@
   #app.show-dailyreport #screen-dailyReport{ transform:translateX(0); }
   #screen-netProfitReport{ transform:translateX(100%); z-index:3; }
   #app.show-netprofitreport #screen-netProfitReport{ transform:translateX(0); }
+  #screen-stock{ transform:translateX(100%); z-index:2; }
+  #app.show-stock #screen-stock{ transform:translateX(0); }
   #screen-appAccess{ transform:translateX(100%); z-index:2; }
   #app.show-appaccess #screen-appAccess{ transform:translateX(0); }
   #screen-pendingEntries{ transform:translateX(100%); z-index:3; }
@@ -255,6 +257,7 @@
   #app.show-collectionreport .fab, #app.show-collectionreport .bottom-nav,
   #app.show-dailyreport .fab, #app.show-dailyreport .bottom-nav,
   #app.show-netprofitreport .fab, #app.show-netprofitreport .bottom-nav,
+  #app.show-stock .fab, #app.show-stock .bottom-nav,
   #app.show-appaccess .fab, #app.show-appaccess .bottom-nav,
   #app.show-pendingentries .fab, #app.show-pendingentries .bottom-nav,
   #app.show-themesettings .fab, #app.show-themesettings .bottom-nav,
@@ -1001,6 +1004,7 @@
   .sheet-option .so-icon{ width:40px;height:40px; border-radius:12px; background:var(--clr-bg); display:flex;align-items:center;justify-content:center; flex-shrink:0; }
   .sheet-option .so-icon svg{width:19px;height:19px; color:var(--clr-primary);}
   .sheet-cancel{ width:100%; margin-top:8px; padding:14px; border:none; border-radius:12px; background:var(--clr-bg); font-size:15px; font-weight:700; color:var(--clr-ink-soft); cursor:pointer; }
+  .sheet-delete-btn{ width:100%; margin-top:8px; padding:14px; border:none; border-radius:12px; background:none; font-size:14px; font-weight:700; color:var(--clr-primary); cursor:pointer; font-family:inherit; }
 
   /* ================= CATEGORY: Give-Type Selection Sheet ================= */
   .give-type-sheet-header{ display:flex; justify-content:space-between; align-items:flex-start; gap:12px; padding:4px 4px 18px; }
@@ -1360,9 +1364,9 @@
           <span class="qa-icon" style="color:#2E9E5B;"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg></span>
           <span>ডাটা ব্যাকআপ</span>
         </button>
-        <button class="quick-action" data-action="bulk-sms">
-          <span class="qa-icon" style="color:var(--clr-primary);"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM8 15H6v-2h2v2zm0-3H6V9.99h2V12zm0-3.01H6V7h2v1.99zM18 15h-8v-2h8v2zm0-3h-8V9.99h8V12zm0-3.01h-8V7h8v1.99z"/></svg></span>
-          <span>টালি-মেসেজ</span>
+        <button class="quick-action" data-action="stock">
+          <span class="qa-icon" style="color:var(--clr-primary);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8z"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg></span>
+          <span>স্টকের হিসাব</span>
         </button>
         <button class="quick-action" data-action="appaccess">
           <span class="qa-icon" style="color:#D18B1D; position:relative;">
@@ -1683,6 +1687,72 @@
       <button class="ss-save-btn" id="expSaveBtn">সংরক্ষণ করুন</button>
       <button class="ss-save-btn" id="expDeleteBtn" style="display:none; background:transparent; color:var(--clr-primary); border:1.4px solid var(--clr-primary); margin-top:8px;">মুছে ফেলুন</button>
       <button class="sheet-cancel" id="expCancelBtn">বাতিল</button>
+    </div>
+  </div>
+
+  <section class="screen" id="screen-stock">
+    <div class="cd-topbar">
+      <button class="cd-back" id="stockBackBtn" aria-label="ফিরে যান">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      </button>
+      <div class="cd-title">স্টকের হিসাব</div>
+    </div>
+    <div style="padding:14px 16px 90px;">
+      <input type="text" class="ni-calc-input" id="stockSearchInput" placeholder="পণ্য খুঁজুন" style="width:100%; max-width:100%; box-sizing:border-box; margin-bottom:14px;" />
+      <div id="stockProductList"></div>
+    </div>
+    <button class="exp-fab" id="addStockProductFab" aria-label="নতুন পণ্য">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </button>
+  </section>
+
+  <div class="sheet-overlay" id="stockProductSheetOverlay">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title" id="stockProductSheetTitle">নতুন পণ্য যোগ করুন</div>
+      <div class="ni-calc-row"><div class="ni-calc-row-label">পণ্যের নাম <span class="req">*</span></div><input type="text" class="ni-calc-input" id="stockNameInput" /></div>
+      <div class="ni-calc-row">
+        <div class="ni-calc-row-label">ক্যাটাগরি</div>
+        <select class="ni-calc-input" id="stockCategoryInput">
+          <option value="general">সাধারণ</option>
+          <option value="other">অন্যান্য</option>
+        </select>
+      </div>
+      <div class="ni-calc-row"><div class="ni-calc-row-label">বর্তমান পরিমাণ <span class="req">*</span></div><input type="number" inputmode="numeric" class="ni-calc-input" id="stockQuantityInput" /></div>
+      <div class="ni-calc-row"><div class="ni-calc-row-label">ক্রয় মূল্য (প্রতি ইউনিট)</div><input type="number" inputmode="decimal" class="ni-calc-input" id="stockPurchasePriceInput" /></div>
+      <div class="ni-calc-row"><div class="ni-calc-row-label">বিক্রয় মূল্য (প্রতি ইউনিট)</div><input type="number" inputmode="decimal" class="ni-calc-input" id="stockSalePriceInput" /></div>
+      <div class="ni-calc-row"><div class="ni-calc-row-label">কম-স্টক সতর্কতা</div><input type="number" inputmode="numeric" class="ni-calc-input" id="stockMinAlertInput" placeholder="ঐচ্ছিক" /></div>
+      <button class="ss-save-btn" id="stockProductSaveBtn" style="margin-top:16px;">সংরক্ষণ করুন</button>
+      <button class="sheet-cancel" id="stockProductCancelBtn">বাতিল</button>
+      <button class="sheet-delete-btn" id="stockProductDeleteBtn" style="display:none;">পণ্যটি মুছে ফেলুন</button>
+    </div>
+  </div>
+
+  <div class="sheet-overlay" id="stockActionSheetOverlay">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title" id="stockActionSheetTitle">পণ্যের নাম</div>
+      <button class="ss-save-btn" id="stockActionSellBtn" style="margin-top:6px;">বিক্রয় করুন</button>
+      <button class="sheet-cancel" id="stockActionEditBtn">এডিট করুন</button>
+      <button class="sheet-cancel" id="stockActionCancelBtn">বাতিল</button>
+    </div>
+  </div>
+
+  <div class="sheet-overlay" id="stockSellSheetOverlay">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title" id="stockSellSheetTitle">বিক্রয় করুন</div>
+      <div class="ni-calc-row">
+        <div class="ni-calc-row-label">কীভাবে বিক্রি হবে</div>
+        <select class="ni-calc-input" id="stockSellCategoryInput">
+          <option value="installment">সহজ কিস্তি</option>
+          <option value="general">সাধারণ বাকি</option>
+        </select>
+      </div>
+      <div class="ni-calc-row"><div class="ni-calc-row-label">কী পরিমাণ বিক্রি হবে <span class="req">*</span></div><input type="number" inputmode="numeric" class="ni-calc-input" id="stockSellQuantityInput" value="1" min="1" /></div>
+      <div id="stockSellQtyWarning" style="display:none; color:var(--clr-primary); font-size:12px; font-weight:700; margin:6px 0 0; text-align:center;"></div>
+      <button class="ss-save-btn" id="stockSellConfirmBtn" style="margin-top:16px;">এগিয়ে যান</button>
+      <button class="sheet-cancel" id="stockSellCancelBtn">বাতিল</button>
     </div>
   </div>
 
@@ -3058,6 +3128,7 @@
   let shopInfo = { name: '', ownerName: '', shopType: '', address: '', businessMode: 'both' };
   let expenses = [];
   let cashChecks = [];
+  let stockProducts = [];
   // ========================================
   // Supabase/RPC ডেটা লোড ও সেভ
   // ========================================
@@ -3083,6 +3154,7 @@
         if(!shopInfo.businessMode) shopInfo.businessMode = 'both';
         expenses = row.expenses || [];
         cashChecks = row.cash_checks || [];
+        stockProducts = row.stock_products || [];
       }else{
         customers = DEFAULT_CUSTOMERS;
         meta = { nextSerial: 1 };
@@ -3145,6 +3217,7 @@
         p_shop_info: fields.shop_info !== undefined ? fields.shop_info : null,
         p_expenses: fields.expenses !== undefined ? fields.expenses : null,
         p_cash_checks: fields.cash_checks !== undefined ? fields.cash_checks : null,
+        p_stock_products: fields.stock_products !== undefined ? fields.stock_products : null,
       });
       if(error) throw error;
       if(fields.customers !== undefined) updateGroupReminderBadge();
@@ -3154,6 +3227,7 @@
     }
   }
   async function persistCashChecks(){ await saveUserDataRpc({ cash_checks: cashChecks }); }
+  async function persistStockProducts(){ await saveUserDataRpc({ stock_products: stockProducts }); }
   async function persistExpenses(){ await saveUserDataRpc({ expenses }); }
   async function persistShopInfo(){ await saveUserDataRpc({ shop_info: shopInfo }); }
   async function persistCustomers(){ await saveUserDataRpc({ customers }); }
@@ -3511,6 +3585,7 @@
     btn.addEventListener('click', ()=>{
       if(btn.dataset.action === 'reminder'){ goToGroupReminder(); return; }
       if(btn.dataset.action === 'appaccess'){ goToAppAccess(); return; }
+      if(btn.dataset.action === 'stock'){ goToStock(); return; }
       showToast(btn.querySelector('span:last-child').textContent + " (শীঘ্রই আসছে)");
     });
   });
@@ -3582,7 +3657,7 @@
     try{ sessionStorage.setItem('lastScreen', JSON.stringify({ screen: name, customerId: currentCustomer ? currentCustomer.id : null })); }catch(e){}
   }
   function goToAddCustomer(){ appEl.classList.add('show-add'); pushAppState('add'); }
-  function goHome(){ appEl.classList.remove('show-add'); appEl.classList.remove('show-detail'); appEl.classList.remove('show-newdue'); appEl.classList.remove('show-txdetail'); appEl.classList.remove('show-customeredit'); appEl.classList.remove('show-newinstallment'); appEl.classList.remove('show-collectinstallment'); appEl.classList.remove('show-report'); appEl.classList.remove('show-shopsettings'); appEl.classList.remove('show-appsettings'); appEl.classList.remove('show-purchasehistory'); appEl.classList.remove('show-groupreminder'); appEl.classList.remove('show-installmentsummary'); appEl.classList.remove('show-installmentdetail'); appEl.classList.remove('show-expenses'); appEl.classList.remove('show-reportshub'); appEl.classList.remove('show-collectionreport'); appEl.classList.remove('show-dailyreport'); appEl.classList.remove('show-netprofitreport'); appEl.classList.remove('show-cashreport'); appEl.classList.remove('show-themesettings'); appEl.classList.remove('show-appaccess'); appEl.classList.remove('show-pendingentries'); resetAddForm(); try{ sessionStorage.removeItem('lastScreen'); }catch(e){} }
+  function goHome(){ appEl.classList.remove('show-add'); appEl.classList.remove('show-detail'); appEl.classList.remove('show-newdue'); appEl.classList.remove('show-txdetail'); appEl.classList.remove('show-customeredit'); appEl.classList.remove('show-newinstallment'); appEl.classList.remove('show-collectinstallment'); appEl.classList.remove('show-report'); appEl.classList.remove('show-shopsettings'); appEl.classList.remove('show-appsettings'); appEl.classList.remove('show-purchasehistory'); appEl.classList.remove('show-groupreminder'); appEl.classList.remove('show-installmentsummary'); appEl.classList.remove('show-installmentdetail'); appEl.classList.remove('show-expenses'); appEl.classList.remove('show-reportshub'); appEl.classList.remove('show-collectionreport'); appEl.classList.remove('show-dailyreport'); appEl.classList.remove('show-netprofitreport'); appEl.classList.remove('show-cashreport'); appEl.classList.remove('show-themesettings'); appEl.classList.remove('show-appaccess'); appEl.classList.remove('show-pendingentries'); appEl.classList.remove('show-stock'); resetAddForm(); try{ sessionStorage.removeItem('lastScreen'); }catch(e){} }
 
   /* ================================================================ */
   /* ================= CATEGORY: Side Menu Drawer ===================== */
@@ -4124,6 +4199,198 @@
   /* ================================================================ */
   /* ================= CATEGORY: অ্যাপ এক্সেস (কর্মচারী প্রোফাইল) ========= */
   /* ================================================================ */
+  /* ================================================================ */
+  /* ================= CATEGORY: স্টকের হিসাব ============================ */
+  /* ================================================================ */
+  let stockEditingId = null;
+  function goToStock(){
+    renderStockList();
+    appEl.classList.add('show-stock');
+    pushAppState('stock');
+  }
+  function closeStock(){ appEl.classList.remove('show-stock'); }
+  document.getElementById('stockBackBtn').addEventListener('click', ()=> history.back());
+  function generateStockId(){
+    const max = stockProducts.reduce((m,p)=> Math.max(m, p.serial||0), 0);
+    return { id: 'P' + String(max+1).padStart(3,'0'), serial: max+1 };
+  }
+  function renderStockList(){
+    const q = document.getElementById('stockSearchInput').value.trim().toLowerCase();
+    const list = document.getElementById('stockProductList');
+    const filtered = stockProducts.filter(p => !q || (p.name||'').toLowerCase().includes(q));
+    if(filtered.length === 0){
+      list.innerHTML = '<div class="gr-empty">এখনো কোনো পণ্য যোগ করা হয়নি</div>';
+      return;
+    }
+    list.innerHTML = filtered.map(p => {
+      const isLow = p.minAlert != null && p.quantity <= p.minAlert;
+      return `<div class="emp-row" data-id="${p.id}" style="cursor:pointer;">
+        <div>
+          <div class="emp-row-name">${escapeHtml(p.name)}</div>
+          <div class="emp-row-mobile">ক্রয় মূল্য: ${bn(p.purchasePrice||0)} টাকা/ইউনিট</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:15px; font-weight:800; color:${isLow ? 'var(--clr-primary)' : 'var(--clr-ink)'};">${bn(p.quantity||0)}</div>
+          ${isLow ? '<div style="font-size:10px; font-weight:700; color:var(--clr-primary);">কম স্টক!</div>' : ''}
+        </div>
+      </div>`;
+    }).join('');
+    list.querySelectorAll('.emp-row').forEach(row=>{
+      row.addEventListener('click', ()=> openStockActionSheet(stockProducts.find(p=>p.id===row.dataset.id)));
+    });
+  }
+  document.getElementById('stockSearchInput').addEventListener('input', renderStockList);
+  document.getElementById('addStockProductFab').addEventListener('click', ()=> openStockProductSheet(null));
+
+  function openStockProductSheet(product){
+    stockEditingId = product ? product.id : null;
+    document.getElementById('stockProductSheetTitle').textContent = product ? 'পণ্য এডিট করুন' : 'নতুন পণ্য যোগ করুন';
+    document.getElementById('stockNameInput').value = product ? product.name : '';
+    document.getElementById('stockCategoryInput').value = product ? (product.category || 'general') : 'general';
+    document.getElementById('stockQuantityInput').value = product ? product.quantity : '';
+    document.getElementById('stockPurchasePriceInput').value = product ? (product.purchasePrice || '') : '';
+    document.getElementById('stockSalePriceInput').value = product ? (product.salePrice || '') : '';
+    document.getElementById('stockMinAlertInput').value = product && product.minAlert != null ? product.minAlert : '';
+    document.getElementById('stockProductDeleteBtn').style.display = product ? '' : 'none';
+    document.getElementById('stockProductSheetOverlay').classList.add('show');
+  }
+  function closeStockProductSheet(){ document.getElementById('stockProductSheetOverlay').classList.remove('show'); }
+  document.getElementById('stockProductCancelBtn').addEventListener('click', closeStockProductSheet);
+  document.getElementById('stockProductSheetOverlay').addEventListener('click', (e)=>{
+    if(e.target.id === 'stockProductSheetOverlay') closeStockProductSheet();
+  });
+  document.getElementById('stockProductSaveBtn').addEventListener('click', async ()=>{
+    const name = document.getElementById('stockNameInput').value.trim();
+    const quantity = Number(document.getElementById('stockQuantityInput').value);
+    if(!name || isNaN(quantity)){ showToast('পণ্যের নাম আর পরিমাণ দিতে হবে', 'danger'); return; }
+    const fields = {
+      name,
+      category: document.getElementById('stockCategoryInput').value,
+      quantity,
+      purchasePrice: Number(document.getElementById('stockPurchasePriceInput').value) || 0,
+      salePrice: Number(document.getElementById('stockSalePriceInput').value) || 0,
+      minAlert: document.getElementById('stockMinAlertInput').value !== '' ? Number(document.getElementById('stockMinAlertInput').value) : null,
+    };
+    const btn = document.getElementById('stockProductSaveBtn');
+    btn.disabled = true;
+    if(stockEditingId){
+      const existing = stockProducts.find(p=>p.id === stockEditingId);
+      Object.assign(existing, fields);
+    }else{
+      const { id, serial } = generateStockId();
+      stockProducts.push({ id, serial, ...fields, history: [] });
+    }
+    await persistStockProducts();
+    btn.disabled = false;
+    closeStockProductSheet();
+    renderStockList();
+  });
+  document.getElementById('stockProductDeleteBtn').addEventListener('click', async ()=>{
+    if(!stockEditingId) return;
+    if(!confirm('এই পণ্যটি মুছে ফেলতে চান?')) return;
+    stockProducts = stockProducts.filter(p => p.id !== stockEditingId);
+    await persistStockProducts();
+    closeStockProductSheet();
+    renderStockList();
+  });
+
+  // ================= পণ্যে চাপ দিলে: বিক্রয় করুন / এডিট করুন =================
+  let stockActionProduct = null;
+  function openStockActionSheet(product){
+    stockActionProduct = product;
+    document.getElementById('stockActionSheetTitle').textContent = product.name;
+    document.getElementById('stockActionSheetOverlay').classList.add('show');
+  }
+  function closeStockActionSheet(){ document.getElementById('stockActionSheetOverlay').classList.remove('show'); }
+  document.getElementById('stockActionCancelBtn').addEventListener('click', closeStockActionSheet);
+  document.getElementById('stockActionSheetOverlay').addEventListener('click', (e)=>{
+    if(e.target.id === 'stockActionSheetOverlay') closeStockActionSheet();
+  });
+  document.getElementById('stockActionEditBtn').addEventListener('click', ()=>{
+    closeStockActionSheet();
+    openStockProductSheet(stockActionProduct);
+  });
+  document.getElementById('stockActionSellBtn').addEventListener('click', ()=>{
+    closeStockActionSheet();
+    openStockSellSheet(stockActionProduct);
+  });
+
+  // ================= বিক্রয় করুন: ক্যাটাগরি + পরিমাণ বেছে নেওয়া =================
+  // এখানে বেছে নেওয়ার পরপরই স্টক কমে না — শুধু pendingStockSale-এ জমা
+  // থাকে; আসল বিক্রয়-ফর্ম (নতুন বাকি/নতুন সহজ কিস্তি) সফলভাবে সেভ হলে
+  // তবেই স্টক কমবে (ধাপ ২-এর মূল শর্ত — মাঝপথে থেমে গেলে স্টক অপরিবর্তিত থাকে)।
+  let pendingStockSale = null;
+  let stockSellProduct = null;
+  function openStockSellSheet(product){
+    stockSellProduct = product;
+    document.getElementById('stockSellSheetTitle').textContent = `বিক্রয় করুন — ${product.name}`;
+    document.getElementById('stockSellCategoryInput').value = 'installment';
+    document.getElementById('stockSellQuantityInput').value = 1;
+    document.getElementById('stockSellQtyWarning').style.display = 'none';
+    document.getElementById('stockSellSheetOverlay').classList.add('show');
+  }
+  function closeStockSellSheet(){ document.getElementById('stockSellSheetOverlay').classList.remove('show'); }
+  document.getElementById('stockSellCancelBtn').addEventListener('click', closeStockSellSheet);
+  document.getElementById('stockSellSheetOverlay').addEventListener('click', (e)=>{
+    if(e.target.id === 'stockSellSheetOverlay') closeStockSellSheet();
+  });
+  document.getElementById('stockSellConfirmBtn').addEventListener('click', ()=>{
+    const quantity = Number(document.getElementById('stockSellQuantityInput').value);
+    const warning = document.getElementById('stockSellQtyWarning');
+    if(!quantity || quantity <= 0){ warning.textContent = 'সঠিক পরিমাণ দাও'; warning.style.display = 'block'; return; }
+    if(quantity > stockSellProduct.quantity){
+      warning.textContent = `স্টকে আছে মাত্র ${bn(stockSellProduct.quantity)}টি`;
+      warning.style.display = 'block';
+      return;
+    }
+    pendingStockSale = {
+      productId: stockSellProduct.id,
+      category: document.getElementById('stockSellCategoryInput').value,
+      quantity,
+    };
+    closeStockSellSheet();
+    closeStock();
+    goHome();
+    showToast(`এখন "${stockSellProduct.name}" কার কাছে বিক্রি হচ্ছে সেই কাস্টমার বেছে নাও (বা নতুন কাস্টমার যোগ করো)`);
+  });
+  // বিক্রয়-ফর্মে প্রয়োজনীয় তথ্য আগে থেকে বসিয়ে দেয় — পণ্যের নাম, দাম
+  // (পরিমাণ দিয়ে গুণ করে)। শুধু প্রথমবার ফর্ম খোলার সময়ই বসে, পরে ইউজার
+  // চাইলে বদলে নিতে পারে।
+  function prefillStockSaleIntoForm(){
+    if(!pendingStockSale) return;
+    const product = stockProducts.find(p => p.id === pendingStockSale.productId);
+    if(!product) { pendingStockSale = null; return; }
+    const qty = pendingStockSale.quantity;
+    if(pendingStockSale.category === 'installment'){
+      document.getElementById('niProductNameInput').value = product.name + (qty > 1 ? ` (${bn(qty)}টি)` : '');
+      if(product.salePrice){
+        document.getElementById('niSalePriceInput').value = product.salePrice * qty;
+      }
+      if(product.purchasePrice){
+        document.getElementById('niPurchasePriceInput').value = product.purchasePrice * qty;
+        document.getElementById('niPurchaseToggle').classList.add('on');
+        document.getElementById('niPurchasePriceInput').style.display = '';
+      }
+      recalcInstallmentPlan();
+    }else{
+      document.getElementById('ndNoteInput').value = `পণ্য: ${product.name}${qty > 1 ? ` (${bn(qty)}টি)` : ''}`;
+      if(product.salePrice){
+        document.getElementById('ndAmountInput').value = product.salePrice * qty;
+      }
+    }
+  }
+  // বিক্রয় সফলভাবে সেভ হওয়ার পরে ডাকা হয় — তখনই আসলে স্টক কমে
+  async function applyPendingStockSale(){
+    if(!pendingStockSale) return;
+    const product = stockProducts.find(p => p.id === pendingStockSale.productId);
+    if(product){
+      product.quantity = Math.max(0, (product.quantity||0) - pendingStockSale.quantity);
+      await persistStockProducts();
+      showToast(`স্টক থেকে ${bn(pendingStockSale.quantity)}টি বিক্রি হিসেবে বাদ পড়েছে`);
+    }
+    pendingStockSale = null;
+  }
+
   function goToAppAccess(){
     renderEmployeeList();
     updatePendingEntriesBadge();
@@ -5009,7 +5276,26 @@
   // ========================================
   // ক্রেতার প্রোফাইল ও লেনদেন বিবরণ
   // ========================================
-  function goToCustomerDetail(customer){ renderCustomerDetail(customer); appEl.classList.add('show-detail'); pushAppState('detail'); }
+  function goToCustomerDetail(customer){
+    renderCustomerDetail(customer);
+    appEl.classList.add('show-detail');
+    pushAppState('detail');
+    if(pendingStockSale){
+      // স্টক পেজ থেকে বিক্রয় শুরু হয়েছিল — কাস্টমার বেছে নেওয়ার সাথে
+      // সাথেই সরাসরি সংশ্লিষ্ট বিক্রয়-ফর্মে নিয়ে যাওয়া হয়, প্রোফাইলে
+      // থামতে হয় না।
+      currentCustomer = customer;
+      sheetMode = 'give';
+      if(pendingStockSale.category === 'installment'){
+        currentEntryCategory = 'installment';
+        goToNewInstallment();
+      }else{
+        currentEntryCategory = 'general';
+        goToNewDue('সাধারণ বাকি');
+      }
+      prefillStockSaleIntoForm();
+    }
+  }
   function closeCustomerDetail(){ appEl.classList.remove('show-detail'); }
   // ========================================
   // রিপোর্ট তৈরি ও PDF ডাউনলোড
@@ -5406,7 +5692,7 @@
     await persistCustomersAndMeta();
     renderList();
     showToast(`✅ ${selectedType==='customer' ? 'ক্রেতা' : 'সাপ্লায়ার'} যোগ হয়েছে — ${name} (${id})`);
-    goHome();
+    if(pendingStockSale){ goToCustomerDetail(newCustomer); }else{ goHome(); }
   });
 
   function resetAddForm(){
@@ -5946,6 +6232,7 @@
     appEl.classList.remove('show-txdetail');
     editingTxIndex = null;
     ndSubmitBar.classList.remove('show');
+    pendingStockSale = null;
   }
 
   document.getElementById('ndBackBtn').addEventListener('click', ()=> history.back());
@@ -5990,6 +6277,7 @@
     appEl.classList.remove('show-txdetail');
     editingTxIndex = null;
     niSubmitBar.classList.remove('show');
+    pendingStockSale = null;
   }
   document.getElementById('niBackBtn').addEventListener('click', ()=> history.back());
 
@@ -6079,6 +6367,7 @@
     renderCustomerDetail(currentCustomer);
     renderList(document.getElementById('searchInput').value);
     if(isNewEntry){
+      if(pendingStockSale && pendingStockSale.category === 'installment') await applyPendingStockSale();
       offerTxSms('installment', currentCustomer, remaining, currentCustomer.amount, { perInstallment, count }, closeNewInstallment, 'niSmsToggle');
     }else{
       closeNewInstallment();
@@ -6570,6 +6859,7 @@
     renderCustomerDetail(currentCustomer);
     renderList(document.getElementById('searchInput').value);
     if(isNewEntry){
+      if(pendingStockSale && pendingStockSale.category === 'general' && sheetMode === 'give') await applyPendingStockSale();
       offerTxSms(sheetMode === 'take' ? 'take' : 'general', currentCustomer, amt, currentCustomer.amount, null, closeNewDue, 'ndSmsToggle');
     }else{
       closeNewDue();
@@ -7125,6 +7415,7 @@
       case 'themesettings': goToThemeSettings(); break;
       case 'appaccess': goToAppAccess(); break;
       case 'pendingentries': goToPendingEntries(); break;
+      case 'stock': goToStock(); break;
       case 'detail':
       case 'newdue':
       case 'txdetail':
@@ -7598,6 +7889,7 @@
     if(appEl.classList.contains('show-installmentdetail')){ closeInstallmentDetail(); return; }
     if(appEl.classList.contains('show-installmentsummary')){ closeInstallmentSummary(); return; }
     if(appEl.classList.contains('show-expenses')){ closeExpenses(); return; }
+    if(appEl.classList.contains('show-stock')){ closeStock(); return; }
     if(appEl.classList.contains('show-pendingentries')){ closePendingEntries(); return; }
     if(appEl.classList.contains('show-appaccess')){ closeAppAccess(); return; }
     if(appEl.classList.contains('show-themesettings')){ closeThemeSettings(); return; }
